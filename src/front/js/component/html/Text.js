@@ -7,11 +7,12 @@ import {
 } from '../../utils/ui';
 import '../../../styles/html/P.css';
 
-export default function Paragraph({
+export default function Text({
   children,
   bgColor,
   textColor,
   fontSize,
+  as: Component = 'p',
   ...rest
 }) {
   const textColorClassName = getTextColorClassName(textColor);
@@ -24,8 +25,8 @@ export default function Paragraph({
     rest.className,
   ]);
   return (
-    <p {...rest} className={className}>
+    <Component {...rest} className={className}>
       {children}
-    </p>
+    </Component>
   );
 }

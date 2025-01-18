@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Context } from '../store/appContext';
 import rigoImageUrl from '../../img/rigo-baby.jpg';
-import Paragraph from '../component/html/Paragraph';
+import Text from '../component/html/Text';
 
 export const Home = () => {
   const { store, actions } = useContext(Context);
@@ -9,19 +9,19 @@ export const Home = () => {
   return (
     <div className="text-center mt-5">
       <h1>Hello Rigo!!</h1>
-      <Paragraph>
+      <Text>
         <img src={rigoImageUrl} />
-      </Paragraph>
+      </Text>
       <div className="alert alert-info">
         {store.message ||
           'Loading message from the backend (make sure your python backend is running)...'}
       </div>
-      <Paragraph className="xd" textColor="primary">
+      <Text as="a" className="xd" textColor="primary">
         This boilerplate comes with lots of documentation:{' '}
         <a href="https://start.4geeksacademy.com/starters/react-flask">
           Read documentation
         </a>
-      </Paragraph>
+      </Text>
     </div>
   );
 };
