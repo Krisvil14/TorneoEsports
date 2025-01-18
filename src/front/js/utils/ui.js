@@ -1,71 +1,87 @@
+export const TEXT_COLOR_PRIMARY = 'primary';
+export const TEXT_COLOR_PRIMARY_100 = 'primary-100';
+export const TEXT_COLOR_PRIMARY_200 = 'primary-200';
+export const TEXT_COLOR_PRIMARY_300 = 'primary-300';
+export const TEXT_COLOR_SECONDARY = 'secondary';
+export const TEXT_COLOR_SECONDARY_100 = 'secondary-100';
+export const TEXT_COLOR_SECONDARY_200 = 'secondary-200';
+export const TEXT_COLOR_SECONDARY_300 = 'secondary-300';
+export const TEXT_COLOR_TERNARY = 'ternary';
+export const TEXT_COLOR_TERNARY_100 = 'ternary-100';
+export const TEXT_COLOR_TERNARY_200 = 'ternary-200';
+export const TEXT_COLOR_TERNARY_300 = 'ternary-300';
+
 export function getTextColorClassName(color) {
   switch (color) {
     // primary
-    case 'primary':
+    case TEXT_COLOR_PRIMARY:
       return 'primary-text-color';
-    case 'primary-100':
+    case TEXT_COLOR_PRIMARY_100:
       return 'primary-text-color-100';
-    case 'primary-200':
+    case TEXT_COLOR_PRIMARY_200:
       return 'primary-text-color-200';
-    case 'primary-300':
+    case TEXT_COLOR_PRIMARY_300:
       return 'primary-text-color-300';
     // secondary
-    case 'secondary':
+    case TEXT_COLOR_SECONDARY:
       return 'secondary-text-color';
-    case 'secondary-100':
+    case TEXT_COLOR_SECONDARY_100:
       return 'secondary-text-color-100';
-    case 'secondary-200':
+    case TEXT_COLOR_SECONDARY_200:
       return 'secondary-text-color-200';
-    case 'secondary-300':
+    case TEXT_COLOR_SECONDARY_300:
       return 'secondary-text-color-300';
     // ternary
-    case 'ternary':
+    case TEXT_COLOR_TERNARY:
       return 'ternary-text-color';
-    case 'ternary-100':
+    case TEXT_COLOR_TERNARY_100:
       return 'ternary-text-color-100';
-    case 'ternary-200':
+    case TEXT_COLOR_TERNARY_200:
       return 'ternary-text-color-200';
-    case 'ternary-300':
+    case TEXT_COLOR_TERNARY_300:
       return 'ternary-text-color-300';
-    // rest
-    case 'danger':
-      return 'danger-text-color';
-    case 'warning':
-      return 'warning-text-color';
-    case 'success':
-      return 'success-text-color';
-    // default is primary text
     default:
-      return null;
+      return '';
   }
 }
+
+export const BACKGROUND_COLOR_PRIMARY = 'primary-bg';
+export const BACKGROUND_COLOR_SECONDARY = 'secondary-bg';
+export const BACKGROUND_COLOR_TERNARY = 'ternary-bg';
 
 export function getBackGroundColorClassName(color) {
   switch (color) {
-    case 'primary':
-      return 'primary-bg-color';
-    case 'secondary':
-      return 'secondary-bg-color';
-    case 'ternary':
-      return 'ternary-bg-color';
+    case BACKGROUND_COLOR_PRIMARY:
+      return 'primary-background-color';
+    case BACKGROUND_COLOR_SECONDARY:
+      return 'secondary-background-color';
+    case BACKGROUND_COLOR_TERNARY:
+      return 'ternary-background-color';
     default:
-      return null;
+      return '';
   }
 }
 
+export const FONT_SIZE_SM = 'sm';
+export const FONT_SIZE_MD = 'md';
+export const FONT_SIZE_LG = 'lg';
+export const FONT_SIZE_XLG = 'xlg';
+export const FONT_SIZE_2XLG = '2xlg';
+export const FONT_SIZE_3XLG = '3xlg';
+
 export function getFontSizeClassName(size) {
   switch (size) {
-    case 'sm':
+    case FONT_SIZE_SM:
       return 'font-sm';
-    case 'md':
+    case FONT_SIZE_MD:
       return 'font-md';
-    case 'lg':
+    case FONT_SIZE_LG:
       return 'font-lg';
-    case 'xlg':
+    case FONT_SIZE_XLG:
       return 'font-xlg';
-    case '2xlg':
+    case FONT_SIZE_2XLG:
       return 'font-2xlg';
-    case '3xlg':
+    case FONT_SIZE_3XLG:
       return 'font-3xlg';
     default:
       return null;
