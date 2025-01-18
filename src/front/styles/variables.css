@@ -1,3 +1,82 @@
 :root {
-  --main-bg-color: brown;
+  /* text colors */
+  --primary-text-color: blue;
+  --primary-text-color-100: blue;
+  --primary-text-color-200: blue;
+  --primary-text-color-300: blue;
+  --secondary-text-color: red;
+  --secondary-text-color-100: red;
+  --secondary-text-color-200: red;
+  --secondary-text-color-300: red;
+  --ternary-text-color: yellow;
+  --ternary-text-color-100: yellow;
+  --ternary-text-color-200: yellow;
+  --ternary-text-color-300: yellow;
+  --danger-text-color: red;
+  --warning-text-color: yellow;
+  --success-text-color: green;
+  /* back-ground colors */
+  --primary-bg-color: brown;
+  --secondary-bg-color: brown;
+  --ternary-bg-color: brown;
+}
+/* primary text */
+.primary-text-color {
+  color: var(--primary-text-color);
+}
+.primary-text-color-100 {
+  color: var(--primary-text-color-100);
+}
+.primary-text-color-200 {
+  color: var(--primary-text-color-200);
+}
+.primary-text-color-300 {
+  color: var(--primary-text-color-300);
+}
+/* secondary text */
+.secondary-text-color {
+  color: var(--secondary-text-color);
+}
+.secondary-text-color-100 {
+  color: var(--secondary-text-color-100);
+}
+.secondary-text-color-200 {
+  color: var(--secondary-text-color-200);
+}
+.secondary-text-color-300 {
+  color: var(--secondary-text-color-300);
+}
+/* ternary text */
+.ternary-text-color {
+  color: var(--ternary-text-color);
+}
+.ternary-text-color-100 {
+  color: var(--ternary-text-color-100);
+}
+.ternary-text-color-200 {
+  color: var(--ternary-text-color-200);
+}
+.ternary-text-color-300 {
+  color: var(--ternary-text-color-300);
+}
+/* rest text */
+.danger-text-color {
+  color: var(--danger-text-color);
+}
+.warning-text-color {
+  color: var(--warning-text-color);
+}
+.success-text-color {
+  color: var(--success-text-color);
+}
+
+/* background styles */
+.primary-bg-color {
+  color: var(--primary-bg-color);
+}
+.secondary-bg-color {
+  color: var(--secondary-bg-color);
+}
+.ternary-bg-color {
+  color: var(--ternary-bg-color);
 }
