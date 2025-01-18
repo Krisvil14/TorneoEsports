@@ -1,4 +1,4 @@
-// for text colors
+// for text-colors
 export const TEXT_COLOR_PRIMARY = 'primary';
 export const TEXT_COLOR_PRIMARY_100 = 'primary-100';
 export const TEXT_COLOR_PRIMARY_200 = 'primary-200';
@@ -17,7 +17,7 @@ export const BACKGROUND_COLOR_PRIMARY = 'primary-bg';
 export const BACKGROUND_COLOR_SECONDARY = 'secondary-bg';
 export const BACKGROUND_COLOR_TERNARY = 'ternary-bg';
 
-// export const for font size
+// export const for font-size
 export const FONT_SIZE_SM = 'sm';
 export const FONT_SIZE_MD = 'md';
 export const FONT_SIZE_LG = 'lg';
