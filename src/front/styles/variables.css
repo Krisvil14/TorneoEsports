@@ -42,6 +42,13 @@
   --secondary-dark-bg-color: brown;
   --ternary-bg-color: brown;
   --ternary-dark-bg-color: brown;
+  /* font size */
+  --font-sm: 1rem;
+  --font-md: 2rem;
+  --font-lg: 3rem;
+  --font-xlg: 4rem;
+  --font-2xlg: 4rem;
+  --font-3xlg: 4rem;
 }
 /* primary text */
 .primary-text-color {
@@ -122,7 +129,6 @@
 .success-text-color {
   color: light-dark(var(--success-text-color), var(--success-dark-text-color));
 }
-
 /* background styles */
 .primary-bg-color {
   color: light-dark(var(--primary-bg-color), var(--primary-dark-bg-color));
@@ -132,4 +138,23 @@
 }
 .ternary-bg-color {
   color: light-dark(var(--ternary-bg-color), var(--ternary-dark-bg-color));
+}
+/* font size */
+.font-sm {
+  font-size: var(--font-sm);
+}
+.font-md {
+  font-size: var(--font-md);
+}
+.font-lg {
+  font-size: var(--font-lg);
+}
+.font-xlg {
+  font-size: var(--font-xlg);
+}
+.font-2xlg {
+  font-size: var(--font-2xlg);
+}
+.font-3xlg {
+  font-size: var(--font-3xlg);
 }

@@ -1,5 +1,5 @@
-export function getTextColorClassName(type) {
-  switch (type) {
+export function getTextColorClassName(color) {
+  switch (color) {
     // primary
     case 'primary':
       return 'primary-text-color';
@@ -40,14 +40,33 @@ export function getTextColorClassName(type) {
   }
 }
 
-export function getBackGroundColorClassName(type) {
-  switch (type) {
+export function getBackGroundColorClassName(color) {
+  switch (color) {
     case 'primary':
       return 'primary-bg-color';
     case 'secondary':
       return 'secondary-bg-color';
     case 'ternary':
       return 'ternary-bg-color';
+    default:
+      return null;
+  }
+}
+
+export function getFontSizeClassName(size) {
+  switch (size) {
+    case 'sm':
+      return 'font-sm';
+    case 'md':
+      return 'font-md';
+    case 'lg':
+      return 'font-lg';
+    case 'xlg':
+      return 'font-xlg';
+    case '2xlg':
+      return 'font-2xlg';
+    case '3xlg':
+      return 'font-3xlg';
     default:
       return null;
   }
