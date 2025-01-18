@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Context } from '../store/appContext';
+import { TEXT_COLOR_PRIMARY } from '../utils/constants';
 import rigoImageUrl from '../../img/rigo-baby.jpg';
 import Text from '../component/html/Text';
 import Container from '../component/html/Container';
@@ -17,7 +18,7 @@ export const Home = () => {
         {store.message ||
           'Loading message from the backend (make sure your python backend is running)...'}
       </Container>
-      <Text className="xd" textColor="primary">
+      <Text className="xd" textColor={TEXT_COLOR_PRIMARY}>
         This boilerplate comes with lots of documentation:{' '}
         <Text
           as="a"
