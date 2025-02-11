@@ -1,6 +1,13 @@
+import enum
 from flask_sqlalchemy import SQLAlchemy
 
+
 db = SQLAlchemy()
+
+class RoleEnum(enum.Enum):
+    admin = 'admin'
+    player = 'player'
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,7 +17,7 @@ class User(db.Model):
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    role = db.Column(db.String(20), nullable=False)  #Aqui como se haria para que solo se pueda escoger entre los roles de usuario o admin?
+    role = db.Column(db.Enum(RoleEnum), nullable=False)  #Aqui como se haria para que solo se pueda escoger entre los roles de usuario o admin?
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
 
     def __repr__(self):
