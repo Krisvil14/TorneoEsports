@@ -4,5 +4,8 @@
   "workbench.editorAssociations": {
     "*.md": "vscode.markdown.preview.editor"
   },
-  "conventionalCommits.scopes": ["client"]
+  "conventionalCommits.scopes": [
+    "client",
+    "api"
+  ]
 }
