@@ -1,8 +1,29 @@
 import React from 'react';
 
 export default function LoginForm() {
+  const [name, setName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [dni, setDni] = React.useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch(process.env.BACKEND_URL + '/api/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        first_name: name,
+        last_name: lastName,
+        cedula: dni,
+        // age: age,
+        // email: email,
+        // password: password,
+        // role: role,
+      }),
+    });
+    console.log({ response });
+  };
+
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <div className="row mb-4 text-center">
         <h1 className="w-75 mx-auto fs-1">Soy el form</h1>
       </div>
@@ -13,6 +34,8 @@ export default function LoginForm() {
             type="text"
             id="first_name"
             name="first_name"
+            value={name}
+            onChange={({ target }) => setName(target.value)}
             required
             className="form-control"
           />
@@ -23,13 +46,17 @@ export default function LoginForm() {
             className="form-control"
             type="text"
             id="last_name"
+            value={lastName}
             name="last_name"
             required
+            onChange={({ target }) => setLastName(target.value)}
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="cedula">Cédula:</label>
           <input
+            onChange={({ target }) => setDni(target.value)}
+            value={dni}
             className="form-control"
             type="text"
             id="cedula"
@@ -84,10 +111,10 @@ export default function LoginForm() {
             required
           />
         </div>
-        <button type="button" class="btn btn-primary w-75 mx-auto">
+        <button type="submit" class="btn btn-primary w-75 mx-auto">
           Primary
         </button>
       </div>
-    </div>
+    </form>
   );
 }
