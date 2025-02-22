@@ -31,7 +31,7 @@ def show_register_form():
 @api.route('/register', methods=['POST'])
 def register_user():
     data = request.form
-
+    
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     cedula = data.get('cedula')

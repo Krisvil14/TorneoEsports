@@ -7,27 +7,25 @@ export default function LoginForm() {
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [role, setRole] = React.useState('');
+  const [role, setRole] = React.useState('player');
   const [adminId, setAdminId] = React.useState('');
-
-  console.log(process.env.BACKEND_URL + '/api/register')
-  console.log(process.env.A)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('first_name', name);
+    formData.append('last_name', lastName);
+    formData.append('cedula', dni);
+    formData.append('age', age);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('role', role);
+
     const response = await fetch(process.env.BACKEND_URL + '/api/register', {
       method: 'POST',
-      body: JSON.stringify({
-        first_name: name,
-        last_name: lastName,
-        cedula: dni,
-        age: age,
-        email: email,
-        password: password,
-        role: role,
-      }),
+      body: formData,
     });
-    console.log({ response });
   };
 
   return (
@@ -110,10 +108,14 @@ export default function LoginForm() {
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="role">Rol:</label>
-          <select id="role" name="role" required className="form-control"
-          onChange={({ target }) => setRole(target.value)}
-          value={role}>
-            <option value="admin">Administrador</option>
+          <select
+            id="role"
+            name="role"
+            required
+            className="form-control"
+            onChange={({ target }) => setRole(target.value)}
+            value={role}
+          >
             <option value="player">Usuario</option>
           </select>
         </div>
