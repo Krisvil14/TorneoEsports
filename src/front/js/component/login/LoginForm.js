@@ -4,6 +4,14 @@ export default function LoginForm() {
   const [name, setName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [dni, setDni] = React.useState('');
+  const [age, setAge] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [role, setRole] = React.useState('');
+  const [adminId, setAdminId] = React.useState('');
+
+  console.log(process.env.BACKEND_URL + '/api/register')
+  console.log(process.env.A)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,10 +21,10 @@ export default function LoginForm() {
         first_name: name,
         last_name: lastName,
         cedula: dni,
-        // age: age,
-        // email: email,
-        // password: password,
-        // role: role,
+        age: age,
+        email: email,
+        password: password,
+        role: role,
       }),
     });
     console.log({ response });
@@ -67,6 +75,8 @@ export default function LoginForm() {
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="age">Edad:</label>
           <input
+            onChange={({ target }) => setAge(target.value)}
+            value={age}
             className="form-control"
             type="number"
             id="age"
@@ -77,6 +87,8 @@ export default function LoginForm() {
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="email">Correo Electrónico:</label>
           <input
+            onChange={({ target }) => setEmail(target.value)}
+            value={email}
             className="form-control"
             type="email"
             id="email"
@@ -87,6 +99,8 @@ export default function LoginForm() {
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="password">Contraseña:</label>
           <input
+            onChange={({ target }) => setPassword(target.value)}
+            value={password}
             className="form-control"
             type="password"
             id="password"
@@ -96,7 +110,9 @@ export default function LoginForm() {
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="role">Rol:</label>
-          <select id="role" name="role" required className="form-control">
+          <select id="role" name="role" required className="form-control"
+          onChange={({ target }) => setRole(target.value)}
+          value={role}>
             <option value="admin">Administrador</option>
             <option value="player">Usuario</option>
           </select>
@@ -104,6 +120,8 @@ export default function LoginForm() {
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="admin_id">ID del Administrador:</label>
           <input
+            onChange={({ target }) => setAdminId(target.value)}
+            value={adminId}
             className="form-control"
             type="text"
             id="admin_id"
