@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 
 export default function LoginForm() {
   const [name, setName] = React.useState('');
@@ -22,10 +23,34 @@ export default function LoginForm() {
     formData.append('password', password);
     formData.append('role', role);
 
-    const response = await fetch(process.env.BACKEND_URL + '/api/register', {
-      method: 'POST',
-      body: formData,
-    });
+    const notification = toast.loading('Registrando usuario...');
+
+    try {
+      const response = await fetch(process.env.BACKEND_URL + '/api/register', {
+        method: 'POST',
+        body: formData,
+      });
+      const { ok } = response;
+      const json = await response.json();
+
+      if (ok) {
+        toast.update(notification, {
+          render: 'Se ha registrado al usuario exitosamente',
+          type: 'success',
+          autoClose: 5000,
+          isLoading: false,
+        });
+      } else {
+        toast.update(notification, {
+          render: json.error,
+          type: 'error',
+          autoClose: 5000,
+          isLoading: false,
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
