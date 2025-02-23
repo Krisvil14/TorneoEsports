@@ -1,32 +1,26 @@
-import React, { useContext } from 'react';
-import { Context } from '../store/appContext';
-import { TEXT_COLOR_PRIMARY } from '../utils/constants';
-import rigoImageUrl from '../../img/rigo-baby.jpg';
-import Text from '../component/html/Text';
-import Container from '../component/html/Container';
+import React, { useContext } from "react";
+import { Context } from "../store/appContext";
+import rigoImageUrl from "../../img/rigo-baby.jpg";
+import "../../styles/home.css";
 
 export const Home = () => {
-  const { store, actions } = useContext(Context);
+	const { store, actions } = useContext(Context);
 
-  return (
-    <Container className="text-center mt-5">
-      <Text as="h1">Hello Rigo!!</Text>
-      <Text>
-        <img src={rigoImageUrl} />
-      </Text>
-      <Container className="alert alert-info">
-        {store.message ||
-          'Loading message from the backend (make sure your python backend is running)...'}
-      </Container>
-      <Text className="xd" textColor={TEXT_COLOR_PRIMARY}>
-        This boilerplate comes with lots of documentation:{' '}
-        <Text
-          as="a"
-          href="https://start.4geeksacademy.com/starters/react-flask"
-        >
-          Read documentation
-        </Text>
-      </Text>
-    </Container>
-  );
+	return (
+		<div className="text-center mt-5">
+			<h1>Hello Rigo!!</h1>
+			<p>
+				<img src={rigoImageUrl} />
+			</p>
+			<div className="alert alert-info">
+				{store.message || "Loading message from the backend (make sure your python backend is running)..."}
+			</div>
+			<p>
+				This boilerplate comes with lots of documentation:{" "}
+				<a href="https://start.4geeksacademy.com/starters/react-flask">
+					Read documentation
+				</a>
+			</p>
+		</div>
+	);
 };
