@@ -39,6 +39,7 @@ def register_user():
     email = data.get('email')
     password = data.get('password')
     role = data.get('role')
+    admin_id = data.get('admin_id')
 
     if not first_name or not last_name or not cedula or not age or not email or not password or not role:
         return jsonify({"error": "Faltan datos"}), 400
@@ -56,13 +57,12 @@ def register_user():
         return jsonify({"error": "La cédula ya está registrada"}), 400
 
     # Verificar el rol del usuario que realiza la solicitud solo si ya hay usuarios en la base de datos
-    if User.query.count() > 0:
-        admin_id = data.get('admin_id')
+    if role is RoleEnum.admin:
         if not admin_id:
-            return jsonify({"error": "Faltan datos"}), 400
+            return jsonify({"error": "No se especificó el administrador que realiza el registro"}), 400
         admin_user = User.query.get(admin_id)
         if not admin_user or admin_user.role != RoleEnum.admin:
-            return jsonify({"error": "Solo un administrador puede registrar a un usuario"}), 403
+            return jsonify({"error": "Solo un administrador puede registrar a un administrador"}), 403
 
     # Crear el nuevo usuario
     new_user = User(
