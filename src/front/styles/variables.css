@@ -1,0 +1,160 @@
+:root {
+  color-scheme: light dark;
+  /* text colors */
+  /* primary */
+  --primary-text-color: blue;
+  --primary-text-color-100: blue;
+  --primary-text-color-200: blue;
+  --primary-text-color-300: blue;
+  --primary-dark-text-color: purple;
+  --primary-dark-text-color-100: purple;
+  --primary-dark-text-color-200: purple;
+  --primary-dark-text-color-300: purple;
+  /* secondary */
+  --secondary-text-color: red;
+  --secondary-text-color-100: red;
+  --secondary-text-color-200: red;
+  --secondary-text-color-300: red;
+  --secondary-dark-text-color: red;
+  --secondary-dark-text-color-100: red;
+  --secondary-dark-text-color-200: red;
+  --secondary-dark-text-color-300: red;
+  /* ternary */
+  --ternary-text-color: yellow;
+  --ternary-text-color-100: yellow;
+  --ternary-text-color-200: yellow;
+  --ternary-text-color-300: yellow;
+  --ternary-dark-text-color: yellow;
+  --ternary-dark-text-color-100: yellow;
+  --ternary-dark-text-color-200: yellow;
+  --ternary-dark-text-color-300: yellow;
+  /* rest texts */
+  --danger-text-color: red;
+  --danger-text-dark-color: red;
+  --warning-text-color: yellow;
+  --warning-text-dark-color: yellow;
+  --success-text-color: green;
+  --success-text-dark-color: green;
+  /* back-ground colors */
+  --primary-bg-color: brown;
+  --primary-dark-bg-color: brown;
+  --secondary-bg-color: brown;
+  --secondary-dark-bg-color: brown;
+  --ternary-bg-color: brown;
+  --ternary-dark-bg-color: brown;
+  /* font size */
+  --font-sm: 1rem;
+  --font-md: 2rem;
+  --font-lg: 3rem;
+  --font-xlg: 4rem;
+  --font-2xlg: 4rem;
+  --font-3xlg: 4rem;
+}
+/* primary text */
+.primary-text-color {
+  color: light-dark(var(--primary-text-color), var(--primary-dark-text-color));
+}
+.primary-text-color-100 {
+  color: light-dark(
+    var(---primary-text-color-100),
+    var(--primary-dark-text-color-100)
+  );
+}
+.primary-text-color-200 {
+  color: light-dark(
+    var(---primary-text-color-200),
+    var(--primary-dark-text-color-200)
+  );
+}
+.primary-text-color-300 {
+  color: light-dark(
+    var(---primary-text-color-300),
+    var(--primary-dark-text-color-300)
+  );
+}
+/* secondary text */
+.secondary-text-color {
+  color: light-dark(
+    var(--secondary-text-color),
+    var(--secondary-dark-text-color)
+  );
+}
+.secondary-text-color-100 {
+  color: light-dark(
+    var(--secondary-text-color-100),
+    var(--secondary-dark-text-color-100)
+  );
+}
+.secondary-text-color-200 {
+  color: light-dark(
+    var(--secondary-text-color-30000),
+    var(--secondary-dark-text-color-30000)
+  );
+}
+.secondary-text-color-300 {
+  color: light-dark(
+    var(--secondary-text-color-300),
+    var(--secondary-dark-text-color-300)
+  );
+}
+/* ternary text */
+.ternary-text-color {
+  color: light-dark(var(--ternary-text-color), var(--ternary-dark-text-color));
+}
+.ternary-text-color-100 {
+  color: light-dark(
+    var(--ternary-text-color-100),
+    var(--ternary-dark-text-color-100)
+  );
+}
+.ternary-text-color-200 {
+  color: light-dark(
+    var(--ternary-text-color-200),
+    var(--ternary-dark-text-color-200)
+  );
+}
+.ternary-text-color-300 {
+  color: light-dark(
+    var(--ternary-text-color-300),
+    var(--ternary-dark-text-color-300)
+  );
+}
+/* rest text */
+.danger-text-color {
+  color: light-dark(var(--danger-text-color), var(--danger-dark-text-color));
+}
+.warning-text-color {
+  color: light-dark(var(--warning-text-color), var(--warning-dark-text-color));
+}
+.success-text-color {
+  color: light-dark(var(--success-text-color), var(--success-dark-text-color));
+}
+/* background styles */
+.primary-bg-color {
+  color: light-dark(var(--primary-bg-color), var(--primary-dark-bg-color));
+}
+.secondary-bg-color {
+  color: light-dark(var(--secondary-bg-color), var(--secondary-dark-bg-color));
+}
+.ternary-bg-color {
+  color: light-dark(var(--ternary-bg-color), var(--ternary-dark-bg-color));
+}
+/* font size */
+.font-sm {
+  font-size: var(--font-sm);
+}
+.font-md {
+  font-size: var(--font-md);
+}
+.font-lg {
+  font-size: var(--font-lg);
+}
+.font-xlg {
+  font-size: var(--font-xlg);
+}
+.font-2xlg {
+  font-size: var(--font-2xlg);
+}
+.font-3xlg {
+  font-size: var(--font-3xlg);
+}
