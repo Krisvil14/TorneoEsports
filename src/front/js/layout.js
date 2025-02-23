@@ -11,6 +11,7 @@ import { Footer } from './component/footer';
 import injectContext from './store/appContext';
 import Register from './pages/register';
 import Login from './pages/login';
+import Recovery from './pages/recovery';
 import 'react-toastify/dist/ReactToastify.css';
 
 //create your first component
@@ -34,6 +35,7 @@ const Layout = () => {
             <Route element={<Single />} path="/single/:theid" />
             <Route element={<Register />} path="/registrar" />
             <Route element={<Login />} path="/login" />
+            <Route element={<Recovery />} path="/recuperar" />
             <Route element={<h1>Not found!</h1>} />
           </Routes>
           <Footer />
