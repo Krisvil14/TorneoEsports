@@ -8,7 +8,7 @@ export default function LoginLayout({ children }) {
       <div className="col-4">
         <img
           alt="imagen de bienvenida"
-          src="https://ethic.es/wp-content/uploads/2023/03/imagen.jpg"
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgoMy_EuXJ93jySOZdCAXh-ZlYiMEKnOgTwQ&s"
           className="w-100 h-100"
         />
       </div>

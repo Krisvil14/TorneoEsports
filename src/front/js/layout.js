@@ -9,6 +9,7 @@ import { Single } from './pages/single';
 import { Navbar } from './component/navbar';
 import { Footer } from './component/footer';
 import injectContext from './store/appContext';
+import Register from './pages/register';
 import Login from './pages/login';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -31,7 +32,8 @@ const Layout = () => {
             <Route element={<Home />} path="/" />
             <Route element={<Demo />} path="/demo" />
             <Route element={<Single />} path="/single/:theid" />
-            <Route element={<Login />} path="/registrar" />
+            <Route element={<Register />} path="/registrar" />
+            <Route element={<Login />} path="/login" />
             <Route element={<h1>Not found!</h1>} />
           </Routes>
           <Footer />

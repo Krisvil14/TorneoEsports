@@ -17,12 +17,33 @@ def validate_password(password):
         return False
     return True
 
+
+
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
     response_body = {
         "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
     }
     return jsonify(response_body), 200
+
+
+@api.route('/login', methods=['POST'])
+def login_user():
+    data = request.form
+
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"error": "Introduzca todos los campos"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user or user.password != password:
+        return jsonify({"error": "Credenciales inválidas"}), 401
+
+    return jsonify({"message": "Inicio de sesión exitoso"}), 200
+
 
 @api.route('/register', methods=['GET'])
 def show_register_form():
@@ -39,7 +60,6 @@ def register_user():
     email = data.get('email')
     password = data.get('password')
     role = data.get('role')
-    admin_id = data.get('admin_id')
 
     if not first_name or not last_name or not cedula or not age or not email or not password or not role:
         return jsonify({"error": "Faltan datos"}), 400
