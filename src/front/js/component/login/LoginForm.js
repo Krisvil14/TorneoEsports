@@ -1,12 +1,15 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Context } from '../../store/appContext';
 
 
 export default function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const navigate = useNavigate();
+  const state = React.useContext(Context);
+  console.log(state);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,6 +29,7 @@ export default function LoginForm() {
           const json = await response.json();
     
           if (ok) {
+            state.actions.login(json);
             toast.update(notification, {
               render: 'Sesion iniciada con exito',
               type: 'success',

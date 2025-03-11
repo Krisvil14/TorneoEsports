@@ -51,29 +51,15 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ demo: demo });
             },
 
-            // Acción para iniciar sesión
-            login: async (email, password) => {
-                try {
-                    const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ email, password })
-                    });
-                    if (resp.ok) {
-                        const data = await resp.json();
-                        setStore({ user: data.user, isAuthenticated: true });
-                        localStorage.setItem("user", JSON.stringify(data.user));
-                    } else {
-                        console.log("Error al iniciar sesión");
-                    }
-                } catch (error) {
-                    console.log("Error al iniciar sesión", error);
-                }
+           
+            login: (user) => {
+
+                        setStore({ user: user, isAuthenticated: true });
+                        localStorage.setItem("user", JSON.stringify(user));
+
             },
 
-            // Acción para cerrar sesión
+            
             logout: () => {
                 setStore({ user: null, isAuthenticated: false });
                 localStorage.removeItem("user");
