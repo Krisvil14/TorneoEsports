@@ -14,6 +14,7 @@ import Login from './pages/login';
 import Recovery from './pages/recovery';
 import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
+import Protected from './component/commons/Protected';
 
 // Crear tu primer componente
 const Layout = () => {
@@ -35,7 +36,7 @@ const Layout = () => {
               <Route element={<Register />} path="/registrar" />
               <Route element={<Login />} path="/login" />
               <Route element={<Recovery />} path="/recuperar" />
-              <Route element={<HomePage />} path="/inicio" />
+              <Route element={<Protected> <HomePage /> </Protected> } path="/inicio" />
               <Route element={<h1>Not found!</h1>} />
             </Routes>
             <Footer />
