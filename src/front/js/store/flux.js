@@ -1,54 +1,101 @@
 const getState = ({ getStore, getActions, setStore }) => {
-	return {
-		store: {
-			message: null,
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			]
-		},
-		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
+    return {
+        store: {
+            message: null,
+            demo: [
+                {
+                    title: "FIRST",
+                    background: "white",
+                    initial: "white"
+                },
+                {
+                    title: "SECOND",
+                    background: "white",
+                    initial: "white"
+                }
+            ],
+            user: null, // Estado del usuario
+            isAuthenticated: false // Estado de autenticación
+        },
+        actions: {
+            // Use getActions to call a function within a function
+            exampleFunction: () => {
+                getActions().changeColor(0, "green");
+            },
 
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
-				}
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
+            getMessage: async () => {
+                try {
+                    // fetching data from the backend
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
+                    const data = await resp.json();
+                    setStore({ message: data.message });
+                    // don't forget to return something, that is how the async resolves
+                    return data;
+                } catch (error) {
+                    console.log("Error loading message from backend", error);
+                }
+            },
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
+            changeColor: (index, color) => {
+                //get the store
+                const store = getStore();
 
-				//reset the global store
-				setStore({ demo: demo });
-			}
-		}
-	};
+                //we have to loop the entire demo array to look for the respective index
+                //and change its color
+                const demo = store.demo.map((elm, i) => {
+                    if (i === index) elm.background = color;
+                    return elm;
+                });
+
+                //reset the global store
+                setStore({ demo: demo });
+            },
+
+            // Acción para iniciar sesión
+            login: async (email, password) => {
+                try {
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        setStore({ user: data.user, isAuthenticated: true });
+                        localStorage.setItem("user", JSON.stringify(data.user));
+                    } else {
+                        console.log("Error al iniciar sesión");
+                    }
+                } catch (error) {
+                    console.log("Error al iniciar sesión", error);
+                }
+            },
+
+            // Acción para cerrar sesión
+            logout: () => {
+                setStore({ user: null, isAuthenticated: false });
+                localStorage.removeItem("user");
+            },
+
+            // Acción para verificar el estado de autenticación
+            checkAuth: () => {
+                const storedUser = localStorage.getItem("user");
+                if (storedUser && storedUser !== "undefined") {
+                    try {
+                        const user = JSON.parse(storedUser);
+                        setStore({ user: user, isAuthenticated: true });
+                    } catch (error) {
+                        console.error("Error parsing stored user data:", error);
+                        localStorage.removeItem("user");
+                    }
+                } else {
+                    setStore({ user: null, isAuthenticated: false });
+                }
+            }
+        }
+    };
 };
 
 export default getState;

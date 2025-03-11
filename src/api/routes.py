@@ -110,7 +110,7 @@ def register_user():
         email=email,
         password=password,
         role=RoleEnum[role],
-        is_active=True
+        is_active=True,
     )
     db.session.add(new_user)
     db.session.commit()
