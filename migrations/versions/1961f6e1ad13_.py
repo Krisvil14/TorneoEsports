@@ -22,7 +22,8 @@ def upgrade():
         batch_op.alter_column('role',
                existing_type=sa.VARCHAR(length=20),
                type_=sa.Enum('admin', 'player', name='roleenum'),
-               existing_nullable=False)
+               existing_nullable=False,
+               postgresql_using='role::roleenum')
 
     # ### end Alembic commands ###
 

@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom';
 import Container from './html/Container';
 import Text from './html/Text';
 import { Context } from '../store/appContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Navbar = () => {
   const { store, actions } = useContext(Context);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     actions.logout();
+    navigate('/login');
   };
 
   return (

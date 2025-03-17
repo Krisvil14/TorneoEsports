@@ -42,24 +42,30 @@ def login_user():
     if not user or user.password != password:
         return jsonify({"error": "Credenciales inválidas"}), 401
 
-    return jsonify({"message": "Inicio de sesión exitoso"}), 200
+    return jsonify({"user": {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "role": user.role.name,
+            "is_active": user.is_active
+        }}), 200
 
 @api.route('/recovery', methods=['POST'])
 def recover_user():
     data = request.form
 
     email = data.get('email')
-    password = data.get('password')
 
-    if not email or not password:
-        return jsonify({"error": "Introduzca todos los campos"}), 400
+    if not email:
+        return jsonify({"error": "Introduzca el correo"}), 400
 
     user = User.query.filter_by(email=email).first()
 
-    if not user or user.password != password:
-        return jsonify({"error": "Credenciales inválidas"}), 401
+    if not user:
+        return jsonify({"error": "Correo no asociado a un usuario"}), 401
 
-    return jsonify({"message": "Recuperacion de usuario en curso..."}), 200
+    return jsonify({"message": "En breve recibirá un email con instrucciones para recuperar su contraseña"}), 200
+    # TO DO // TODO: enviar email de recuperación al usuario
 
 
 @api.route('/register', methods=['GET'])
@@ -116,4 +122,27 @@ def register_user():
     db.session.commit()
 
     return jsonify({"message": "Usuario registrado exitosamente"}), 201
+
+# @api.route('/Regteams', methods=['POST'])
+# def register_team():
+#     data = request.form
+    
+#     name = data.get('name')
+#     members_count = data.get('members_count')
+#     game = data.get('game')
+#     tournament = data.get('tournament')
+
+#     if not name or not members_count or not game or not tournament:
+#         return jsonify({"error": "Faltan datos"}), 400
+
+#     new_team = Team(
+#         name=name,
+#         members_count=members_count,
+#         game=game,
+#         tournament=tournament
+#     )
+#     db.session.add(new_team)
+#     db.session.commit()
+
+#     return jsonify({"message": "Equipo registrado exitosamente"}), 201
 

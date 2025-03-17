@@ -12,9 +12,12 @@ import injectContext from './store/appContext';
 import Register from './pages/register';
 import Login from './pages/login';
 import Recovery from './pages/recovery';
+import TeamsInterface from './component/interfaces/Teams';
 import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
 import Protected from './component/commons/Protected';
+import RegTeamsForm from './component/teams/RegTeamsForm';
+
 
 // Crear tu primer componente
 const Layout = () => {
@@ -37,6 +40,9 @@ const Layout = () => {
               <Route element={<Login />} path="/login" />
               <Route element={<Recovery />} path="/recuperar" />
               <Route element={<Protected> <HomePage /> </Protected> } path="/inicio" />
+              <Route element={<Protected> <TeamsInterface /> </Protected> } path="/teams" />
+              <Route element={<Protected> <RegTeamsForm /> </Protected> } path="/Regteams" />
+
               <Route element={<h1>Not found!</h1>} />
             </Routes>
             <Footer />

@@ -65,7 +65,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 localStorage.removeItem("user");
             },
 
-            // Acción para verificar el estado de autenticación
             checkAuth: () => {
                 const storedUser = localStorage.getItem("user");
                 if (storedUser && storedUser !== "undefined") {
