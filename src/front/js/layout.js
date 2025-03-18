@@ -17,6 +17,7 @@ import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
 import Protected from './component/commons/Protected';
 import RegTeamsForm from './component/teams/RegTeamsForm';
+import UsersPage from './pages/users';
 
 
 // Crear tu primer componente
@@ -42,6 +43,7 @@ const Layout = () => {
               <Route element={<Protected> <HomePage /> </Protected> } path="/inicio" />
               <Route element={<Protected> <TeamsInterface /> </Protected> } path="/teams" />
               <Route element={<Protected> <RegTeamsForm /> </Protected> } path="/Regteams" />
+              <Route element={<Protected> <UsersPage /> </Protected>} path="/users" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>

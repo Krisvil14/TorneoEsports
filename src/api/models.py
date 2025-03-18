@@ -22,6 +22,7 @@ class User(db.Model):
     password = db.Column(db.String(80), nullable=False)
     role = db.Column(role_enum, nullable=False)  # Solo se puede escoger entre 'admin' o 'player'
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
+    is_in_team = db.Column(db.Boolean(), nullable=False, default=False)
     
     def __repr__(self):
         return f'<User {self.email}>'
@@ -35,6 +36,8 @@ class User(db.Model):
             "age": self.age,
             "email": self.email,
             "role": self.role.name,
+            "is_active": self.is_active,
+            "is_in_team": self.is_in_team,
         }
     
 class Tournament(db.Model):
@@ -42,7 +45,6 @@ class Tournament(db.Model):
     name = db.Column(db.String(120), nullable=False)
     date_start = db.Column(db.String(50), nullable=False)
     num_max_teams = db.Column(db.Integer, nullable=False)
-    teams = db.relationship('Team', backref='tournament', lazy=True)
 
     __table_args__ = (
         CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
@@ -57,7 +59,6 @@ class Tournament(db.Model):
             "name": self.name,
             "date_start": self.date_start,
             "num_max_teams": self.num_max_teams,
-            "teams": [team.serialize() for team in self.teams],
         }
     
 class Team(db.Model):
@@ -66,7 +67,6 @@ class Team(db.Model):
      name = db.Column(db.String(80), nullable=False)
      members_count = db.Column(db.Integer, nullable=False)
      game = db.Column(db.String(80), nullable=False)
-     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
 
      def __repr__(self):
          return f'<Team {self.name}>'
@@ -77,5 +77,4 @@ class Team(db.Model):
              "name": self.name,
              "members_count": self.members_count,
              "game": self.game,
-             "tournament_id": self.tournament_id,
          }

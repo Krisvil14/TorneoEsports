@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, RoleEnum, Team
+from api.models import db, User, RoleEnum, Team, Tournament
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 import re
@@ -130,19 +130,43 @@ def register_team():
      name = data.get('name')
      members_count = data.get('members_count')
      game = data.get('game')
-     tournament = data.get('tournament')
 
-     if not name or not members_count or not game or not tournament:
+     if not name or not members_count or not game:
          return jsonify({"error": "Faltan datos"}), 400
 
      new_team = Team(
          name=name,
          members_count=members_count,
          game=game,
-         tournament=tournament
      )
      db.session.add(new_team)
      db.session.commit()
 
      return jsonify({"message": "Equipo registrado exitosamente"}), 201
 
+@api.route('/tournaments', methods=['GET'])
+def get_tournaments():
+    tournaments = Tournament.query.all()
+    return jsonify([tournament.serialize() for tournament in tournaments]), 200
+
+@api.route('/teams', methods=['GET'])
+def get_teams():
+    teams = Team.query.all()
+    return jsonify([team.serialize() for team in teams]), 200
+
+@api.route('/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    user_list = []
+    for user in users:
+        teams = Team.query.filter_by().all()
+        user.is_in_team = False
+        for team in teams:
+            # Assuming there is a relationship between User and Team
+            # and you can access the users in a team like this:
+            # if user in team.users:
+            if team.name == user.first_name:
+                user.is_in_team = True
+                break
+        user_list.append(user.serialize())
+    return jsonify(user_list), 200

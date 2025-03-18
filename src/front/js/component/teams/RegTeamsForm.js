@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 export default function RegTeamsForm() {
-  const [name, setName] = React.useState('');
-  const [membersCount, setMembersCount] = React.useState('');
-  const [game, setGame] = React.useState('');
-  const [tournament, setTournament] = React.useState('');
+  const [name, setName] = useState('');
+  const [membersCount, setMembersCount] = useState('');
+  const [game, setGame] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -16,11 +15,9 @@ export default function RegTeamsForm() {
     formData.append('name', name);
     formData.append('members_count', membersCount);
     formData.append('game', game);
-    formData.append('tournament', tournament);
-    
 
     const notification = toast.loading('Registrando equipo...');
-    
+
     try {
       const response = await fetch(process.env.BACKEND_URL + '/api/Regteams', {
         method: 'POST',
@@ -37,8 +34,7 @@ export default function RegTeamsForm() {
           autoClose: 5000,
           isLoading: false,
         });
-        navigate('/Regteams');
-
+        navigate('/teams');
       } else {
         toast.update(notification, {
           render: json.error,
@@ -90,27 +86,18 @@ export default function RegTeamsForm() {
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
           <label htmlFor="game">Juego:</label>
-          <input
-            type="text"
+          <select
             id="game"
             name="game"
             value={game}
             onChange={({ target }) => setGame(target.value)}
             required
             className="form-control"
-          />
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label htmlFor="tournament">Torneo:</label>
-          <input
-            type="text"
-            id="tournament"
-            name="tournament"
-            value={tournament}
-            onChange={({ target }) => setTournament(target.value)}
-            required
-            className="form-control"
-          />
+          >
+            <option value="">Seleccione un juego</option>
+            <option value="League of Legends">League of Legends</option>
+            <option value="Valorant">Valorant</option>
+          </select>
         </div>
         <button type="submit" className="btn btn-primary w-75 mx-auto">
           Registrar
