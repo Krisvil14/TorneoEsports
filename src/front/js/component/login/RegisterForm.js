@@ -1,5 +1,6 @@
 import React from 'react';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterForm() {
   const [name, setName] = React.useState('');
@@ -9,6 +10,7 @@ export default function RegisterForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [role, setRole] = React.useState('player');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +41,7 @@ export default function RegisterForm() {
           autoClose: 5000,
           isLoading: false,
         });
+        navigate('/inicio');
       } else {
         toast.update(notification, {
           render: json.error,

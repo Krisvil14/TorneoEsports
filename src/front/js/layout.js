@@ -11,15 +11,16 @@ import { Footer } from './component/footer';
 import injectContext from './store/appContext';
 import Register from './pages/register';
 import Login from './pages/login';
+import Recovery from './pages/recovery';
+import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
+import Protected from './component/commons/Protected';
 
-//create your first component
+// Crear tu primer componente
 const Layout = () => {
-  //the basename is used when your project is published in a subdirectory and not in the root of the domain
-  // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
   const basename = process.env.BASENAME || '';
 
-  if (!process.env.BACKEND_URL || process.env.BACKEND_URL == '')
+  if (!process.env.BACKEND_URL || process.env.BACKEND_URL === '')
     return <BackendURL />;
 
   return (
@@ -27,16 +28,18 @@ const Layout = () => {
       <ToastContainer />
       <BrowserRouter basename={basename}>
         <ScrollToTop>
-          <Navbar />
-          <Routes>
-            <Route element={<Home />} path="/" />
-            <Route element={<Demo />} path="/demo" />
-            <Route element={<Single />} path="/single/:theid" />
-            <Route element={<Register />} path="/registrar" />
-            <Route element={<Login />} path="/login" />
-            <Route element={<h1>Not found!</h1>} />
-          </Routes>
-          <Footer />
+            <Navbar />
+            <Routes>
+              <Route element={<Home />} path="/" />
+              <Route element={<Demo />} path="/demo" />
+              <Route element={<Single />} path="/single/:theid" />
+              <Route element={<Register />} path="/registrar" />
+              <Route element={<Login />} path="/login" />
+              <Route element={<Recovery />} path="/recuperar" />
+              <Route element={<Protected> <HomePage /> </Protected> } path="/inicio" />
+              <Route element={<h1>Not found!</h1>} />
+            </Routes>
+            <Footer />
         </ScrollToTop>
       </BrowserRouter>
     </div>

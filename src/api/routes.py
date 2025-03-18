@@ -44,6 +44,23 @@ def login_user():
 
     return jsonify({"message": "Inicio de sesión exitoso"}), 200
 
+@api.route('/recovery', methods=['POST'])
+def recover_user():
+    data = request.form
+
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({"error": "Introduzca todos los campos"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user or user.password != password:
+        return jsonify({"error": "Credenciales inválidas"}), 401
+
+    return jsonify({"message": "Recuperacion de usuario en curso..."}), 200
+
 
 @api.route('/register', methods=['GET'])
 def show_register_form():
@@ -93,7 +110,7 @@ def register_user():
         email=email,
         password=password,
         role=RoleEnum[role],
-        is_active=True
+        is_active=True,
     )
     db.session.add(new_user)
     db.session.commit()

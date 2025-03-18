@@ -1,14 +1,11 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { Context } from '../../store/appContext';
 
 
-export default function LoginForm() {
+export default function RecoveryForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const navigate = useNavigate();
-  const state = React.useContext(Context);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +14,7 @@ export default function LoginForm() {
     formData.append('email', email);
     formData.append('password', password);
 
-    const notification = toast.loading('Iniciando sesion...');
+    const notification = toast.loading('Recuperando usuario...');
     
         try {
           const response = await fetch(process.env.BACKEND_URL + '/api/login', {
@@ -28,14 +25,12 @@ export default function LoginForm() {
           const json = await response.json();
     
           if (ok) {
-            state.actions.login(json);
             toast.update(notification, {
-              render: 'Sesion iniciada con exito',
+              render: 'Correo enviado',
               type: 'success',
               autoClose: 5000,
               isLoading: false,
             });
-            navigate('/inicio');
           } else {
             toast.update(notification, {
               render: json.error,
@@ -52,7 +47,7 @@ export default function LoginForm() {
       return (
         <form onSubmit={handleSubmit}>
           <div className="row mb-4 text-center">
-            <h1 className="w-75 mx-auto fs-1">Ingresar al sistema</h1>
+            <h1 className="w-75 mx-auto fs-1">Recuperar usuario</h1>
           </div>
           <div className="row gy-3">
             <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
