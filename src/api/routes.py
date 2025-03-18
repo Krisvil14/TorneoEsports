@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, RoleEnum, Team, Tournament
+from api.models import db, User, RoleEnum, Team, Tournament, GameEnum
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 import re
@@ -147,7 +147,18 @@ def register_team():
 @api.route('/tournaments', methods=['GET'])
 def get_tournaments():
     tournaments = Tournament.query.all()
-    return jsonify([tournament.serialize() for tournament in tournaments]), 200
+    tournament_list = []
+    try:
+        for tournament in tournaments:
+            num_teams = len(tournament.teams)
+            tournament_data = tournament.serialize()
+            tournament_data['num_teams'] = num_teams
+            tournament_list.append(tournament_data)
+        response = jsonify(tournament_list)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @api.route('/teams', methods=['GET'])
 def get_teams():
@@ -162,11 +173,41 @@ def get_users():
         teams = Team.query.filter_by().all()
         user.is_in_team = False
         for team in teams:
-            # Assuming there is a relationship between User and Team
-            # and you can access the users in a team like this:
-            # if user in team.users:
             if team.name == user.first_name:
                 user.is_in_team = True
                 break
         user_list.append(user.serialize())
     return jsonify(user_list), 200
+
+@api.route('/tournaments/<tournament_id>/teams', methods=['POST'])
+def add_team_to_tournament(tournament_id):
+    data = request.form
+
+    team_id = data.get('team_id')
+
+    if not team_id:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    try:
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        if team in tournament.teams:
+            return jsonify({"error": "Elija un equipo que no este registrado en este torneo"}), 400
+
+        tournament.teams.append(team)
+        db.session.commit()
+
+        # Recalculate num_teams for the tournament
+        num_teams = len(tournament.teams)
+        tournament.num_teams = num_teams
+        db.session.commit()
+
+        return jsonify({"message": "Equipo añadido al torneo exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

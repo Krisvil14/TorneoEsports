@@ -15,7 +15,9 @@ const Table = ({ columns, data }) => {
         {data.map((row, rowIndex) => (
           <tr key={rowIndex}>
             {columns.map((column, colIndex) => (
-              <td key={colIndex}>{row[column.accessor]}</td>
+              <td key={colIndex}>
+                {column.Cell ? column.Cell({ value: row[column.accessor], row }) : row[column.accessor]}
+              </td>
             ))}
           </tr>
         ))}

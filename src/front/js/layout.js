@@ -18,6 +18,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import Protected from './component/commons/Protected';
 import RegTeamsForm from './component/teams/RegTeamsForm';
 import UsersPage from './pages/users';
+import TournamentsPage from './pages/tournaments';
+import CreateTournamentForm from './component/tournaments/CreateTournamentForm';
+import AddTeamToTournament from './component/tournaments/AddTeamToTournament';
 
 
 // Crear tu primer componente
@@ -44,6 +47,9 @@ const Layout = () => {
               <Route element={<Protected> <TeamsInterface /> </Protected> } path="/teams" />
               <Route element={<Protected> <RegTeamsForm /> </Protected> } path="/Regteams" />
               <Route element={<Protected> <UsersPage /> </Protected>} path="/users" />
+              <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
+              <Route element={<Protected> <CreateTournamentForm /> </Protected>} path="/Cretournament" />
+              <Route element={<Protected> <AddTeamToTournament /> </Protected>} path="/addteam/:tournament_id" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>

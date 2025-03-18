@@ -39,12 +39,20 @@ class User(db.Model):
             "is_active": self.is_active,
             "is_in_team": self.is_in_team,
         }
-    
+
+class GameEnum(enum.Enum):
+    league_of_legends = 'League of Legends'
+    valorant = 'Valorant'
+
+game_enum = ENUM(GameEnum, name='gameenum', create_type=False)
+
 class Tournament(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
     name = db.Column(db.String(120), nullable=False)
     date_start = db.Column(db.String(50), nullable=False)
     num_max_teams = db.Column(db.Integer, nullable=False)
+    game = db.Column(game_enum, nullable=False)
+    teams = db.relationship('Team', backref='tournament', lazy=True)
 
     __table_args__ = (
         CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
@@ -59,6 +67,7 @@ class Tournament(db.Model):
             "name": self.name,
             "date_start": self.date_start,
             "num_max_teams": self.num_max_teams,
+            "game": self.game.name,
         }
     
 class Team(db.Model):
@@ -67,6 +76,11 @@ class Team(db.Model):
      name = db.Column(db.String(80), nullable=False)
      members_count = db.Column(db.Integer, nullable=False)
      game = db.Column(db.String(80), nullable=False)
+
+     def __repr__(self):
+         return f'<Team {self.name}>'
+    
+     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
 
      def __repr__(self):
          return f'<Team {self.name}>'
