@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, RoleEnum
+from api.models import db, User, RoleEnum, Team
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 import re
@@ -123,26 +123,26 @@ def register_user():
 
     return jsonify({"message": "Usuario registrado exitosamente"}), 201
 
-# @api.route('/Regteams', methods=['POST'])
-# def register_team():
-#     data = request.form
+@api.route('/Regteams', methods=['POST'])
+def register_team():
+     data = request.form
     
-#     name = data.get('name')
-#     members_count = data.get('members_count')
-#     game = data.get('game')
-#     tournament = data.get('tournament')
+     name = data.get('name')
+     members_count = data.get('members_count')
+     game = data.get('game')
+     tournament = data.get('tournament')
 
-#     if not name or not members_count or not game or not tournament:
-#         return jsonify({"error": "Faltan datos"}), 400
+     if not name or not members_count or not game or not tournament:
+         return jsonify({"error": "Faltan datos"}), 400
 
-#     new_team = Team(
-#         name=name,
-#         members_count=members_count,
-#         game=game,
-#         tournament=tournament
-#     )
-#     db.session.add(new_team)
-#     db.session.commit()
+     new_team = Team(
+         name=name,
+         members_count=members_count,
+         game=game,
+         tournament=tournament
+     )
+     db.session.add(new_team)
+     db.session.commit()
 
-#     return jsonify({"message": "Equipo registrado exitosamente"}), 201
+     return jsonify({"message": "Equipo registrado exitosamente"}), 201
 

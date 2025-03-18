@@ -1,6 +1,8 @@
 import enum
+import uuid
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects.postgresql import ENUM
+from sqlalchemy import CheckConstraint
+from sqlalchemy.dialects.postgresql import ENUM, UUID
 
 db = SQLAlchemy()
 
@@ -20,7 +22,7 @@ class User(db.Model):
     password = db.Column(db.String(80), nullable=False)
     role = db.Column(role_enum, nullable=False)  # Solo se puede escoger entre 'admin' o 'player'
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
-
+    
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -35,13 +37,36 @@ class User(db.Model):
             "role": self.role.name,
         }
     
+class Tournament(db.Model):
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
+    name = db.Column(db.String(120), nullable=False)
+    date_start = db.Column(db.String(50), nullable=False)
+    num_max_teams = db.Column(db.Integer, nullable=False)
+    teams = db.relationship('Team', backref='tournament', lazy=True)
+
+    __table_args__ = (
+        CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
+    )
+
+    def __repr__(self):
+        return f'<Tournament {self.name}>'
+
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "date_start": self.date_start,
+            "num_max_teams": self.num_max_teams,
+            "teams": [team.serialize() for team in self.teams],
+        }
+    
 class Team(db.Model):
     
      id = db.Column(db.Integer, primary_key=True)
      name = db.Column(db.String(80), nullable=False)
      members_count = db.Column(db.Integer, nullable=False)
      game = db.Column(db.String(80), nullable=False)
-     tournament = db.Column(db.String(80), nullable=False)
+     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
 
      def __repr__(self):
          return f'<Team {self.name}>'
@@ -52,5 +77,5 @@ class Team(db.Model):
              "name": self.name,
              "members_count": self.members_count,
              "game": self.game,
-             "tournament": self.tournament,
+             "tournament_id": self.tournament_id,
          }
