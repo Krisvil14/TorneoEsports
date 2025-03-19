@@ -7,20 +7,40 @@ export default function AddTeamToTournament() {
     const [selectedTeam, setSelectedTeam] = useState('');
     const navigate = useNavigate();
     const { tournament_id } = useParams();
+    const [tournament, setTournament] = useState(null);
 
     useEffect(() => {
-        const fetchTeams = async () => {
+        const fetchTournament = async () => {
             try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/teams');
+                const response = await fetch(process.env.BACKEND_URL + `/api/tournaments/${tournament_id}`);
                 const data = await response.json();
-                setTeams(data);
+                setTournament(data);
+                console.log("Tournament data:", data);
+
+                // Fetch teams after tournament data is loaded
+                const fetchTeams = async () => {
+                    let teamData; // Declare teamData outside the try block
+                    try {
+                        const response = await fetch(process.env.BACKEND_URL + `/api/teams`);
+                        let teamData;
+                        teamData = await response.json();
+                        const filteredTeams = teamData.filter(team => team.game === data?.game);
+                        setTeams(filteredTeams);
+                        console.log("Teams data:", teamData);
+                    } catch (error) {
+                        console.error('Error fetching teams:', error);
+                    }
+                };
+
+                fetchTeams();
+
             } catch (error) {
-                console.error('Error fetching teams:', error);
+                console.error('Error fetching tournament:', error);
             }
         };
 
-        fetchTeams();
-    }, []);
+        fetchTournament();
+    }, [tournament_id]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -49,7 +69,7 @@ export default function AddTeamToTournament() {
                 navigate(`/tournaments`);
             } else {
                 toast.update(notification, {
-                    render: json.error,
+                    render: 'Error al añadir el equipo al torneo',
                     type: 'error',
                     autoClose: 5000,
                     isLoading: false,
@@ -83,11 +103,15 @@ export default function AddTeamToTournament() {
                         className="form-control"
                     >
                         <option value="">Seleccione un equipo</option>
-                        {teams.map((team) => (
-                            <option key={team.id} value={team.id}>
-                                {team.name}
-                            </option>
-                        ))}
+                        {tournament && teams.map((team) => {
+                            console.log("team.game:", team.game);
+                            console.log("data?.game:", tournament?.game);
+                            return (
+                                <option key={team.id} value={team.id}>
+                                    {team.name}
+                                </option>
+                            );
+                        })}
                     </select>
                 </div>
                 <button type="submit" className="btn btn-primary w-75 mx-auto">

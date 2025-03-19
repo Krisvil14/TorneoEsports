@@ -137,12 +137,45 @@ def register_team():
      new_team = Team(
          name=name,
          members_count=members_count,
-         game=game,
+         game=GameEnum[game],
      )
      db.session.add(new_team)
      db.session.commit()
 
      return jsonify({"message": "Equipo registrado exitosamente"}), 201
+
+@api.route('/create_tournament', methods=['POST'])
+def create_tournament():
+    data = request.form
+
+    name = data.get('name')
+    date_start = data.get('date_start')
+    num_max_teams = data.get('num_max_teams')
+    game = data.get('game')
+
+    if not name or not date_start or not num_max_teams or not game:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    try:
+        num_max_teams = int(num_max_teams)
+    except ValueError:
+        return jsonify({"error": "Cantidad de equipos debe ser un número entero válido"}), 400
+
+    try:
+        new_tournament = Tournament(
+            name=name,
+            date_start=date_start,
+            num_max_teams=num_max_teams,
+            game=GameEnum[game],
+        )
+        db.session.add(new_tournament)
+        db.session.commit()
+
+        response = jsonify({"message": "Torneo creado exitosamente"})
+        response.headers.add('Access-Control-Allow-Origin', '*')  # Add CORS header
+        return response, 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @api.route('/tournaments', methods=['GET'])
 def get_tournaments():
@@ -159,6 +192,20 @@ def get_tournaments():
         return response, 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@api.route('/tournaments/<tournament_id>', methods=['GET'])
+def get_tournament(tournament_id):
+    try:
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+
+        tournament_data = tournament.serialize()
+        response = jsonify(tournament_data)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @api.route('/teams', methods=['GET'])
 def get_teams():

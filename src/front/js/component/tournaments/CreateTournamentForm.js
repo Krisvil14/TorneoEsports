@@ -21,6 +21,7 @@ export default function CreateTournamentForm() {
         const notification = toast.loading('Creando torneo...');
 
         try {
+            console.log("Form data:", Object.fromEntries(formData));
             const response = await fetch(process.env.BACKEND_URL + '/api/create_tournament', {
                 method: 'POST',
                 body: formData,

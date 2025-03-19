@@ -95,8 +95,8 @@ export default function RegTeamsForm() {
             className="form-control"
           >
             <option value="">Seleccione un juego</option>
-            <option value="League of Legends">League of Legends</option>
-            <option value="Valorant">Valorant</option>
+            <option value="league_of_legends">League of Legends</option>
+            <option value="valorant">Valorant</option>
           </select>
         </div>
         <button type="submit" className="btn btn-primary w-75 mx-auto">

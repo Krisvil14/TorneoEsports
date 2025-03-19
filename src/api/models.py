@@ -75,7 +75,7 @@ class Team(db.Model):
      id = db.Column(db.Integer, primary_key=True)
      name = db.Column(db.String(80), nullable=False)
      members_count = db.Column(db.Integer, nullable=False)
-     game = db.Column(db.String(80), nullable=False)
+     game = db.Column(game_enum, nullable=False)
 
      def __repr__(self):
          return f'<Team {self.name}>'
@@ -90,5 +90,5 @@ class Team(db.Model):
              "id": self.id,
              "name": self.name,
              "members_count": self.members_count,
-             "game": self.game,
+             "game": self.game.name,
          }
