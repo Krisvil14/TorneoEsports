@@ -6,11 +6,7 @@ from sqlalchemy.dialects.postgresql import ENUM, UUID
 
 db = SQLAlchemy()
 
-class RoleEnum(enum.Enum):
-    admin = 'admin'
-    player = 'player'
 
-role_enum = ENUM(RoleEnum, name='roleenum', create_type=False)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -20,9 +16,9 @@ class User(db.Model):
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    role = db.Column(role_enum, nullable=False)  # Solo se puede escoger entre 'admin' o 'player'
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
     is_in_team = db.Column(db.Boolean(), nullable=False, default=False)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     
     def __repr__(self):
         return f'<User {self.email}>'
@@ -35,9 +31,9 @@ class User(db.Model):
             "cedula": self.cedula,
             "age": self.age,
             "email": self.email,
-            "role": self.role.name,
             "is_active": self.is_active,
             "is_in_team": self.is_in_team,
+            "team_id": self.team_id,
         }
 
 class GameEnum(enum.Enum):

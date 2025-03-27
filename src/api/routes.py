@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, RoleEnum, Team, Tournament, GameEnum
+from api.models import db, User, Team, Tournament, GameEnum
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 import re
@@ -46,7 +46,6 @@ def login_user():
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
-            "role": user.role.name,
             "is_active": user.is_active
         }}), 200
 
@@ -82,9 +81,8 @@ def register_user():
     age = data.get('age')
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role')
 
-    if not first_name or not last_name or not cedula or not age or not email or not password or not role:
+    if not first_name or not last_name or not cedula or not age or not email or not password:
         return jsonify({"error": "Faltan datos"}), 400
 
     # Validar la contraseña
@@ -99,14 +97,6 @@ def register_user():
     if User.query.filter_by(cedula=cedula).first():
         return jsonify({"error": "La cédula ya está registrada"}), 400
 
-    # Verificar el rol del usuario que realiza la solicitud solo si ya hay usuarios en la base de datos
-    if role is RoleEnum.admin:
-        if not admin_id:
-            return jsonify({"error": "No se especificó el administrador que realiza el registro"}), 400
-        admin_user = User.query.get(admin_id)
-        if not admin_user or admin_user.role != RoleEnum.admin:
-            return jsonify({"error": "Solo un administrador puede registrar a un administrador"}), 403
-
     # Crear el nuevo usuario
     new_user = User(
         first_name=first_name,
@@ -115,7 +105,6 @@ def register_user():
         age=age,
         email=email,
         password=password,
-        role=RoleEnum[role],
         is_active=True,
     )
     db.session.add(new_user)
@@ -177,6 +166,32 @@ def create_tournament():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@api.route('/add_player_to_team/<int:user_id>', methods=['POST'])
+def add_player_to_team(user_id):
+    """
+    Adds a player to a team
+    """
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    if user.team_id is not None:
+        return jsonify({"error": "El Usuairo ya esta en un Equipo"}), 400
+
+    team_id = request.form.get('team_id')
+    if team_id is None:
+        return jsonify({"error": "Team id is required"}), 400
+
+    team = Team.query.get(team_id)
+    if team is None:
+        return jsonify({"error": "Team not found"}), 404
+
+    user.team_id = team_id
+    user.is_in_team = True  # Update is_in_team attribute
+    db.session.commit()
+
+    return jsonify(user.serialize()), 200
+
 @api.route('/tournaments', methods=['GET'])
 def get_tournaments():
     tournaments = Tournament.query.all()
@@ -210,6 +225,7 @@ def get_tournament(tournament_id):
 @api.route('/teams', methods=['GET'])
 def get_teams():
     teams = Team.query.all()
+    print(teams)
     return jsonify([team.serialize() for team in teams]), 200
 
 @api.route('/users', methods=['GET'])
@@ -217,14 +233,26 @@ def get_users():
     users = User.query.all()
     user_list = []
     for user in users:
-        teams = Team.query.filter_by().all()
-        user.is_in_team = False
-        for team in teams:
-            if team.name == user.first_name:
-                user.is_in_team = True
-                break
-        user_list.append(user.serialize())
+        team = Team.query.get(user.team_id)
+        team_name = team.name if team else None
+        user_list.append({
+            **user.serialize(),
+            "team_name": team_name
+        })
     return jsonify(user_list), 200
+
+@api.route('/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        response = jsonify(user.serialize())
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @api.route('/tournaments/<tournament_id>/teams', methods=['POST'])
 def add_team_to_tournament(tournament_id):

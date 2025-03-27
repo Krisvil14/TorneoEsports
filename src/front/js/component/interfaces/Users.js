@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../commons/Table';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function UsersInterface() {
     const [users, setUsers] = useState([]);
+     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -23,7 +26,26 @@ export default function UsersInterface() {
         { header: 'Apellido', accessor: 'last_name' },
         { header: 'Cédula', accessor: 'cedula' },
         { header: 'Email', accessor: 'email' },
-        { header: 'En Equipo', accessor: 'is_in_team' },
+        {
+            header: 'En Equipo',
+            accessor: 'is_in_team',
+            Cell: ({ row }) => (row.is_in_team ? '✔' : 'X'),
+        },
+        { header: 'Equipo asignado', accessor: 'team_name' },
+        {
+            header: 'Actions',
+            accessor: 'actions',
+            Cell: ({ row }) => (
+                !row.is_in_team ? (
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => navigate(`/add_player_to_team/${row.id}`)}
+                    >
+                        Añadir A Equipo
+                    </button>
+                ) : null
+            ),
+        },
     ];
 
     return (

@@ -9,7 +9,6 @@ export default function RegisterForm() {
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [role, setRole] = React.useState('player');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,7 +21,6 @@ export default function RegisterForm() {
     formData.append('age', age);
     formData.append('email', email);
     formData.append('password', password);
-    formData.append('role', role);
 
     const notification = toast.loading('Registrando usuario...');
 
@@ -132,19 +130,6 @@ export default function RegisterForm() {
             name="password"
             required
           />
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="role">Rol:</label>
-          <select
-            id="role"
-            name="role"
-            required
-            className="form-control"
-            onChange={({ target }) => setRole(target.value)}
-            value={role}
-          >
-            <option value="player">Usuario</option>
-          </select>
         </div>
         <button type="submit" class="btn btn-primary w-75 mx-auto">
           Primary
