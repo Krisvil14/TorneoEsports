@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function AddTeamToTournament() {
     const [teams, setTeams] = useState([]);
@@ -114,9 +115,14 @@ export default function AddTeamToTournament() {
                         })}
                     </select>
                 </div>
-                <button type="submit" className="btn btn-primary w-75 mx-auto">
-                    Añadir Equipo
-                </button>
+                <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
+                          <button type="submit" class="btn btn-primary w-100 w-md-75">
+                            Añadir equipo al torneo
+                          </button>
+                          <Link to="/tournaments" className="btn btn-secondary w-100 w-md-75">
+                            Volver
+                          </Link>
+                        </div>
             </div>
         </form>
     );

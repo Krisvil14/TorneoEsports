@@ -80,7 +80,7 @@ export default function LoginForm() {
               />
             </div>
             <button type="submit" class="btn btn-primary w-75 mx-auto">
-            Primary
+            Ingresar al sistema
             </button>
             </div>
         </form>

@@ -132,7 +132,7 @@ export default function RegisterForm() {
           />
         </div>
         <button type="submit" class="btn btn-primary w-75 mx-auto">
-          Primary
+          Registrar Usuario
         </button>
       </div>
     </form>
