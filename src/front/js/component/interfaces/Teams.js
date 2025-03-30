@@ -27,7 +27,6 @@ export default function TeamsInterface() {
 
     const columns = [
         { header: 'Nombre del Equipo', accessor: 'name' },
-        { header: 'Cantidad de Integrantes', accessor: 'members_count' },
         { header: 'Juego', accessor: 'game' }
     ];
 

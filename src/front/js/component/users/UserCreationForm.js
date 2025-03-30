@@ -1,8 +1,9 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-export default function RegisterForm() {
+export default function CreateUserForm() {
   const [name, setName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [dni, setDni] = React.useState('');
@@ -39,7 +40,7 @@ export default function RegisterForm() {
           autoClose: 5000,
           isLoading: false,
         });
-        navigate('/inicio');
+        navigate('/users');
       } else {
         toast.update(notification, {
           render: json.error,
@@ -56,7 +57,7 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="row mb-4 text-center">
-        <h1 className="w-75 mx-auto fs-1">Registrar usuario en el sistema</h1>
+        <h1 className="w-75 mx-auto fs-1">Crear Usuario</h1>
       </div>
       <div className="row gy-3">
         <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
@@ -131,12 +132,17 @@ export default function RegisterForm() {
             required
           />
         </div>
-        <button type="submit" class="btn btn-primary w-75 mx-auto">
-          Primary
+        <div className="d-flex w-75 justify-content-center flex-column flex-sm-row gap-2 mx-auto">
+        <button type="submit" class="btn btn-primary w-75">
+          Crear Usuario
         </button>
+        <Link to="/users" className='w-100 p-0 d-flex'>
+          <button type="button" className="btn btn-secondary w-75">
+            Volver
+          </button>
+        </Link>
+        </div>
       </div>
     </form>
   );
 }
-
-

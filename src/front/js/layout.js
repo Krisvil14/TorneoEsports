@@ -22,11 +22,12 @@ import TournamentsPage from './pages/tournaments';
 import CreateTournamentForm from './component/tournaments/CreateTournamentForm';
 import AddTeamToTournament from './component/tournaments/AddTeamToTournament';
 import AddPlayerToTeam from './component/users/AddPlayerToTeam';
+import CreateUserPage from './pages/createUser';
 
 
 // Crear tu primer componente
 const Layout = () => {
-  const basename = process.env.BASENAME || '';
+    const basename = process.env.BASENAME || "";
 
   if (!process.env.BACKEND_URL || process.env.BACKEND_URL === '')
     return <BackendURL />;
@@ -52,6 +53,7 @@ const Layout = () => {
               <Route element={<Protected> <CreateTournamentForm /> </Protected>} path="/Cretournament" />
               <Route element={<Protected> <AddTeamToTournament /> </Protected>} path="/addteam/:tournament_id" />
               <Route element={<Protected> <AddPlayerToTeam /> </Protected>} path="/add_player_to_team/:user_id" />
+              <Route element={<Protected> <CreateUserPage /> </Protected>} path="/create_user" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>

@@ -70,7 +70,7 @@ class Team(db.Model):
     
      id = db.Column(db.Integer, primary_key=True)
      name = db.Column(db.String(80), nullable=False)
-     members_count = db.Column(db.Integer, nullable=False)
+     max_players = db.Column(db.Integer, nullable=False, default=5)
      game = db.Column(game_enum, nullable=False)
 
      def __repr__(self):
@@ -85,6 +85,6 @@ class Team(db.Model):
          return {
              "id": self.id,
              "name": self.name,
-             "members_count": self.members_count,
+             "max_players": self.max_players,
              "game": self.game.name,
          }

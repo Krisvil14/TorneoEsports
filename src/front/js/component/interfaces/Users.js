@@ -7,6 +7,10 @@ export default function UsersInterface() {
     const [users, setUsers] = useState([]);
      const navigate = useNavigate();
 
+     const handleCreateTeam = () => {
+        navigate('/Regteams');
+    };
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -51,6 +55,13 @@ export default function UsersInterface() {
     return (
         <div className="container text-center">
             <h1 className="my-4">Gestión de Usuarios</h1>
+            <div className="row">
+                <div className="col">
+                    <button className="btn btn-primary my-2" onClick={() => navigate('/create_user')}>
+                        Crear Usuario
+                    </button>
+                </div>
+            </div>
             <div className="row">
                 <div className="col">
                     <Table columns={columns} data={users} />

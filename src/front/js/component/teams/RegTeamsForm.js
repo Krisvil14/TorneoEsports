@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 export default function RegTeamsForm() {
   const [name, setName] = useState('');
-  const [membersCount, setMembersCount] = useState('');
   const [game, setGame] = useState('');
   const navigate = useNavigate();
 
@@ -13,7 +12,6 @@ export default function RegTeamsForm() {
 
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('members_count', membersCount);
     formData.append('game', game);
 
     const notification = toast.loading('Registrando equipo...');
@@ -68,18 +66,6 @@ export default function RegTeamsForm() {
             name="name"
             value={name}
             onChange={({ target }) => setName(target.value)}
-            required
-            className="form-control"
-          />
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label htmlFor="membersCount">Cantidad de Integrantes:</label>
-          <input
-            type="number"
-            id="membersCount"
-            name="membersCount"
-            value={membersCount}
-            onChange={({ target }) => setMembersCount(target.value)}
             required
             className="form-control"
           />

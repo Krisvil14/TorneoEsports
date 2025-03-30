@@ -117,15 +117,13 @@ def register_team():
      data = request.form
     
      name = data.get('name')
-     members_count = data.get('members_count')
      game = data.get('game')
 
-     if not name or not members_count or not game:
+     if not name or not game:
          return jsonify({"error": "Faltan datos"}), 400
 
      new_team = Team(
          name=name,
-         members_count=members_count,
          game=GameEnum[game],
      )
      db.session.add(new_team)
@@ -185,6 +183,11 @@ def add_player_to_team(user_id):
     team = Team.query.get(team_id)
     if team is None:
         return jsonify({"error": "Team not found"}), 404
+
+    # Check if the team is full
+    team_members = User.query.filter_by(team_id=team_id).count()
+    if team_members >= team.max_players:
+        return jsonify({"error": "El equipo está lleno"}), 400
 
     user.team_id = team_id
     user.is_in_team = True  # Update is_in_team attribute
