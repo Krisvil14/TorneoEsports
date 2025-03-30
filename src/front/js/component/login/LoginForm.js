@@ -28,7 +28,7 @@ export default function LoginForm() {
           const json = await response.json();
     
           if (ok) {
-            state.actions.login(json);
+            state.actions.login(json.user);
             toast.update(notification, {
               render: 'Sesion iniciada con exito',
               type: 'success',

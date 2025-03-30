@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 
 export default function RecoveryForm() {
   const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
 
 
   const handleSubmit = async (e) => {
@@ -12,12 +11,11 @@ export default function RecoveryForm() {
 
     const formData = new FormData();
     formData.append('email', email);
-    formData.append('password', password);
 
     const notification = toast.loading('Recuperando usuario...');
     
         try {
-          const response = await fetch(process.env.BACKEND_URL + '/api/login', {
+          const response = await fetch(process.env.BACKEND_URL + '/api/recovery', {
             method: 'POST',
             body: formData,
           });
@@ -26,7 +24,7 @@ export default function RecoveryForm() {
     
           if (ok) {
             toast.update(notification, {
-              render: 'Correo enviado',
+              render: 'En breve recibirá un email con instrucciones para recuperar su contraseña',
               type: 'success',
               autoClose: 5000,
               isLoading: false,
@@ -61,18 +59,6 @@ export default function RecoveryForm() {
                 required
                 className="form-control"
                 />
-            </div>
-            <div className="d-flex flex-column gy-3 w-75 mx-auto">
-              <label for="password">Contraseña:</label>
-              <input
-                onChange={({ target }) => setPassword(target.value)}
-                value={password}
-                className="form-control"
-                type="password"
-                id="password"
-                name="password"
-                required
-              />
             </div>
             <button type="submit" class="btn btn-primary w-75 mx-auto">
             Primary
