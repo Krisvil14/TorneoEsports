@@ -132,15 +132,13 @@ export default function CreateUserForm() {
             required
           />
         </div>
-        <div className="d-flex w-75 justify-content-center flex-column flex-sm-row gap-2 mx-auto">
-        <button type="submit" class="btn btn-primary w-75">
-          Crear Usuario
-        </button>
-        <Link to="/users" className='w-100 p-0 d-flex'>
-          <button type="button" className="btn btn-secondary w-75">
-            Volver
+        <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
+          <button type="submit" class="btn btn-primary w-100 w-md-75">
+            Crear Usuario
           </button>
-        </Link>
+          <Link to="/users" className="btn btn-secondary w-100 w-md-75">
+            Volver
+          </Link>
         </div>
       </div>
     </form>
