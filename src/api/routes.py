@@ -173,24 +173,26 @@ def add_player_to_team(user_id):
     if user is None:
         return jsonify({"error": "User not found"}), 404
 
-    if user.team_id is not None:
-        return jsonify({"error": "El Usuairo ya esta en un Equipo"}), 400
-
     team_id = request.form.get('team_id')
-    if team_id is None:
+
+    if user.team_id is not None and not team_id:
+        user.team_id = None
+        user.is_in_team = False
+    elif team_id:
+        team = Team.query.get(team_id)
+        if team is None:
+            return jsonify({"error": "Team not found"}), 404
+
+        # Check if the team is full
+        team_members = User.query.filter_by(team_id=team_id).count()
+        if team_members >= team.max_players:
+            return jsonify({"error": "El equipo está lleno"}), 400
+
+        user.team_id = team_id
+        user.is_in_team = True  # Update is_in_team attribute
+    else:
         return jsonify({"error": "Team id is required"}), 400
 
-    team = Team.query.get(team_id)
-    if team is None:
-        return jsonify({"error": "Team not found"}), 404
-
-    # Check if the team is full
-    team_members = User.query.filter_by(team_id=team_id).count()
-    if team_members >= team.max_players:
-        return jsonify({"error": "El equipo está lleno"}), 400
-
-    user.team_id = team_id
-    user.is_in_team = True  # Update is_in_team attribute
     db.session.commit()
 
     return jsonify(user.serialize()), 200

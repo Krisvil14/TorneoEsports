@@ -39,16 +39,46 @@ export default function UsersInterface() {
         {
             header: 'Actions',
             accessor: 'actions',
-            Cell: ({ row }) => (
-                !row.is_in_team ? (
+            Cell: ({ row }) => {
+                return !row.is_in_team ? (
                     <button
                         className="btn btn-primary"
                         onClick={() => navigate(`/add_player_to_team/${row.id}`)}
                     >
                         Añadir A Equipo
                     </button>
-                ) : null
-            ),
+                ) : (
+                    <button
+                        className="btn btn-danger"
+                        onClick={async () => {
+                            try {
+                                const response = await fetch(process.env.BACKEND_URL + `/api/add_player_to_team/${row.id}`, {
+                                    method: 'POST',
+                                    body: new FormData(),
+                                });
+                                if (response.ok) {
+                                    const fetchUsers = async () => {
+                                        try {
+                                            const response = await fetch(process.env.BACKEND_URL + '/api/users');
+                                            const data = await response.json();
+                                            setUsers(data);
+                                        } catch (error) {
+                                            console.error('Error fetching users:', error);
+                                        }
+                                    };
+                                    fetchUsers();
+                                } else {
+                                    console.error('Error removing user from team');
+                                }
+                            } catch (error) {
+                                console.error('Error removing user from team:', error);
+                            }
+                        }}
+                    >
+                        Remover De Equipo
+                    </button>
+                );
+            },
         },
     ];
 
