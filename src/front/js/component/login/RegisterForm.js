@@ -131,7 +131,7 @@ export default function RegisterForm() {
             required
           />
         </div>
-        <button type="submit" class="btn btn-primary w-75 mx-auto">
+        <button type="submit" className="btn btn-primary w-75 mx-auto">
           Registrar Usuario
         </button>
       </div>

@@ -60,7 +60,7 @@ export default function RecoveryForm() {
                 className="form-control"
                 />
             </div>
-            <button type="submit" class="btn btn-primary w-75 mx-auto">
+            <button type="submit" className="btn btn-primary w-75 mx-auto">
             Recuperar usuario
             </button>
             </div>

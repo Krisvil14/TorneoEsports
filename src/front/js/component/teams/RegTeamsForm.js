@@ -87,7 +87,7 @@ export default function RegTeamsForm() {
           </select>
         </div>
         <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
-                  <button type="submit" class="btn btn-primary w-100 w-md-75">
+                  <button type="submit" className="btn btn-primary w-100 w-md-75">
                     Registratr Equipo
                   </button>
                   <Link to="/users" className="btn btn-secondary w-100 w-md-75">

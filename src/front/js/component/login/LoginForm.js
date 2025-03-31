@@ -79,7 +79,7 @@ export default function LoginForm() {
                 required
               />
             </div>
-            <button type="submit" class="btn btn-primary w-75 mx-auto">
+            <button type="submit" className="btn btn-primary w-75 mx-auto">
             Ingresar al sistema
             </button>
             </div>

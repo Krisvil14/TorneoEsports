@@ -16,7 +16,7 @@ export default function AddTeamToTournament() {
                 const response = await fetch(process.env.BACKEND_URL + `/api/tournaments/${tournament_id}`);
                 const data = await response.json();
                 setTournament(data);
-                console.log("Tournament data:", data);
+
 
                 // Fetch teams after tournament data is loaded
                 const fetchTeams = async () => {
@@ -27,7 +27,6 @@ export default function AddTeamToTournament() {
                         teamData = await response.json();
                         const filteredTeams = teamData.filter(team => team.game === data?.game);
                         setTeams(filteredTeams);
-                        console.log("Teams data:", teamData);
                     } catch (error) {
                         console.error('Error fetching teams:', error);
                     }
@@ -105,8 +104,6 @@ export default function AddTeamToTournament() {
                     >
                         <option value="">Seleccione un equipo</option>
                         {tournament && teams.map((team) => {
-                            console.log("team.game:", team.game);
-                            console.log("data?.game:", tournament?.game);
                             return (
                                 <option key={team.id} value={team.id}>
                                     {team.name}
@@ -116,7 +113,7 @@ export default function AddTeamToTournament() {
                     </select>
                 </div>
                 <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
-                          <button type="submit" class="btn btn-primary w-100 w-md-75">
+                          <button type="submit" className="btn btn-primary w-100 w-md-75">
                             Añadir equipo al torneo
                           </button>
                           <Link to="/tournaments" className="btn btn-secondary w-100 w-md-75">
