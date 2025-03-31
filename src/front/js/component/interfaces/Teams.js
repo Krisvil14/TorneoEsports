@@ -25,10 +25,22 @@ export default function TeamsInterface() {
         fetchTeams();
     }, []);
 
-    const columns = [
-        { header: 'Nombre del Equipo', accessor: 'name' },
-        { header: 'Juego', accessor: 'game' }
-    ];
+ const columns = [
+  { header: 'Nombre del Equipo', accessor: 'name' },
+  { header: 'Juego', accessor: 'game' },
+  {
+   header: 'Ver Información',
+   accessor: 'verInformacion',
+   Cell: ({ row }) => (
+    <button
+     className="btn btn-primary"
+     onClick={() => navigate(`/teamInfo/${row.id}`)}
+    >
+     Ver Información
+    </button>
+   ),
+  },
+ ];
 
     return (
         <div className="container text-center">

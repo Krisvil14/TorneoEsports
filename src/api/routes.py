@@ -173,7 +173,7 @@ def add_player_to_team(user_id):
     if user is None:
         return jsonify({"error": "User not found"}), 404
 
-    team_id = request.form.get('team_id')
+    team_id = request.form.get('team_id', None)
 
     if user.team_id is not None and not team_id:
         user.team_id = None
@@ -196,6 +196,29 @@ def add_player_to_team(user_id):
     db.session.commit()
 
     return jsonify(user.serialize()), 200
+
+@api.route('/teams/<int:team_id>', methods=['GET'])
+def get_team(team_id):
+    """
+    Get a team by id
+    """
+    team = Team.query.get(team_id)
+    if team is None:
+        return jsonify({"error": "Team not found"}), 404
+
+    return jsonify(team.serialize()), 200
+
+@api.route('/teams/<int:team_id>/users', methods=['GET'])
+def get_team_users(team_id):
+    """
+    Get all users in a team
+    """
+    team = Team.query.get(team_id)
+    if team is None:
+        return jsonify({"error": "Team not found"}), 404
+
+    users = User.query.filter_by(team_id=team_id)
+    return jsonify([user.serialize() for user in users]), 200
 
 @api.route('/tournaments', methods=['GET'])
 def get_tournaments():

@@ -23,6 +23,7 @@ import CreateTournamentForm from './component/tournaments/CreateTournamentForm';
 import AddTeamToTournament from './component/tournaments/AddTeamToTournament';
 import AddPlayerToTeam from './component/users/AddPlayerToTeam';
 import CreateUserPage from './pages/createUser';
+import TeamInfo from './pages/teamInfo';
 
 
 // Crear tu primer componente
@@ -54,6 +55,7 @@ const Layout = () => {
               <Route element={<Protected> <AddTeamToTournament /> </Protected>} path="/addteam/:tournament_id" />
               <Route element={<Protected> <AddPlayerToTeam /> </Protected>} path="/add_player_to_team/:user_id" />
               <Route element={<Protected> <CreateUserPage /> </Protected>} path="/create_user" />
+              <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>

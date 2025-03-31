@@ -13,9 +13,9 @@ const Table = ({ columns, data }) => {
       </thead>
       <tbody>
         {data.map((row, rowIndex) => (
-          <tr key={rowIndex}>
+          <tr key={rowIndex} className="row-separator">
             {columns.map((column, colIndex) => (
-              <td key={colIndex}>
+              <td key={colIndex} className="column-separator">
                 {column.Cell ? column.Cell({ value: row[column.accessor], row }) : row[column.accessor]}
               </td>
             ))}
