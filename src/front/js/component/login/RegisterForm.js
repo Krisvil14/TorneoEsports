@@ -9,6 +9,7 @@ export default function RegisterForm() {
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+    const [role, setRole] = React.useState('user');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -60,7 +61,7 @@ export default function RegisterForm() {
       </div>
       <div className="row gy-3">
         <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label for="first_name">Nombre:</label>
+          <label htmlFor="first_name">Nombre:</label>
           <input
             type="text"
             id="first_name"
@@ -72,7 +73,7 @@ export default function RegisterForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="last_name">Apellido:</label>
+          <label htmlFor="last_name">Apellido:</label>
           <input
             className="form-control"
             type="text"
@@ -84,7 +85,7 @@ export default function RegisterForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="cedula">Cédula:</label>
+          <label htmlFor="cedula">Cédula:</label>
           <input
             onChange={({ target }) => setDni(target.value)}
             value={dni}
@@ -96,7 +97,7 @@ export default function RegisterForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="age">Edad:</label>
+          <label htmlFor="age">Edad:</label>
           <input
             onChange={({ target }) => setAge(target.value)}
             value={age}
@@ -108,7 +109,7 @@ export default function RegisterForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="email">Correo Electrónico:</label>
+          <label htmlFor="email">Correo Electrónico:</label>
           <input
             onChange={({ target }) => setEmail(target.value)}
             value={email}
@@ -120,7 +121,7 @@ export default function RegisterForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="password">Contraseña:</label>
+          <label htmlFor="password">Contraseña:</label>
           <input
             onChange={({ target }) => setPassword(target.value)}
             value={password}
@@ -138,5 +139,3 @@ export default function RegisterForm() {
     </form>
   );
 }
-
-

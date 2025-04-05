@@ -10,6 +10,7 @@ export default function CreateUserForm() {
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [role, setRole] = React.useState('user');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,8 +23,9 @@ export default function CreateUserForm() {
     formData.append('age', age);
     formData.append('email', email);
     formData.append('password', password);
+    formData.append('role', role);
 
-    const notification = toast.loading('Registrando usuario...');
+    const notification = toast.loading('Creando usuario...');
 
     try {
       const response = await fetch(process.env.BACKEND_URL + '/api/register', {
@@ -107,6 +109,19 @@ export default function CreateUserForm() {
             name="age"
             required
           />
+        </div>
+         <div className="d-flex flex-column gy-3 w-75 mx-auto">
+          <label htmlFor="role">Rol:</label>
+          <select
+            className="form-control"
+            id="role"
+            name="role"
+            onChange={({ target }) => setRole(target.value)}
+            required
+          >
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label for="email">Correo Electrónico:</label>

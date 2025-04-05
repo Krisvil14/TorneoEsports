@@ -19,7 +19,8 @@ class User(db.Model):
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
     is_in_team = db.Column(db.Boolean(), nullable=False, default=False)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
-    
+    role = db.Column(db.String(20), nullable=False, default='user')
+
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -34,6 +35,7 @@ class User(db.Model):
             "is_active": self.is_active,
             "is_in_team": self.is_in_team,
             "team_id": self.team_id,
+            "role": self.role,
         }
 
 class GameEnum(enum.Enum):

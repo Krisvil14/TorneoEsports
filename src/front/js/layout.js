@@ -50,11 +50,11 @@ const Layout = () => {
               <Route element={<Protected> <TeamsInterface /> </Protected> } path="/teams" />
               <Route element={<Protected> <RegTeamsForm /> </Protected> } path="/Regteams" />
               <Route element={<Protected> <UsersPage /> </Protected>} path="/users" />
-              <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
-              <Route element={<Protected> <CreateTournamentForm /> </Protected>} path="/Cretournament" />
-              <Route element={<Protected> <AddTeamToTournament /> </Protected>} path="/addteam/:tournament_id" />
-              <Route element={<Protected> <AddPlayerToTeam /> </Protected>} path="/add_player_to_team/:user_id" />
-              <Route element={<Protected> <CreateUserPage /> </Protected>} path="/create_user" />
+              <Route element={<Protected > <TournamentsPage /> </Protected>} path="/tournaments" />
+              <Route element={<Protected requiredRole="admin"> <CreateTournamentForm /> </Protected>} path="/Cretournament" />
+              <Route element={<Protected requiredRole="admin"> <AddTeamToTournament /> </Protected>} path="/addteam/:tournament_id" />
+              <Route element={<Protected requiredRole="admin"> <AddPlayerToTeam /> </Protected>} path="/add_player_to_team/:user_id" />
+              <Route element={<Protected requiredRole="admin"> <CreateUserPage /> </Protected>} path="/create_user" />
               <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
 
               <Route element={<h1>Not found!</h1>} />

@@ -53,10 +53,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
            
             login: (user) => {
-
-                        setStore({ user: user, isAuthenticated: true });
-                        localStorage.setItem("user", JSON.stringify(user));
-
+                setStore({ user: user, isAuthenticated: true });
+                localStorage.setItem("user", JSON.stringify(user));
             },
 
             

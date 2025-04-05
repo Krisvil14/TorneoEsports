@@ -49,7 +49,7 @@ export default function RecoveryForm() {
           </div>
           <div className="row gy-3">
             <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-              <label for="email">Correo:</label>
+              <label htmlFor="email">Correo:</label>
               <input
                 type="text"
                 id="email"

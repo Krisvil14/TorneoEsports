@@ -46,7 +46,8 @@ def login_user():
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
-            "is_active": user.is_active
+            "is_active": user.is_active,
+            "role": user.role
         }}), 200
 
 @api.route('/recovery', methods=['POST'])
@@ -81,8 +82,9 @@ def register_user():
     age = data.get('age')
     email = data.get('email')
     password = data.get('password')
+    role = data.get('role')
 
-    if not first_name or not last_name or not cedula or not age or not email or not password:
+    if not first_name or not last_name or not cedula or not age or not email or not password or not role:
         return jsonify({"error": "Faltan datos"}), 400
 
     # Validar la contraseña
@@ -105,10 +107,15 @@ def register_user():
         age=age,
         email=email,
         password=password,
+        role=role,
         is_active=True,
     )
     db.session.add(new_user)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
     return jsonify({"message": "Usuario registrado exitosamente"}), 201
 
