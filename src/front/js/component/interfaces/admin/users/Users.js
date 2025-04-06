@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Table from '../commons/Table';
+import Table from '../../../commons/Table';
 import { useNavigate } from 'react-router-dom';
 
 
-export default function UsersInterface() {
+export default function UsersAdminInterface() {
     const [users, setUsers] = useState([]);
      const navigate = useNavigate();
 
-     const handleCreateTeam = () => {
-        navigate('/Regteams');
-    };
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -43,7 +40,7 @@ export default function UsersInterface() {
                 return !row.is_in_team ? (
                     <button
                         className="btn btn-primary"
-                        onClick={() => navigate(`/add_player_to_team/${row.id}`)}
+                        onClick={() => navigate(`/admin/add_player_to_team/${row.id}`)}
                     >
                         Añadir A Equipo
                     </button>
@@ -52,7 +49,7 @@ export default function UsersInterface() {
                         className="btn btn-danger"
                         onClick={async () => {
                             try {
-                                const response = await fetch(process.env.BACKEND_URL + `/api/add_player_to_team/${row.id}`, {
+                                const response = await fetch(process.env.BACKEND_URL + `/api/admin/add_player_to_team/${row.id}`, {
                                     method: 'POST',
                                     body: new FormData(),
                                 });
@@ -87,7 +84,7 @@ export default function UsersInterface() {
             <h1 className="my-4">Gestión de Usuarios</h1>
             <div className="row">
                 <div className="col">
-                    <button className="btn btn-primary my-2" onClick={() => navigate('/create_user')}>
+                    <button className="btn btn-primary my-2" onClick={() => navigate('/admin/create_user')}>
                         Crear Usuario
                     </button>
                 </div>

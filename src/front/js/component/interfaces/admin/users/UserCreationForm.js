@@ -28,7 +28,7 @@ export default function CreateUserForm() {
     const notification = toast.loading('Creando usuario...');
 
     try {
-      const response = await fetch(process.env.BACKEND_URL + '/api/register', {
+      const response = await fetch(process.env.BACKEND_URL + '/api/admin/create_user', {
         method: 'POST',
         body: formData,
       });
@@ -42,7 +42,7 @@ export default function CreateUserForm() {
           autoClose: 5000,
           isLoading: false,
         });
-        navigate('/users');
+        navigate('/admin/users');
       } else {
         toast.update(notification, {
           render: json.error,
@@ -63,7 +63,7 @@ export default function CreateUserForm() {
       </div>
       <div className="row gy-3">
         <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label for="first_name">Nombre:</label>
+          <label htmlFor="first_name">Nombre:</label>
           <input
             type="text"
             id="first_name"
@@ -75,7 +75,7 @@ export default function CreateUserForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="last_name">Apellido:</label>
+          <label htmlFor="last_name">Apellido:</label>
           <input
             className="form-control"
             type="text"
@@ -87,7 +87,7 @@ export default function CreateUserForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="cedula">Cédula:</label>
+          <label htmlFor="cedula">Cédula:</label>
           <input
             onChange={({ target }) => setDni(target.value)}
             value={dni}
@@ -99,7 +99,7 @@ export default function CreateUserForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="age">Edad:</label>
+          <label htmlFor="age">Edad:</label>
           <input
             onChange={({ target }) => setAge(target.value)}
             value={age}
@@ -124,7 +124,7 @@ export default function CreateUserForm() {
           </select>
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="email">Correo Electrónico:</label>
+          <label htmlFor="email">Correo Electrónico:</label>
           <input
             onChange={({ target }) => setEmail(target.value)}
             value={email}
@@ -136,7 +136,7 @@ export default function CreateUserForm() {
           />
         </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label for="password">Contraseña:</label>
+          <label htmlFor="password">Contraseña:</label>
           <input
             onChange={({ target }) => setPassword(target.value)}
             value={password}
@@ -151,7 +151,7 @@ export default function CreateUserForm() {
           <button type="submit" className="btn btn-primary w-100 w-md-75">
             Crear Usuario
           </button>
-          <Link to="/users" className="btn btn-secondary w-100 w-md-75">
+          <Link to="/admin/users" className="btn btn-secondary w-100 w-md-75">
             Volver
           </Link>
         </div>

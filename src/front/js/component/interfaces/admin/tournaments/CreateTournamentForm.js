@@ -119,7 +119,7 @@ export default function CreateTournamentForm() {
                           <button type="submit" className="btn btn-primary w-100 w-md-75">
                             Añadir equipo al torneo
                           </button>
-                          <Link to="/tournaments" className="btn btn-secondary w-100 w-md-75">
+                          <Link to="/admin/tournaments" className="btn btn-secondary w-100 w-md-75">
                             Volver
                           </Link>
                         </div>

@@ -47,7 +47,7 @@ export default function AddPlayerToTeam() {
             const formData = new FormData();
             formData.append('team_id', selectedTeam);
 
-            const response = await fetch(process.env.BACKEND_URL + `/api/add_player_to_team/${user_id}`, {
+            const response = await fetch(process.env.BACKEND_URL + `/api/admin/add_player_to_team/${user_id}`, {
                 method: 'POST',
                 body: formData,
             });
@@ -62,7 +62,7 @@ export default function AddPlayerToTeam() {
                     autoClose: 5000,
                     isLoading: false,
                 });
-                navigate(`/users`);
+                navigate(`/admin/users`);
             } else {
                 toast.update(notification, {
                     render: responseData.error || 'Error al añadir el jugador al equipo',
@@ -113,7 +113,7 @@ export default function AddPlayerToTeam() {
                               <button type="submit" className="btn btn-primary w-100 w-md-75">
                                 Añadir Jugador al Equipo
                               </button>
-                              <Link to="/users" className="btn btn-secondary w-100 w-md-75">
+                              <Link to="/admin/users" className="btn btn-secondary w-100 w-md-75">
                                 Volver
                               </Link>
                             </div>

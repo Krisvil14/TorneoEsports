@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Table from '../commons/Table';
+import Table from '../../../commons/Table';
 
-export default function TeamsInterface() {
+export default function TeamsAdminInterface() {
     const navigate = useNavigate();
     const [teams, setTeams] = useState([]);
 

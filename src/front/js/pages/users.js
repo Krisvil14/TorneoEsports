@@ -1,5 +1,5 @@
 import React from 'react';
-import UsersInterface from '../component/interfaces/Users';
+import UsersInterface from '../component/interfaces/user/Users';
 
 
 export default function UsersPage() {

@@ -51,7 +51,7 @@ export default function AddTeamToTournament() {
         const notification = toast.loading('Añadiendo equipo al torneo...');
 
         try {
-            const response = await fetch(process.env.BACKEND_URL + `/api/tournaments/${tournament_id}/teams`, {
+            const response = await fetch(process.env.BACKEND_URL + `/api/admin/tournaments/${tournament_id}/teams`, {
                 method: 'POST',
                 body: formData,
             });
@@ -68,12 +68,21 @@ export default function AddTeamToTournament() {
                 });
                 navigate(`/tournaments`);
             } else {
-                toast.update(notification, {
-                    render: 'Error al añadir el equipo al torneo',
-                    type: 'error',
-                    autoClose: 5000,
-                    isLoading: false,
-                });
+                if (json.error === "Elija un equipo que no este registrado en este torneo") {
+                    toast.update(notification, {
+                        render: 'El equipo ya está en este torneo',
+                        type: 'error',
+                        autoClose: 5000,
+                        isLoading: false,
+                    });
+                } else {
+                    toast.update(notification, {
+                        render: 'Error al añadir el equipo al torneo',
+                        type: 'error',
+                        autoClose: 5000,
+                        isLoading: false,
+                    });
+                }
             }
         } catch (err) {
             console.error(err);

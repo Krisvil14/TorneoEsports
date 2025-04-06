@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Table from '../commons/Table';
+import Table from '../../../commons/Table';
 import { useNavigate } from 'react-router-dom';
 
-export default function TournamentsInterface() {
+export default function TournamentsAdminInterface() {
     const [tournaments, setTournaments] = useState([]);
     const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ export default function TournamentsInterface() {
     }, []);
 
     const handleCreateTournament = () => {
-        navigate('/Cretournament');
+        navigate('/admin/create_tournament');
     };
 
     const columns = [
@@ -35,7 +35,7 @@ export default function TournamentsInterface() {
             Cell: ({ value }) => (
                 <button
                     className="btn btn-primary"
-                    onClick={() => navigate(`/addteam/${value}`)}
+                    onClick={() => navigate(`/admin/addteam/${value}`)}
                 >
                     Añadir Equipo
                 </button>

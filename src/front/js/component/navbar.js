@@ -28,24 +28,43 @@ export const Navbar = () => {
           <Container className="navbar-nav justify-content-center w-100">
             {store.isAuthenticated && (
               <Container className="d-flex">
-                <Link to="/inicio" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                  <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif', color:'' }}>Inicio</Text>
-                </Link>
-                <Link to="/teams" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                  <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif',color:'' }}>Equipos</Text>
-                </Link>
-                <Link to="/users" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                  <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif',color:'' }}>Usuarios</Text>
-                </Link>
-                <Link to="/tournaments" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                  <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif',color:'' }}>Torneos</Text>
-                </Link>
+                {store.user && store.user.role === 'admin' ? (
+                  <>
+                    <Link to="/inicio" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Inicio</Text>
+                    </Link>
+                    <Link to="/admin/teams" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Equipos</Text>
+                    </Link>
+                    <Link to="/admin/users" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Usuarios</Text>
+                    </Link>
+                     <Link to="/admin/tournaments" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Torneos</Text>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/inicio" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Inicio</Text>
+                    </Link>
+                    <Link to="/teams" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Equipos</Text>
+                    </Link>
+                    <Link to="/users" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Usuarios</Text>
+                    </Link>
+                    <Link to="/tournaments" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Torneos</Text>
+                    </Link>
+                  </>
+                )}
               </Container>
             )}
             {store.isAuthenticated && (
               <Container className="ms-auto">
                 <button onClick={handleLogout} className="btn btn-danger" style={{ marginLeft: '10px' }}>
-                <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif',color:'white' }}>Cerrar Sesión</Text>
+                <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif',color:'white' }}>Cerrar Sesión</Text>
                 </button>
               </Container>
             )}

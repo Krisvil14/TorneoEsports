@@ -1,5 +1,5 @@
 import React from 'react';
-import TournamentsInterface from '../component/interfaces/Tournaments';
+import TournamentsInterface from '../component/interfaces/user/Tournaments';
 
 
 export default function TournamentsPage() {

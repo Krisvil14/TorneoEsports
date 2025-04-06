@@ -138,7 +138,7 @@ def register_team():
 
      return jsonify({"message": "Equipo registrado exitosamente"}), 201
 
-@api.route('/create_tournament', methods=['POST'])
+@api.route('/admin/create_tournament', methods=['POST'])
 def create_tournament():
     data = request.form
 
@@ -171,7 +171,7 @@ def create_tournament():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@api.route('/add_player_to_team/<int:user_id>', methods=['POST'])
+@api.route('/admin/add_player_to_team/<int:user_id>', methods=['POST'])
 def add_player_to_team(user_id):
     """
     Adds a player to a team
@@ -289,7 +289,7 @@ def get_user(user_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@api.route('/tournaments/<tournament_id>/teams', methods=['POST'])
+@api.route('/admin/tournaments/<tournament_id>/teams', methods=['POST'])
 def add_team_to_tournament(tournament_id):
     data = request.form
 
@@ -321,3 +321,50 @@ def add_team_to_tournament(tournament_id):
         return jsonify({"message": "Equipo añadido al torneo exitosamente"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/create_user', methods=['POST'])
+def create_user():
+    data = request.form
+    
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    cedula = data.get('cedula')
+    age = data.get('age')
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role')
+
+    if not first_name or not last_name or not cedula or not age or not email or not password or not role:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    # Validar la contraseña
+    if not validate_password(password):
+        return jsonify({"error": "La contraseña debe tener al menos 1 mayúscula, 1 minúscula y 1 número y tener minimo 8 caracteres"}), 400
+
+    # Verificar que el email sea único
+    if User.query.filter_by(email=email).first():
+        return jsonify({"error": "El email ya está registrado"}), 400
+
+    # Verificar que la cédula sea única
+    if User.query.filter_by(cedula=cedula).first():
+        return jsonify({"error": "La cédula ya está registrada"}), 400
+
+    # Crear el nuevo usuario
+    new_user = User(
+        first_name=first_name,
+        last_name=last_name,
+        cedula=cedula,
+        age=age,
+        email=email,
+        password=password,
+        role=role,
+        is_active=True,
+    )
+    db.session.add(new_user)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"message": "Usuario creado exitosamente"}), 201
