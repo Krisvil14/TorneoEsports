@@ -1,44 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import Table from '../../commons/Table';
-
+import React, { useContext } from 'react';
+import { Context } from '../../../store/appContext';
 
 export default function UsersInterface() {
-    const [users, setUsers] = useState([]);
+    const { store } = useContext(Context);
+    const user = store.user;
 
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/users');
-                const data = await response.json();
-                setUsers(data);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
-    const columns = [
-        { header: 'Nombre', accessor: 'first_name' },
-        { header: 'Apellido', accessor: 'last_name' },
-        { header: 'Cédula', accessor: 'cedula' },
-        { header: 'Email', accessor: 'email' },
-        {
-            header: 'En Equipo',
-            accessor: 'is_in_team',
-            Cell: ({ row }) => (row.is_in_team ? '✔' : 'X'),
-        },
-        { header: 'Equipo asignado', accessor: 'team_name' },
-    ];
+    if (!user) {
+        return <div>Loading user data...</div>;
+    }
 
     return (
         <div className="container text-center">
-            <h1 className="my-4">Gestión de Usuarios</h1>
+            <h1 className="my-4">Información Personal</h1>
             <div className="row">
                 <div className="col">
-                    <Table columns={columns} data={users} />
+                    <p><strong>Nombre:</strong> {user.first_name}</p>
+                    <p><strong>Apellido:</strong> {user.last_name}</p>
+                    <p><strong>Cédula:</strong> {user.cedula}</p>
+                    <p><strong>Email:</strong> {user.email}</p>
+                    <p><strong>En Equipo:</strong> {user.is_in_team ? '✔' : 'X'}</p>
+                    <p><strong>Equipo asignado:</strong> {user.team_name}</p>
                 </div>
             </div>
         </div>

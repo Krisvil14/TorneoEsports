@@ -62,6 +62,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             logout: () => {
                 setStore({ user: null, isAuthenticated: false });
                 localStorage.removeItem("user");
+                localStorage.removeItem("role");
             },
 
             checkAuth: () => {

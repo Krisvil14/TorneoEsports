@@ -42,12 +42,20 @@ def login_user():
     if not user or user.password != password:
         return jsonify({"error": "Credenciales inválidas"}), 401
 
+    team = Team.query.get(user.team_id)
+    team_name = team.name if team else None
+
     return jsonify({"user": {
+            "id": user.id,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
             "is_active": user.is_active,
-            "role": user.role
+            "role": user.role,
+            "cedula": user.cedula,
+            "is_in_team": user.is_in_team,
+            "team_id": user.team_id,
+            "team_name": team_name
         }}), 200
 
 @api.route('/recovery', methods=['POST'])
