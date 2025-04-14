@@ -51,8 +51,8 @@ export const Navbar = () => {
                     <Link to="/teams" className="nav-item nav-link" style={{ marginRight: '10px' }}>
                       <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Equipos</Text>
                     </Link>
-                    <Link to="/users" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Usuarios</Text>
+                    <Link to="/profile" className="nav-item nav-link" style={{ marginRight: '10px' }}>
+                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Perfil</Text>
                     </Link>
                     <Link to="/tournaments" className="nav-item nav-link" style={{ marginRight: '10px' }}>
                       <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Torneos</Text>

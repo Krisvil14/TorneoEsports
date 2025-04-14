@@ -17,7 +17,7 @@ import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
 import Protected from './component/commons/Protected';
 import RegTeamsForm from './component/teams/RegTeamsForm';
-import UsersPage from './pages/users';
+import ProfilePage from './pages/profile';
 import TournamentsPage from './pages/tournaments';
 import CreateTournamentForm from './component/interfaces/admin/tournaments/CreateTournamentForm';
 import AddTeamToTournament from './component/interfaces/admin/tournaments/AddTeamToTournament';
@@ -27,7 +27,7 @@ import TeamInfo from './pages/teamInfo';
 import TeamsAdminPage from './pages/admin/teams';
 import UsersAdminInterface from './component/interfaces/admin/users/Users'
 import TournamentsAdminPage from './pages/admin/tournaments';
-
+import EditProfilePage from './pages/editProfile';
 
 
 // Crear tu primer componente
@@ -53,7 +53,8 @@ const Layout = () => {
               <Route element={<Protected> <HomePage /> </Protected>} path="/inicio" />
               <Route element={<Protected> <TeamsInterface /> </Protected>} path="/teams" />
               <Route element={<Protected> <RegTeamsForm /> </Protected>} path="/Regteams" />
-              <Route element={<Protected> <UsersPage /> </Protected>} path="/users" />
+              <Route element={<Protected> <ProfilePage /> </Protected>} path="/profile" />
+              <Route element={<Protected> <EditProfilePage /> </Protected>} path="/editProfile" />
               <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
               <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
               <Route element={<Protected requiredRole="admin"> <CreateTournamentForm /> </Protected>} path="/admin/create_tournament" />

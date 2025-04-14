@@ -78,9 +78,15 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } else {
                     setStore({ user: null, isAuthenticated: false });
                 }
-            }
-        }
+            },
+
+            updateUser: (updatedUser) => {
+                const store = getStore();
+                setStore({ user: { ...store.user, ...updatedUser } }); // Actualiza el usuario en el estado global
+            },
+
+    }
+
     };
 };
-
 export default getState;

@@ -1,14 +1,10 @@
 import React, { useContext } from 'react';
-import { Link } from "react-router-dom";
 import { Context } from '../../../store/appContext';
 
 export default function ProfileInterface() {
     const { store } = useContext(Context);
     const user = store.user;
 
-    if (!user) {
-        return <div>Loading user data...</div>;
-    }
 
     return (
         <div className="container text-center">
@@ -23,7 +19,7 @@ export default function ProfileInterface() {
                     <p><strong>Equipo asignado:</strong> {user.team_name}</p>
                 </div>
             </div>
-            <Link to="/edit-profile" className="btn btn-primary">Editar</Link>
+            <a href="/editProfile" className="btn btn-primary">Editar Perfil</a>
         </div>
     );
 }

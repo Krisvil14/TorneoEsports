@@ -312,6 +312,31 @@ def get_user(user_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@api.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.email = data.get('email', user.email)
+    user.age = data.get('age', user.age)
+    user.password = data.get('password', user.password)
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify({"message": "Usuario actualizado exitosamente"}), 200
+
+
 @api.route('/admin/tournaments/<tournament_id>/teams', methods=['POST'])
 def add_team_to_tournament(tournament_id):
     data = request.form
