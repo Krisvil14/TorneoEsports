@@ -265,6 +265,21 @@ def get_tournament(tournament_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@api.route('/teams/user/<int:user_id>', methods=['GET'])
+def get_user_team(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    if user.team_id is None:
+        return jsonify([]), 200
+
+    team = Team.query.get(user.team_id)
+    if team is None:
+        return jsonify({"error": "Team not found"}), 404
+
+    return jsonify([team.serialize()]), 200
+
 @api.route('/teams', methods=['GET'])
 def get_teams():
     teams = Team.query.all()
