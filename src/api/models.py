@@ -91,4 +91,45 @@ class Team(db.Model):
              "name": self.name,
              "max_players": self.max_players,
              "game": self.game.name,
+             # Include the number of team members
+             "member_count": User.query.filter_by(team_id=self.id).count()
          }
+
+class ActionEnum(enum.Enum):
+    join_team = 'join_team'
+    join_tournament = 'join_tournament'
+    do_payment = 'do_payment'
+
+action_enum = ENUM(ActionEnum, name='actionenum', create_type=False)
+
+class StatusEnum(enum.Enum):
+    pending = 'pending'
+    approved = 'approved'
+    rejected = 'rejected'
+
+status_enum = ENUM(StatusEnum, name='statusenum', create_type=False)
+
+class Application(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    userID = db.Column(db.Integer, nullable=True)
+    teamID = db.Column(db.Integer, nullable=True)
+    tournamentID = db.Column(UUID(as_uuid=True), nullable=True)
+    payment = db.Column(db.String(120), nullable=True)
+    action = db.Column(action_enum, nullable=False)
+    status = db.Column(status_enum, nullable=False)
+    active = db.Column(db.Boolean(), nullable=False, default=True)
+
+    def __repr__(self):
+        return f'<Application {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "userID": self.userID,
+            "teamID": self.teamID,
+            "tournamentID": str(self.tournamentID),
+            "payment": self.payment,
+            "action": self.action.name,
+            "status": self.status.name,
+            "active": self.active,
+        }

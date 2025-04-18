@@ -29,6 +29,8 @@ import UsersAdminInterface from './component/interfaces/admin/users/Users'
 import TournamentsAdminPage from './pages/admin/tournaments';
 import EditProfilePage from './pages/editProfile';
 import CreateTeamForm from './component/teams/CreateTeamForm';
+import BuscaEquipo from './pages/BuscaEquipo';
+import TeamInfoUser from './pages/teamInfoUser';
 
 
 // Crear tu primer componente
@@ -56,6 +58,7 @@ const Layout = () => {
               <Route element={<Protected> <ProfilePage /> </Protected>} path="/profile" />
               <Route element={<Protected> <EditProfilePage /> </Protected>} path="/editProfile" />
               <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
+              <Route element={<Protected> <TeamInfoUser /> </Protected>} path="/busca-equipo/:teamId" />
               <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
               <Route element={<Protected requiredRole="admin"> <RegTeamsForm /> </Protected>} path="/admin/Regteams" />
               <Route element={<Protected requiredRole="admin"> <CreateTournamentForm /> </Protected>} path="/admin/create_tournament" />
@@ -66,6 +69,7 @@ const Layout = () => {
               <Route element={<Protected requiredRole="admin"> <UsersAdminInterface /> </Protected>} path="/admin/users" />
               <Route element={<Protected requiredRole="admin"> <TournamentsAdminPage /> </Protected>} path="/admin/tournaments" />
               <Route element={<Protected> <CreateTeamForm /> </Protected>} path="/create-team" />
+              <Route element={<Protected> <BuscaEquipo /> </Protected>} path="/busca-equipo" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>

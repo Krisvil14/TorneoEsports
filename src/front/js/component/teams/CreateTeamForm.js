@@ -36,40 +36,36 @@ export default function CreateTeamForm() {
           isLoading: false,
         });
 
-        // Add user to the team
-        try {
-          const addPlayerResponse = await fetch(process.env.BACKEND_URL + '/api/add_player_to_team', {
-            method: 'POST',
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ user_id: store.user.id, team_id: json.team_id })
-          });
+        const addPlayerResponse = await fetch(process.env.BACKEND_URL + '/api/add_player_to_team', {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ user_id: store.user.id, team_id: json.team_id })
+        });
 
-          if (addPlayerResponse.ok) {
-            toast.success('Jugador añadido al equipo exitosamente');
-            // Update user's is_leader attribute
-            await actions.updateUser({ ...store.user, is_leader: true });
-             // Update local storage
-            actions.getUser();
-            navigate('/teams');
-          } else {
-            toast.error('Error al agregar el jugador al equipo');
-          }
-        } catch (addPlayerErr) {
-          console.log(addPlayerErr);
+        if (addPlayerResponse.ok) {
+          toast.success('Jugador añadido al equipo exitosamente');
+
+          const updatedUser = { ...store.user, is_leader: true };
+          await actions.updateUser(updatedUser);
+
+          navigate('/teams');
+          
+          await actions.getUser();
+        } else {
           toast.error('Error al agregar el jugador al equipo');
         }
       } else {
         toast.update(notification, {
-          render: json.error,
+          render: json.error || 'Error desconocido al registrar el equipo',
           type: 'error',
           autoClose: 5000,
           isLoading: false,
         });
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
       toast.update(notification, {
         render: 'Error al registrar el equipo',
         type: 'error',
@@ -114,7 +110,7 @@ export default function CreateTeamForm() {
         </div>
         <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
           <button type="submit" className="btn btn-primary w-100 w-md-75">
-            Registratr Equipo
+            Registrar Equipo
           </button>
           <Link to="/teams" className="btn btn-secondary w-100 w-md-75">
             Volver

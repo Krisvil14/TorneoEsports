@@ -8,10 +8,15 @@ export default function TeamsInterface() {
     const user = store.user;
     const navigate = useNavigate();
     const [teams, setTeams] = useState([]);
+    const [userFetched, setUserFetched] = useState(false); // Add a new state variable
 
     useEffect(() => {
-        // Obtener los datos de los equipos desde el backend
         const fetchTeams = async () => {
+            if (!userFetched) { // Add a conditional statement
+                actions.getUser();
+                setUserFetched(true); // Set the state variable to true
+            }
+
             if (user) {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + `/api/teams/user/${user.id}`);
@@ -23,9 +28,8 @@ export default function TeamsInterface() {
             }
         };
 
-        actions.getUser();
         fetchTeams();
-    }, [user]);
+    }, [user]); // Add the user object to the dependency array
 
     const columns = [
         { header: 'Nombre del Equipo', accessor: 'name' },
@@ -56,8 +60,8 @@ export default function TeamsInterface() {
             ) : (
                 <div className="row">
                     <div className="col">
-                        <button className="btn btn-primary" onClick={() => navigate('/create-team')}>Crear Equipo</button>
-                        <button className="btn btn-secondary">Buscar Equipo</button>
+                    <button className="btn btn-primary me-2" onClick={() => navigate('/create-team')}>Crear Equipo</button>
+                    <button className="btn btn-secondary" onClick={() => navigate('/busca-equipo')}>Buscar Equipo</button>
                     </div>
                 </div>
             )}

@@ -45,6 +45,9 @@ def login_user():
     team = Team.query.get(user.team_id)
     team_name = team.name if team else None
 
+    # Check if the user is in a team
+    
+
     return jsonify({"user": {
             "id": user.id,
             "first_name": user.first_name,
@@ -53,7 +56,6 @@ def login_user():
             "is_active": user.is_active,
             "role": user.role,
             "cedula": user.cedula,
-            "is_in_team": user.is_in_team,
             "team_id": user.team_id,
             "team_name": team_name
         }}), 200
@@ -347,6 +349,7 @@ def update_user(user_id):
     age = data.get('age', user.age)
     email = data.get('email', user.email)
     password = data.get('password', user.password)
+    is_leader = data.get('is_leader', user.is_leader)
 
     if not first_name or not last_name or not cedula or not age or not email or not password:
         return jsonify({"error": "Faltan datos"}), 400
@@ -368,6 +371,7 @@ def update_user(user_id):
     user.email = email
     user.age = age
     user.password = password
+    user.is_leader = is_leader
 
     try:
         db.session.commit()

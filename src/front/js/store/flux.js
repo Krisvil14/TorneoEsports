@@ -80,9 +80,24 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            updateUser: (updatedUser) => {
+           updateUser: async (updatedUser) => {
                 const store = getStore();
-                setStore({ user: { ...store.user, ...updatedUser } }); // Actualiza el usuario en el estado global
+                try {
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/users/" + store.user.id, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updatedUser)
+                    });
+                    if (resp.ok) {
+                        setStore({ user: { ...store.user, ...updatedUser } }); // Actualiza el usuario en el estado global
+                    } else {
+                        console.error("Error updating user in backend", resp.status);
+                    }
+                } catch (error) {
+                    console.log("Error updating user in backend", error);
+                }
             },
 
             getUser: async () => {
