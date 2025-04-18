@@ -341,11 +341,33 @@ def update_user(user_id):
     if not data:
         return jsonify({"error": "Faltan datos"}), 400
 
-    user.first_name = data.get('first_name', user.first_name)
-    user.last_name = data.get('last_name', user.last_name)
-    user.email = data.get('email', user.email)
-    user.age = data.get('age', user.age)
-    user.password = data.get('password', user.password)
+    first_name = data.get('first_name', user.first_name)
+    last_name = data.get('last_name', user.last_name)
+    cedula = data.get('cedula', user.cedula)
+    age = data.get('age', user.age)
+    email = data.get('email', user.email)
+    password = data.get('password', user.password)
+
+    if not first_name or not last_name or not cedula or not age or not email or not password:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    # Validar la contraseña
+    if password and not validate_password(password):
+        return jsonify({"error": "La contraseña debe tener al menos 1 mayúscula, 1 minúscula y 1 número y tener minimo 8 caracteres"}), 400
+
+    # Verificar que el email sea único
+    if email != user.email and User.query.filter_by(email=email).first():
+        return jsonify({"error": "El email ya está registrado"}), 400
+
+    # Verificar que la cédula sea única
+    if cedula != user.cedula and User.query.filter_by(cedula=cedula).first():
+        return jsonify({"error": "La cédula ya está registrada"}), 400
+
+    user.first_name = first_name
+    user.last_name = last_name
+    user.email = email
+    user.age = age
+    user.password = password
 
     try:
         db.session.commit()

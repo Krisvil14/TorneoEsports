@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function EditProfilePage() {
     const { store, actions } = useContext(Context);
@@ -24,30 +25,39 @@ export default function EditProfilePage() {
             age: age,
         };
 
-        try {
-            const response = await fetch(`${process.env.BACKEND_URL}/api/users/${user.id}`, {
+        toast.promise(
+            fetch(`${process.env.BACKEND_URL}/api/users/${user.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${store.token}`,
                 },
                 body: JSON.stringify(updatedData),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Error: ${response.status} - ${errorData.message || 'No se pudo actualizar el perfil'}`);
+            })
+            .then(async (response) => {
+                if (!response.ok) {
+                    const errorData = await response.json(); // Obtiene el mensaje de error de la API
+                    throw new Error(errorData.error || 'No se pudo actualizar el perfil'); // Usa el mensaje de error de la API
+                }
+                return response.json();
+            })
+            .then(() => {
+                navigate('/profile');
+            }),
+            {
+                pending: 'Actualizando perfil...',
+                success: 'Perfil actualizado exitosamente',
+                error: {
+                    render({ data }) {
+                        // Muestra el mensaje de error retornado por la API
+                        return `${data.message || 'Error desconocido'}`;
+                    }
+                }
             }
-
-            await response.json();
-            actions.logout();
-            navigate('/login');
-            
-        } catch (error) {
-            console.error('Error al actualizar el perfil:', error.message);
-            alert(`Error al actualizar el perfil: ${error.message}`);
-        }
-    };
+        ).catch(error => {
+            console.error(error.message);
+        });
+    }
 
     return (
         <div className="container text-center">
@@ -112,4 +122,3 @@ export default function EditProfilePage() {
         </div>
     );
 }
-
