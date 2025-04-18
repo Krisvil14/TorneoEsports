@@ -1,10 +1,13 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Context } from '../../../store/appContext';
 
 export default function ProfileInterface() {
-    const { store } = useContext(Context);
+    const { store, actions } = useContext(Context);
     const user = store.user;
 
+    useEffect(() => {
+        actions.getUser();
+    }, []);
 
     return (
         <div className="container text-center">

@@ -48,8 +48,10 @@ export default function CreateTeamForm() {
 
           if (addPlayerResponse.ok) {
             toast.success('Jugador añadido al equipo exitosamente');
-    
+            // Update user's is_leader attribute
             actions.updateUser({ ...store.user, is_leader: true });
+             // Update local storage
+            actions.getUser();
             navigate('/teams');
           } else {
             toast.error('Error al agregar el jugador al equipo');

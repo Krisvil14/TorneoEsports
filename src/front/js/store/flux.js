@@ -85,6 +85,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ user: { ...store.user, ...updatedUser } }); // Actualiza el usuario en el estado global
             },
 
+            getUser: async () => {
+                try {
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/users/" + getStore().user.id);
+                    const data = await resp.json();
+                    setStore({ user: data });
+                } catch (error) {
+                    console.log("Error loading user from backend", error);
+                }
+            },
+
     }
 
     };
