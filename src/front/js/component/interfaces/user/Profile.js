@@ -11,12 +11,18 @@ export default function ProfileInterface() {
             <h1 className="my-4">Información Personal</h1>
             <div className="row">
                 <div className="col">
-                    <p><strong>Nombre:</strong> {user.first_name}</p>
-                    <p><strong>Apellido:</strong> {user.last_name}</p>
-                    <p><strong>Cédula:</strong> {user.cedula}</p>
-                    <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>En Equipo:</strong> {user.is_in_team ? '✔' : 'X'}</p>
-                    <p><strong>Equipo asignado:</strong> {user.team_name}</p>
+                    {user ? (
+                        <>
+                            <p><strong>Nombre:</strong> {user.first_name}</p>
+                            <p><strong>Apellido:</strong> {user.last_name}</p>
+                            <p><strong>Cédula:</strong> {user.cedula}</p>
+                            <p><strong>Email:</strong> {user.email}</p>
+                            <p><strong>En Equipo:</strong> {user.is_in_team ? '✔' : 'X'}</p>
+                            <p><strong>Equipo asignado:</strong> {user.team_name}</p>
+                        </>
+                    ) : (
+                        <p>Cargando información del usuario...</p>
+                    )}
                 </div>
             </div>
             <a href="/editProfile" className="btn btn-primary">Editar Perfil</a>

@@ -17,6 +17,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean(), nullable=False, default=True)
+    is_leader = db.Column(db.Boolean(), nullable=False, default=False)
     is_in_team = db.Column(db.Boolean(), nullable=False, default=False)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     role = db.Column(db.String(20), nullable=False, default='user')
@@ -33,6 +34,7 @@ class User(db.Model):
             "age": self.age,
             "email": self.email,
             "is_active": self.is_active,
+            "is_leader": self.is_leader,
             "is_in_team": self.is_in_team,
             "team_id": self.team_id,
             "role": self.role,

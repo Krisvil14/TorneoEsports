@@ -52,11 +52,11 @@ const Layout = () => {
               <Route element={<Recovery />} path="/recuperar" />
               <Route element={<Protected> <HomePage /> </Protected>} path="/inicio" />
               <Route element={<Protected> <TeamsInterface /> </Protected>} path="/teams" />
-              <Route element={<Protected> <RegTeamsForm /> </Protected>} path="/Regteams" />
               <Route element={<Protected> <ProfilePage /> </Protected>} path="/profile" />
               <Route element={<Protected> <EditProfilePage /> </Protected>} path="/editProfile" />
               <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
               <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
+              <Route element={<Protected requiredRole="admin"> <RegTeamsForm /> </Protected>} path="/admin/Regteams" />
               <Route element={<Protected requiredRole="admin"> <CreateTournamentForm /> </Protected>} path="/admin/create_tournament" />
               <Route element={<Protected requiredRole="admin"> <AddTeamToTournament /> </Protected>} path="/admin/addteam/:tournament_id" />
               <Route element={<Protected requiredRole="admin"> <AddPlayerToTeam /> </Protected>} path="/admin/add_player_to_team/:user_id" />

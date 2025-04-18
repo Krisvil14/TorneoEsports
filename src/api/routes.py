@@ -146,6 +146,25 @@ def register_team():
 
      return jsonify({"message": "Equipo registrado exitosamente"}), 201
 
+@api.route('/admin/Regteams', methods=['POST'])
+def register_team_admin():
+     data = request.form
+    
+     name = data.get('name')
+     game = data.get('game')
+
+     if not name or not game:
+         return jsonify({"error": "Faltan datos"}), 400
+
+     new_team = Team(
+         name=name,
+         game=GameEnum[game],
+     )
+     db.session.add(new_team)
+     db.session.commit()
+
+     return jsonify({"message": "Equipo registrado exitosamente"}), 201
+
 @api.route('/admin/create_tournament', methods=['POST'])
 def create_tournament():
     data = request.form

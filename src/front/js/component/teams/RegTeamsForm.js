@@ -18,7 +18,7 @@ export default function RegTeamsForm() {
     const notification = toast.loading('Registrando equipo...');
 
     try {
-      const response = await fetch(process.env.BACKEND_URL + '/api/Regteams', {
+      const response = await fetch(process.env.BACKEND_URL + '/api/admin/Regteams', {
         method: 'POST',
         body: formData,
       });
@@ -33,7 +33,7 @@ export default function RegTeamsForm() {
           autoClose: 5000,
           isLoading: false,
         });
-        navigate('/teams');
+        navigate('/admin/teams');
       } else {
         toast.update(notification, {
           render: json.error,
@@ -90,7 +90,7 @@ export default function RegTeamsForm() {
                   <button type="submit" className="btn btn-primary w-100 w-md-75">
                     Registratr Equipo
                   </button>
-                  <Link to="/users" className="btn btn-secondary w-100 w-md-75">
+                  <Link to="/admin/teams" className="btn btn-secondary w-100 w-md-75">
                     Volver
                   </Link>
                 </div>
