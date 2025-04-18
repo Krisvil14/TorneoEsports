@@ -1,6 +1,7 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function RegisterForm() {
   const [name, setName] = React.useState('');
@@ -135,6 +136,9 @@ export default function RegisterForm() {
         <button type="submit" className="btn btn-primary w-75 mx-auto">
           Registrar Usuario
         </button>
+        <Link to="/login" className="btn btn-secondary w-75 mx-auto">
+        Volver
+        </Link>
       </div>
     </form>
   );

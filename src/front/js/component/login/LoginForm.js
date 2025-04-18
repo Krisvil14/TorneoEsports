@@ -2,6 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Context } from '../../store/appContext';
+import { Link } from 'react-router-dom';
 
 
 export default function LoginForm() {
@@ -82,6 +83,9 @@ export default function LoginForm() {
             <button type="submit" className="btn btn-primary w-75 mx-auto">
             Ingresar al sistema
             </button>
+            <Link to="/registrar" className="btn btn-secondary w-75 mx-auto">
+            Registrar Usuario
+            </Link>
             </div>
         </form>
         );

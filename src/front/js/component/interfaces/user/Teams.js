@@ -57,7 +57,7 @@ export default function TeamsInterface() {
             ) : (
                 <div className="row">
                     <div className="col">
-                        <button className="btn btn-primary">Crear Equipo</button>
+                        <button className="btn btn-primary" onClick={() => navigate('/create-team')}>Crear Equipo</button>
                         <button className="btn btn-secondary">Buscar Equipo</button>
                     </div>
                 </div>

@@ -92,7 +92,7 @@ def register_user():
     password = data.get('password')
     role = data.get('role')
 
-    if not first_name or not last_name or not cedula or not age or not email or not password or not role:
+    if not first_name or not last_name or not cedula or not age or not email or not password:
         return jsonify({"error": "Faltan datos"}), 400
 
     # Validar la contraseña
@@ -144,7 +144,7 @@ def register_team():
      db.session.add(new_team)
      db.session.commit()
 
-     return jsonify({"message": "Equipo registrado exitosamente"}), 201
+     return jsonify({"message": "Equipo registrado exitosamente", "team_id": new_team.id}), 201
 
 @api.route('/admin/Regteams', methods=['POST'])
 def register_team_admin():
@@ -163,7 +163,7 @@ def register_team_admin():
      db.session.add(new_team)
      db.session.commit()
 
-     return jsonify({"message": "Equipo registrado exitosamente"}), 201
+     return jsonify({"message": "Equipo registrado exitosamente", "team_id": new_team.id}), 201
 
 @api.route('/admin/create_tournament', methods=['POST'])
 def create_tournament():
@@ -435,3 +435,26 @@ def create_user():
         return jsonify({"error": str(e)}), 500
 
     return jsonify({"message": "Usuario creado exitosamente"}), 201
+
+@api.route('/add_player_to_team', methods=['POST'])
+def add_player_to_team_route():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    team_id = data.get('team_id')
+
+    if not user_id or not team_id:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    team = Team.query.get(team_id)
+    if not team:
+        return jsonify({"error": "Equipo no encontrado"}), 404
+
+    user.team_id = team_id
+    user.is_in_team = True
+    db.session.commit()
+
+    return jsonify({"message": "Usuario añadido al equipo exitosamente"}), 200

@@ -28,6 +28,7 @@ import TeamsAdminPage from './pages/admin/teams';
 import UsersAdminInterface from './component/interfaces/admin/users/Users'
 import TournamentsAdminPage from './pages/admin/tournaments';
 import EditProfilePage from './pages/editProfile';
+import CreateTeamForm from './component/teams/CreateTeamForm';
 
 
 // Crear tu primer componente
@@ -64,7 +65,7 @@ const Layout = () => {
               <Route element={<Protected requiredRole="admin"> <TeamsAdminPage /> </Protected>} path="/admin/teams" />
               <Route element={<Protected requiredRole="admin"> <UsersAdminInterface /> </Protected>} path="/admin/users" />
               <Route element={<Protected requiredRole="admin"> <TournamentsAdminPage /> </Protected>} path="/admin/tournaments" />
-
+              <Route element={<Protected> <CreateTeamForm /> </Protected>} path="/create-team" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>
