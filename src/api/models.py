@@ -22,6 +22,10 @@ class User(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     role = db.Column(db.String(20), nullable=False, default='user')
 
+    Team = db.relationship("Team", backref="user")
+    Application = db.relationship("Application", back_populates="user")
+    Tournament = db.relationship("Tournament", backref="user")
+
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -53,6 +57,8 @@ class Tournament(db.Model):
     num_max_teams = db.Column(db.Integer, nullable=False)
     game = db.Column(game_enum, nullable=False)
     teams = db.relationship('Team', backref='tournament', lazy=True)
+    applications = db.relationship('Application', backref='tournament', lazy=True)
+    User = db.relationship("User", backref="tournament")
 
     __table_args__ = (
         CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
@@ -76,6 +82,8 @@ class Team(db.Model):
      name = db.Column(db.String(80), nullable=False)
      max_players = db.Column(db.Integer, nullable=False, default=5)
      game = db.Column(game_enum, nullable=False)
+
+     
 
      def __repr__(self):
          return f'<Team {self.name}>'
@@ -111,9 +119,9 @@ status_enum = ENUM(StatusEnum, name='statusenum', create_type=False)
 
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer, nullable=True)
-    teamID = db.Column(db.Integer, nullable=True)
-    tournamentID = db.Column(UUID(as_uuid=True), nullable=True)
+    userID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    teamID = db.Column(db.Integer,db.ForeignKey('team.id'), nullable=True)
+    tournamentID = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
     payment = db.Column(db.String(120), nullable=True)
     action = db.Column(action_enum, nullable=False)
     status = db.Column(status_enum, nullable=False)
