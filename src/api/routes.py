@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum
-from api.utils import generate_sitemap, APIException
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum
+from api.utils import generate_sitemap, APIException, approved_join_team
 from flask_cors import CORS
 import re
 
@@ -484,3 +484,28 @@ def add_player_to_team_route():
     db.session.commit()
 
     return jsonify({"message": "Usuario añadido al equipo exitosamente"}), 200
+
+@api.route('/handle_application', methods=['POST'])
+def handle_application():
+    data = request.form
+    application_id = data.get('application_id')    # application id
+    accepted = data.get('accepted') # boolean Approved or Rejetected
+
+    # aca debes validar el beta
+
+    # get application
+    application = Application.query.filter_by(id=application_id).first()
+
+    if not accepted:
+        application.status = 'rejected'
+
+    if accepted and application.action == ActionEnum.join_team:
+        approved_join_team(application)
+    # if accepted and application.action == ActionEnum.join_tournament:
+    #     hacer algo interesante
+    # if accepted and application.action == ActionEnum.do_payment:
+    #     hacer algo interesante
+
+    db.session.commit()
+
+    return jsonify({"message": f"La aplicación ha sido procesada exitosamente"}), 200
