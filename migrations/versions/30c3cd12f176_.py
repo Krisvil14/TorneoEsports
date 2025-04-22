@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3edc5941e9d5
+Revision ID: 30c3cd12f176
 Revises: 
-Create Date: 2025-04-21 20:56:55.156681
+Create Date: 2025-04-21 21:28:19.632629
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '3edc5941e9d5'
+revision = '30c3cd12f176'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -57,14 +57,14 @@ def upgrade():
     )
     op.create_table('application',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('userID', sa.Integer(), nullable=True),
-    sa.Column('teamID', sa.Integer(), nullable=True),
-    sa.Column('tournamentID', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('payment', sa.String(length=120), nullable=True),
     sa.Column('action', postgresql.ENUM('join_team', 'join_tournament', 'do_payment', name='actionenum'), nullable=False),
     sa.Column('status', postgresql.ENUM('pending', 'approved', 'rejected', name='statusenum'), nullable=False),
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('userID', sa.Integer(), nullable=True),
+    sa.Column('teamID', sa.Integer(), nullable=True),
+    sa.Column('tournamentID', postgresql.UUID(as_uuid=True), nullable=True),
     sa.ForeignKeyConstraint(['teamID'], ['team.id'], ),
     sa.ForeignKeyConstraint(['tournamentID'], ['tournament.id'], ),
     sa.ForeignKeyConstraint(['userID'], ['user.id'], ),
