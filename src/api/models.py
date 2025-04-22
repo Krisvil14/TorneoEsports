@@ -118,6 +118,7 @@ class Application(db.Model):
     action = db.Column(action_enum, nullable=False)
     status = db.Column(status_enum, nullable=False)
     active = db.Column(db.Boolean(), nullable=False, default=True)
+    created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
 
     def __repr__(self):
         return f'<Application {self.id}>'
@@ -132,4 +133,5 @@ class Application(db.Model):
             "action": self.action.name,
             "status": self.status.name,
             "active": self.active,
+            "created_at": self.created_at,
         }

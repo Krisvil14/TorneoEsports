@@ -5,10 +5,6 @@ export default function ProfileInterface() {
     const { store, actions } = useContext(Context);
     const user = store.user;
 
-    useEffect(() => {
-        actions.getUser();
-    }, []);
-
     return (
         <div className="container text-center">
             <h1 className="my-4">Información Personal</h1>
@@ -20,8 +16,9 @@ export default function ProfileInterface() {
                             <p><strong>Apellido:</strong> {user.last_name}</p>
                             <p><strong>Cédula:</strong> {user.cedula}</p>
                             <p><strong>Email:</strong> {user.email}</p>
-                            <p><strong>En Equipo:</strong> {user.is_in_team ? '✔' : 'X'}</p>
                             <p><strong>Equipo asignado:</strong> {user.team_name}</p>
+                            <p><strong>En Equipo:</strong> {user.is_in_team ? '✔' : 'X'}</p>
+                            
                         </>
                     ) : (
                         <p>Cargando información del usuario...</p>

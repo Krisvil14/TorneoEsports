@@ -39,6 +39,7 @@ export default function EditProfilePage() {
                     const errorData = await response.json(); // Obtiene el mensaje de error de la API
                     throw new Error(errorData.error || 'No se pudo actualizar el perfil'); // Usa el mensaje de error de la API
                 }
+                await actions.getUser();
                 return response.json();
             })
             .then(() => {

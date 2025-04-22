@@ -45,7 +45,6 @@ def login_user():
     team = Team.query.get(user.team_id)
     team_name = team.name if team else None
 
-    # Check if the user is in a team
     
 
     return jsonify({"user": {
@@ -57,6 +56,7 @@ def login_user():
             "role": user.role,
             "cedula": user.cedula,
             "team_id": user.team_id,
+            "is_in_team": user.is_in_team,
             "team_name": team_name
         }}), 200
 
