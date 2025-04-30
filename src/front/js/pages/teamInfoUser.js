@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Table from '../component/commons/Table';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Context } from '../store/appContext';
 
 export default function TeamInfoUser() {
     const { teamId } = useParams();
     const [team, setTeam] = useState(null);
     const [users, setUsers] = useState([]);
+    const [hasRequested, setHasRequested] = useState(false);
+    const { store } = React.useContext(Context);
 
     useEffect(() => {
         const fetchTeam = async () => {
@@ -29,9 +34,74 @@ export default function TeamInfoUser() {
             }
         };
 
+        const checkRequestStatus = async () => {
+            if (!store.user || !store.user.id) {
+                console.log('No user logged in');
+                return;
+            }
+
+            try {
+                const response = await fetch(process.env.BACKEND_URL + `/api/team-requests/check/${teamId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'user_id': store.user.id.toString()
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Error checking request:', errorData);
+                    return;
+                }
+
+                const data = await response.json();
+                setHasRequested(data.hasRequested);
+            } catch (error) {
+                console.error('Error checking request status:', error);
+            }
+        };
+
         fetchTeam();
         fetchUsers();
-    }, [teamId]);
+        checkRequestStatus();
+    }, [teamId, store.user]);
+
+    const handleJoinRequest = async () => {
+        if (!store.user || !store.user.id) {
+            toast.error('Debes iniciar sesión para solicitar unirte a un equipo');
+            return;
+        }
+
+        if (hasRequested) {
+            toast.warning('Ya has solicitado unirte a este equipo');
+            return;
+        }
+
+        try {
+            const response = await fetch(process.env.BACKEND_URL + `/api/team-requests`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: store.user.id,
+                    team_id: teamId
+                })
+            });
+
+            if (response.ok) {
+                setHasRequested(true);
+                toast.success('Solicitud hecha exitosamente');
+            } else {
+                const data = await response.json();
+                toast.error(data.error || 'Error al realizar la solicitud');
+            }
+        } catch (error) {
+            console.error('Error sending request:', error);
+            toast.error('Error al realizar la solicitud');
+        }
+    };
 
     if (!team) {
         return <div>Loading...</div>;
@@ -64,12 +134,18 @@ export default function TeamInfoUser() {
 
     return (
         <div className="container text-center">
-                <Link to="/busca-equipo" className="btn btn-primary w-50 w-md-75 my-5">
-                    Volver
-                </Link>
-                <Link to="/" className="btn btn-secondary w-50 w-md-75 my-5">
-                    Solicitar unirse al equipo
-                </Link>
+            <div className="d-flex justify-content-center gap-3">
+            <Link to="/busca-equipo" className="btn btn-primary w-50 w-md-75 my-5">
+                Volver
+            </Link>
+            <button 
+                onClick={handleJoinRequest}
+                className="btn btn-secondary w-50 w-md-75 my-5"
+                disabled={hasRequested}
+            >
+                {hasRequested ? 'Solicitud ya enviada' : 'Solicitar unirse al equipo'}
+            </button>
+            </div>
             <Table data={teamData} columns={teamColumns} />
             <h3>Integrantes:</h3>
             <Table data={usersData} columns={usersColumns} />

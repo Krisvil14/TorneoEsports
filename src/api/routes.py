@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment
 from flask_cors import CORS
 import re
@@ -495,25 +495,95 @@ def add_player_to_team_route():
 
 @api.route('/handle_application', methods=['POST'])
 def handle_application():
-    data = request.form
-    application_id = data.get('application_id')    # application id
-    accepted = data.get('accepted') # boolean Approved or Rejetected
+    try:
+        data = request.get_json()  # Cambiar de request.form a request.get_json()
+        application_id = data.get('application_id')    # application id
+        accepted = data.get('accepted') # boolean Approved or Rejetected
 
-    # aca debes validar el beta
+        # get application
+        application = Application.query.filter_by(id=application_id).first()
+        if not application:
+            return jsonify({"error": "Application not found"}), 404
 
-    # get application
-    application = Application.query.filter_by(id=application_id).first()
+        if not accepted:
+            application.status = 'rejected'
 
-    if not accepted:
-        application.status = 'rejected'
+        if accepted and application.action == ActionEnum.join_team:
+            approved_join_team(application)
+        if accepted and application.action == ActionEnum.join_tournament:
+            approved_join_tournament(application)
+        if accepted and application.action == ActionEnum.do_payment:
+            approved_do_payment(application)
 
-    if accepted and application.action == ActionEnum.join_team:
-        approved_join_team(application)
-    if accepted and application.action == ActionEnum.join_tournament:
-        approved_join_tournament(application)
-    if accepted and application.action == ActionEnum.do_payment:
-        approved_do_payment(application)
+        db.session.commit()
 
-    db.session.commit()
+        response = jsonify({"message": f"La aplicación ha sido procesada exitosamente"})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
-    return jsonify({"message": f"La aplicación ha sido procesada exitosamente"}), 200
+@api.route('/applications/team/<int:team_id>', methods=['GET'])
+def get_team_applications(team_id):
+    try:
+        applications = Application.query.filter_by(teamID=team_id).all()
+        return jsonify([app.serialize() for app in applications]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/team-requests/check/<int:team_id>', methods=['GET'])
+def check_team_request(team_id):
+    try:
+        user_id = request.headers.get('user_id')
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Verificar si ya existe una solicitud activa para este usuario y equipo
+        existing_request = Application.query.filter_by(
+            userID=int(user_id),
+            teamID=team_id,
+            action=ActionEnum.join_team,
+            active=True
+        ).first()
+
+        has_requested = existing_request is not None
+        return jsonify({"hasRequested": has_requested}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/team-requests', methods=['POST'])
+def create_team_request():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        team_id = data.get('team_id')
+
+        if not user_id or not team_id:
+            return jsonify({"error": "User ID and Team ID are required"}), 400
+
+        # Verificar si ya existe una solicitud activa
+        existing_request = Application.query.filter_by(
+            userID=user_id,
+            teamID=team_id,
+            action=ActionEnum.join_team,
+            active=True
+        ).first()
+
+        if existing_request:
+            return jsonify({"error": "Ya has solicitado unirte a este equipo"}), 400
+
+        # Crear nueva solicitud
+        new_request = Application(
+            userID=user_id,
+            teamID=team_id,
+            action=ActionEnum.join_team,
+            status=StatusEnum.pending,
+            active=True
+        )
+
+        db.session.add(new_request)
+        db.session.commit()
+
+        return jsonify({"message": "Solicitud creada exitosamente"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

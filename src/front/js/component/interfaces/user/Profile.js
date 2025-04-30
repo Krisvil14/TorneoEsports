@@ -5,6 +5,8 @@ export default function ProfileInterface() {
     const { store, actions } = useContext(Context);
     const user = store.user;
 
+    console.log(user);
+
     return (
         <div className="container text-center">
             <h1 className="my-4">Información Personal</h1>

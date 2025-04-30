@@ -169,12 +169,18 @@ class Application(db.Model):
             "id": self.id,
             "userID": self.userID,
             "teamID": self.teamID,
-            "tournamentID": str(self.tournamentID),
+            "tournamentID": str(self.tournamentID) if self.tournamentID else None,
             "payment": self.payment,
             "action": self.action.name,
             "status": self.status.name,
             "active": self.active,
-            "created_at": self.created_at,
+            "created_at": self.created_at.isoformat(),
+            "user": {
+                "id": self.user.id,
+                "first_name": self.user.first_name,
+                "last_name": self.user.last_name,
+                "is_active": self.user.is_active
+            } if self.user else None
         }
 
 class Payment(db.Model):

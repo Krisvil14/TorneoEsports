@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -14,6 +14,23 @@ export default function EditProfilePage() {
     const [password, setPassword] = useState('');
     const [age, setAge] = useState(user?.age || '');
 
+    // Cargar datos actualizados del usuario al montar el componente
+    useEffect(() => {
+        if (user?.id) {
+            actions.getUser();
+        }
+    }, []);
+
+    // Actualizar los estados cuando cambie el usuario
+    useEffect(() => {
+        if (user) {
+            setFirstName(user.first_name || '');
+            setLastName(user.last_name || '');
+            setEmail(user.email || '');
+            setAge(user.age || '');
+        }
+    }, [user]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -21,8 +38,9 @@ export default function EditProfilePage() {
             first_name: firstName,
             last_name: lastName,
             email: email,
-            password: password,
             age: age,
+            // Solo incluir la contraseña si se ha modificado
+            ...(password && { password: password })
         };
 
         toast.promise(
@@ -36,8 +54,8 @@ export default function EditProfilePage() {
             })
             .then(async (response) => {
                 if (!response.ok) {
-                    const errorData = await response.json(); // Obtiene el mensaje de error de la API
-                    throw new Error(errorData.error || 'No se pudo actualizar el perfil'); // Usa el mensaje de error de la API
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'No se pudo actualizar el perfil');
                 }
                 await actions.getUser();
                 return response.json();
@@ -50,7 +68,6 @@ export default function EditProfilePage() {
                 success: 'Perfil actualizado exitosamente',
                 error: {
                     render({ data }) {
-                        // Muestra el mensaje de error retornado por la API
                         return `${data.message || 'Error desconocido'}`;
                     }
                 }
@@ -98,6 +115,7 @@ export default function EditProfilePage() {
                         className="form-control"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Dejar en blanco para mantener la contraseña actual"
                     />
                 </div>
                 <div className="form-group">
@@ -114,7 +132,7 @@ export default function EditProfilePage() {
                 </button>
                 <button
                     type="button"
-                    className="btn btn-danger mt-3"
+                    className="btn btn-danger mt-3 ms-2"
                     onClick={() => navigate('/profile')}
                 >
                     Cancelar
