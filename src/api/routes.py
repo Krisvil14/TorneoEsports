@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum
-from api.utils import generate_sitemap, APIException, approved_join_team
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum
+from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment
 from flask_cors import CORS
 import re
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
-CORS(api)
+CORS(api, resources={r"/api/*": {"origins": ["http://localhost:3000"]}})
 
 def validate_password(password):
     if (len(password) < 8 or
@@ -45,15 +45,13 @@ def login_user():
     team = Team.query.get(user.team_id)
     team_name = team.name if team else None
 
-    
-
     return jsonify({"user": {
             "id": user.id,
             "first_name": user.first_name,
             "last_name": user.last_name,
             "email": user.email,
             "is_active": user.is_active,
-            "role": user.role,
+            "role": user.role.name if user.role else None,
             "cedula": user.cedula,
             "team_id": user.team_id,
             "is_in_team": user.is_in_team,
@@ -92,7 +90,7 @@ def register_user():
     age = data.get('age')
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role')
+    role = data.get('role', 'user')  # Default to 'user' if not specified
 
     if not first_name or not last_name or not cedula or not age or not email or not password:
         return jsonify({"error": "Faltan datos"}), 400
@@ -109,6 +107,11 @@ def register_user():
     if User.query.filter_by(cedula=cedula).first():
         return jsonify({"error": "La cédula ya está registrada"}), 400
 
+    try:
+        role_enum = RoleEnum[role]
+    except KeyError:
+        return jsonify({"error": "Rol inválido"}), 400
+
     # Crear el nuevo usuario
     new_user = User(
         first_name=first_name,
@@ -117,7 +120,7 @@ def register_user():
         age=age,
         email=email,
         password=password,
-        role=role,
+        role=role_enum,
         is_active=True,
     )
     db.session.add(new_user)
@@ -442,6 +445,11 @@ def create_user():
     if User.query.filter_by(cedula=cedula).first():
         return jsonify({"error": "La cédula ya está registrada"}), 400
 
+    try:
+        role_enum = RoleEnum[role]
+    except KeyError:
+        return jsonify({"error": "Rol inválido"}), 400
+
     # Crear el nuevo usuario
     new_user = User(
         first_name=first_name,
@@ -450,7 +458,7 @@ def create_user():
         age=age,
         email=email,
         password=password,
-        role=role,
+        role=role_enum,
         is_active=True,
     )
     db.session.add(new_user)
@@ -501,10 +509,10 @@ def handle_application():
 
     if accepted and application.action == ActionEnum.join_team:
         approved_join_team(application)
-    # if accepted and application.action == ActionEnum.join_tournament:
-    #     hacer algo interesante
-    # if accepted and application.action == ActionEnum.do_payment:
-    #     hacer algo interesante
+    if accepted and application.action == ActionEnum.join_tournament:
+        approved_join_tournament(application)
+    if accepted and application.action == ActionEnum.do_payment:
+        approved_do_payment(application)
 
     db.session.commit()
 

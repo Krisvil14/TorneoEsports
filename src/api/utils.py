@@ -47,3 +47,16 @@ def approved_join_team(application):
     user.team_id = team.id
     user.is_in_team = True 
     application.status = 'approved'
+
+def approved_join_tournament(application):
+    team = Team.query.get(application.teamID)
+    tournament = Tournament.query.get(application.tournamentID)
+    team.tournament_id = tournament.id
+    application.status = 'approved'
+
+def approved_do_payment(application):
+    # Actualizar el estado de la aplicación a aprobado
+    application.status = 'approved'
+    # Aquí podrías agregar lógica adicional relacionada con el pago
+    # como actualizar el estado del pago en la base de datos
+    # o enviar notificaciones, etc.
