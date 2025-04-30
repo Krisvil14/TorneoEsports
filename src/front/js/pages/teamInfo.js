@@ -4,6 +4,7 @@ import Table from '../component/commons/Table';
 import { Link } from 'react-router-dom';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/teamInfo.css';
 
 export default function TeamInfo() {
     const { teamId } = useParams();
@@ -84,7 +85,7 @@ export default function TeamInfo() {
     };
 
     if (!team) {
-        return <div>Loading...</div>;
+        return <div className="team-info-container">Loading...</div>;
     }
 
     const teamData = [
@@ -118,15 +119,15 @@ export default function TeamInfo() {
             Usuario: app.user.first_name + ' ' + app.user.last_name,
             Estado: app.user.is_active ? 'Activo' : 'Inactivo',
             Acciones: (
-                <div>
+                <div className="team-info-buttons">
                     <button 
-                        className="btn btn-success me-2" 
+                        className="team-info-button" 
                         onClick={() => handleApplication(app.id, true)}
                     >
                         Aceptar
                     </button>
                     <button 
-                        className="btn btn-danger" 
+                        className="team-info-button secondary" 
                         onClick={() => handleApplication(app.id, false)}
                     >
                         Rechazar
@@ -142,24 +143,45 @@ export default function TeamInfo() {
     ];
 
     return (
-        <div className="container text-center">
-            <Link to="/teams" className="btn btn-primary w-50 w-md-75 my-5">
-                Volver
-            </Link>
-            <Table data={teamData} columns={teamColumns} />
-            <h3>Integrantes:</h3>
-            <Table data={usersData} columns={usersColumns} />
+        <div className="team-info-container">
+            <section className="team-info-hero">
+                <h1>Información del Equipo</h1>
+            </section>
             
-            {isLeader && (
-                <>
-                    <h3>Solicitudes:</h3>
-                    {applicationsData.length > 0 ? (
-                        <Table data={applicationsData} columns={applicationsColumns} />
-                    ) : (
-                        <p>No hay solicitudes pendientes</p>
-                    )}
-                </>
-            )}
+            <div className="team-info-content">
+                <div className="team-info-buttons">
+                    <Link to="/teams" className="team-info-button">
+                        Volver
+                    </Link>
+                </div>
+
+                <div className="team-info-section">
+                    <h3>Detalles del Equipo</h3>
+                    <div className="team-info-table">
+                        <Table data={teamData} columns={teamColumns} />
+                    </div>
+                </div>
+
+                <div className="team-info-section">
+                    <h3>Integrantes</h3>
+                    <div className="team-info-table">
+                        <Table data={usersData} columns={usersColumns} />
+                    </div>
+                </div>
+                
+                {isLeader && (
+                    <div className="team-info-section">
+                        <h3>Solicitudes</h3>
+                        {applicationsData.length > 0 ? (
+                            <div className="team-info-table">
+                                <Table data={applicationsData} columns={applicationsColumns} />
+                            </div>
+                        ) : (
+                            <p>No hay solicitudes pendientes</p>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

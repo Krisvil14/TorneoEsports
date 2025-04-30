@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import '../../styles/editProfile.css'
 
 export default function EditProfilePage() {
     const { store, actions } = useContext(Context);
@@ -78,65 +79,69 @@ export default function EditProfilePage() {
     }
 
     return (
-        <div className="container text-center">
-            <h1 className="my-4">Editar Perfil</h1>
-            <form onSubmit={handleSubmit}>
+        <div className="edit-profile-container">
+            <section className="edit-profile-hero">
+                <h1>Editar Perfil</h1>
+            </section>
+            
+            <form onSubmit={handleSubmit} className="edit-profile-form">
                 <div className="form-group">
-                    <label>Nombre:</label>
+                    <label>Nombre</label>
                     <input
                         type="text"
-                        className="form-control"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Ingresa tu nombre"
                     />
                 </div>
                 <div className="form-group">
-                    <label>Apellido:</label>
+                    <label>Apellido</label>
                     <input
                         type="text"
-                        className="form-control"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Ingresa tu apellido"
                     />
                 </div>
                 <div className="form-group">
-                    <label>Email:</label>
+                    <label>Email</label>
                     <input
                         type="email"
-                        className="form-control"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Ingresa tu email"
                     />
                 </div>
                 <div className="form-group">
-                    <label>Contraseña:</label>
+                    <label>Contraseña</label>
                     <input
                         type="password"
-                        className="form-control"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Dejar en blanco para mantener la contraseña actual"
                     />
                 </div>
                 <div className="form-group">
-                    <label>Edad:</label>
+                    <label>Edad</label>
                     <input
                         type="number"
-                        className="form-control"
                         value={age}
                         onChange={(e) => setAge(e.target.value)}
+                        placeholder="Ingresa tu edad"
                     />
                 </div>
-                <button type="submit" className="btn btn-success mt-3">
-                    Guardar
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-danger mt-3 ms-2"
-                    onClick={() => navigate('/profile')}
-                >
-                    Cancelar
-                </button>
+                <div className="button-group">
+                    <button type="submit" className="save-button">
+                        Guardar Cambios
+                    </button>
+                    <button
+                        type="button"
+                        className="cancel-button"
+                        onClick={() => navigate('/profile')}
+                    >
+                        Cancelar
+                    </button>
+                </div>
             </form>
         </div>
     );

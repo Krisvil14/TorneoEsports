@@ -24,7 +24,7 @@ const BuscaEquipo = () => {
  const columns = [
   { header: 'Nombre del Equipo', accessor: 'name' },
   { header: 'Juego', accessor: 'game' },
-  { header: 'Jugadores', accessor: 'member_count' },
+  { header: 'Jugadores', accessor: 'current_players', Cell: ({ row }) => `${row.current_players}/${row.max_players}` },
   {
    header: 'Actions',
    accessor: 'verInformacion',

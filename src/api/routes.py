@@ -307,8 +307,8 @@ def get_user_team(user_id):
 @api.route('/teams', methods=['GET'])
 def get_teams():
     teams = Team.query.all()
-    print(teams)
-    return jsonify([team.serialize() for team in teams]), 200
+    filtered_teams = [team for team in teams if len(team.members) < 5]
+    return jsonify([team.serialize() for team in filtered_teams]), 200
 
 @api.route('/users', methods=['GET'])
 def get_users():

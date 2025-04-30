@@ -1,0 +1,119 @@
+/* Navbar Gaming Style */
+.gaming-navbar {
+    background: linear-gradient(90deg, #6a0572 0%, #00ffff 100%);
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.4);
+    border-radius: 0;
+    padding: 0;
+    min-height: 70px;
+    z-index: 1000;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    width: 100%;
+}
+
+.gaming-navbar .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    background: transparent !important;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    margin: 0;
+    max-width: 100%;
+}
+
+.gaming-navbar .navbar-collapse {
+    background: transparent;
+}
+
+.gaming-navbar .navbar-nav {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.gaming-navbar .nav-link {
+    color: #fff !important;
+    font-size: 1.3rem;
+    font-family: 'Orbitron', Impact, sans-serif;
+    letter-spacing: 1px;
+    margin: 0 10px;
+    transition: color 0.2s, text-shadow 0.2s;
+    text-shadow: 0 0 8px #00ffff80;
+    position: relative;
+    background: transparent;
+}
+
+.gaming-navbar .nav-link:hover, .gaming-navbar .nav-link.active {
+    color: #00ffff !important;
+    text-shadow: 0 0 12px #00ffff, 0 0 4px #fff;
+}
+
+.gaming-navbar .navbar-toggler {
+    border: none;
+    background: #333;
+}
+
+.gaming-navbar .navbar-toggler-icon {
+    background-image: linear-gradient(45deg, #ff00ff, #00ffff);
+    border-radius: 4px;
+}
+
+.gaming-navbar .gaming-logo {
+    height: 48px;
+    margin-right: 18px;
+    filter: drop-shadow(0 0 8px #00ffff80);
+}
+
+.gaming-navbar .btn-logout {
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 28px;
+    font-size: 1.1rem;
+    font-family: 'Orbitron', Impact, sans-serif;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px #00ffff80;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gaming-navbar .btn-logout:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 20px #ff00ff80, 0 0 8px #00ffff80;
+    color: #fff;
+}
+
+/* Asegurar que todos los contenedores dentro del navbar sean transparentes */
+.gaming-navbar .container,
+.gaming-navbar .container-fluid,
+.gaming-navbar .navbar-collapse,
+.gaming-navbar .navbar-nav,
+.gaming-navbar .nav-item {
+    background: transparent !important;
+}
+
+@media (max-width: 992px) {
+    .gaming-navbar .container-fluid {
+        flex-direction: column;
+        padding: 0;
+    }
+    .gaming-navbar .navbar-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .gaming-navbar .nav-link {
+        margin: 8px 0;
+        font-size: 1.1rem;
+    }
+    .gaming-navbar .btn-logout {
+        width: 100%;
+        margin-top: 10px;
+    }
+} 

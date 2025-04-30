@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Table from '../../../commons/Table';
+import "../../../../../styles/teams.css";
 
 export default function TeamsAdminInterface() {
     const navigate = useNavigate();
@@ -25,35 +26,40 @@ export default function TeamsAdminInterface() {
         fetchTeams();
     }, []);
 
- const columns = [
-  { header: 'Nombre del Equipo', accessor: 'name' },
-  { header: 'Juego', accessor: 'game' },
-  {
-   header: 'Ver Información',
-   accessor: 'verInformacion',
-   Cell: ({ row }) => (
-    <button
-     className="btn btn-primary"
-     onClick={() => navigate(`/teamInfo/${row.id}`)}
-    >
-     Ver Información
-    </button>
-   ),
-  },
- ];
+    const columns = [
+        { header: 'Nombre del Equipo', accessor: 'name' },
+        { header: 'Juego', accessor: 'game' },
+        {
+            header: 'Ver Información',
+            accessor: 'verInformacion',
+            Cell: ({ row }) => (
+                <button
+                    className="action-button"
+                    onClick={() => navigate(`/teamInfo/${row.id}`)}
+                >
+                    Ver Información
+                </button>
+            ),
+        },
+    ];
 
     return (
-        <div className="container text-center">
-            <h1 className="my-4">Gestión de Equipos</h1>
-            <div className="row">
-                <div className="col">
-                    <button className="btn btn-primary my-2" onClick={handleCreateTeam}>
-                        Crear equipo
+        <div className="teams-container">
+            <section className="teams-hero">
+                <h1>Gestión de Equipos</h1>
+            </section>
+            
+            <div className="teams-content">
+                <div className="button-container">
+                    <button 
+                        className="create-team-button"
+                        onClick={handleCreateTeam}
+                    >
+                        Crear Equipo
                     </button>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col">
+                
+                <div className="teams-table">
                     <Table columns={columns} data={teams} />
                 </div>
             </div>

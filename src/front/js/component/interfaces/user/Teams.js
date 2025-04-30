@@ -2,19 +2,20 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Table from '../../commons/Table';
 import { Context } from '../../../store/appContext';
+import "../../../../styles/teams.css";
 
 export default function TeamsInterface() {
     const { store, actions } = useContext(Context);
     const user = store.user;
     const navigate = useNavigate();
     const [teams, setTeams] = useState([]);
-    const [userFetched, setUserFetched] = useState(false); // Add a new state variable
+    const [userFetched, setUserFetched] = useState(false);
 
     useEffect(() => {
         const fetchTeams = async () => {
-            if (!userFetched) { // Add a conditional statement
+            if (!userFetched) {
                 actions.getUser();
-                setUserFetched(true); // Set the state variable to true
+                setUserFetched(true);
             }
 
             if (user) {
@@ -29,7 +30,7 @@ export default function TeamsInterface() {
         };
 
         fetchTeams();
-    }, [user]); // Add the user object to the dependency array
+    }, [user]);
 
     const columns = [
         { header: 'Nombre del Equipo', accessor: 'name' },
@@ -39,7 +40,7 @@ export default function TeamsInterface() {
             accessor: 'verInformacion',
             Cell: ({ row }) => (
                 <button
-                    className="btn btn-primary"
+                    className="action-button"
                     onClick={() => navigate(`/teamInfo/${row.id}`)}
                 >
                     Ver Información
@@ -49,22 +50,33 @@ export default function TeamsInterface() {
     ];
 
     return (
-        <div className="container text-center">
-            <h1 className="my-4">Gestión de Equipos</h1>
-            {user && user.is_in_team ? (
-                <div className="row">
-                    <div className="col">
+        <div className="teams-container">
+            <section className="teams-hero">
+                <h1>Gestión de Equipos</h1>
+            </section>
+            
+            <div className="teams-content">
+                {user && user.is_in_team ? (
+                    <div className="teams-table">
                         <Table columns={columns} data={teams} />
                     </div>
-                </div>
-            ) : (
-                <div className="row">
-                    <div className="col">
-                    <button className="btn btn-primary me-2" onClick={() => navigate('/create-team')}>Crear Equipo</button>
-                    <button className="btn btn-secondary" onClick={() => navigate('/busca-equipo')}>Buscar Equipo</button>
+                ) : (
+                    <div className="button-container">
+                        <button 
+                            className="create-team-button" 
+                            onClick={() => navigate('/create-team')}
+                        >
+                            Crear Equipo
+                        </button>
+                        <button 
+                            className="search-team-button" 
+                            onClick={() => navigate('/busca-equipo')}
+                        >
+                            Buscar Equipo
+                        </button>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }

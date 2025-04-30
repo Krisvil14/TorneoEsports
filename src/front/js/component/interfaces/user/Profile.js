@@ -1,33 +1,61 @@
 import React, { useContext, useEffect } from 'react';
 import { Context } from '../../../store/appContext';
+import "../../../../styles/profile.css";
 
 export default function ProfileInterface() {
     const { store, actions } = useContext(Context);
     const user = store.user;
 
-    console.log(user);
+    // Función para obtener las iniciales del nombre
+    const getInitials = (firstName, lastName) => {
+        return `${firstName ? firstName[0] : ''}${lastName ? lastName[0] : ''}`;
+    };
 
     return (
-        <div className="container text-center">
-            <h1 className="my-4">Información Personal</h1>
-            <div className="row">
-                <div className="col">
-                    {user ? (
-                        <>
-                            <p><strong>Nombre:</strong> {user.first_name}</p>
-                            <p><strong>Apellido:</strong> {user.last_name}</p>
-                            <p><strong>Cédula:</strong> {user.cedula}</p>
-                            <p><strong>Email:</strong> {user.email}</p>
-                            <p><strong>Equipo asignado:</strong> {user.team_name}</p>
-                            <p><strong>En Equipo:</strong> {user.is_in_team ? '✔' : 'X'}</p>
-                            
-                        </>
-                    ) : (
-                        <p>Cargando información del usuario...</p>
-                    )}
+        <div className="profile-container">
+            <section className="profile-hero">
+                <div className="profile-avatar">
+                    {user ? getInitials(user.first_name, user.last_name) : '??'}
                 </div>
-            </div>
-            <a href="/editProfile" className="btn btn-primary">Editar Perfil</a>
+                <h1>{user ? `${user.first_name} ${user.last_name}` : 'Cargando...'}</h1>
+            </section>
+
+            {user ? (
+                <div className="profile-content">
+                    <div className="info-grid">
+                        <div className="info-card">
+                            <strong>Nombre</strong>
+                            <p>{user.first_name}</p>
+                        </div>
+                        <div className="info-card">
+                            <strong>Apellido</strong>
+                            <p>{user.last_name}</p>
+                        </div>
+                        <div className="info-card">
+                            <strong>Cédula</strong>
+                            <p>{user.cedula}</p>
+                        </div>
+                        <div className="info-card">
+                            <strong>Email</strong>
+                            <p>{user.email}</p>
+                        </div>
+                        <div className="info-card">
+                            <strong>Edad</strong>
+                            <p>{user.age}</p>
+                        </div>
+                    </div>
+
+                    <div className="text-center">
+                        <a href="/editProfile" className="edit-button">
+                            Editar Perfil
+                        </a>
+                    </div>
+                </div>
+            ) : (
+                <div className="profile-content">
+                    <p className="text-center">Cargando información del usuario...</p>
+                </div>
+            )}
         </div>
     );
 }

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Context } from '../store/appContext';
+import '../../styles/teamInfo.css';
 
 export default function TeamInfoUser() {
     const { teamId } = useParams();
@@ -104,7 +105,7 @@ export default function TeamInfoUser() {
     };
 
     if (!team) {
-        return <div>Loading...</div>;
+        return <div className="team-info-container">Loading...</div>;
     }
 
     const teamData = [
@@ -133,22 +134,39 @@ export default function TeamInfoUser() {
     ];
 
     return (
-        <div className="container text-center">
-            <div className="d-flex justify-content-center gap-3">
-            <Link to="/busca-equipo" className="btn btn-primary w-50 w-md-75 my-5">
-                Volver
-            </Link>
-            <button 
-                onClick={handleJoinRequest}
-                className="btn btn-secondary w-50 w-md-75 my-5"
-                disabled={hasRequested}
-            >
-                {hasRequested ? 'Solicitud ya enviada' : 'Solicitar unirse al equipo'}
-            </button>
+        <div className="team-info-container">
+            <section className="team-info-hero">
+                <h1>Información del Equipo</h1>
+            </section>
+            
+            <div className="team-info-content">
+                <div className="team-info-buttons">
+                    <Link to="/busca-equipo" className="team-info-button">
+                        Volver
+                    </Link>
+                    <button 
+                        onClick={handleJoinRequest}
+                        className={`team-info-button ${hasRequested ? 'secondary' : ''}`}
+                        disabled={hasRequested}
+                    >
+                        {hasRequested ? 'Solicitud ya enviada' : 'Solicitar unirse al equipo'}
+                    </button>
+                </div>
+
+                <div className="team-info-section">
+                    <h3>Detalles del Equipo</h3>
+                    <div className="team-info-table">
+                        <Table data={teamData} columns={teamColumns} />
+                    </div>
+                </div>
+
+                <div className="team-info-section">
+                    <h3>Integrantes</h3>
+                    <div className="team-info-table">
+                        <Table data={usersData} columns={usersColumns} />
+                    </div>
+                </div>
             </div>
-            <Table data={teamData} columns={teamColumns} />
-            <h3>Integrantes:</h3>
-            <Table data={usersData} columns={usersColumns} />
         </div>
     );
 }
