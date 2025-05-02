@@ -50,14 +50,7 @@ export default function TeamsAdminInterface() {
             </section>
             
             <div className="teams-content">
-                <div className="button-container">
-                    <button 
-                        className="create-team-button"
-                        onClick={handleCreateTeam}
-                    >
-                        Crear Equipo
-                    </button>
-                </div>
+                
                 
                 <div className="teams-table">
                     <Table columns={columns} data={teams} />

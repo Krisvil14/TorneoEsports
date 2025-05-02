@@ -139,6 +139,7 @@ class Team(db.Model):
             "max_players": self.max_players,
             "current_players": len(self.members),
             "game": self.game.name,
+            "tournament_id": str(self.tournament_id) if self.tournament_id else None,
             "members": [member.email for member in self.members]
         }
 

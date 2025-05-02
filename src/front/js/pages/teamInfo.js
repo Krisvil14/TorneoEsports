@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Table from '../component/commons/Table';
 import { Link } from 'react-router-dom';
 import { Context } from '../store/appContext';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../../styles/teamInfo.css';
 
 export default function TeamInfo() {
@@ -14,6 +15,7 @@ export default function TeamInfo() {
     const [applications, setApplications] = useState([]);
     const [isLeader, setIsLeader] = useState(false);
     const navigate = useNavigate();
+
     useEffect(() => {
         const fetchTeam = async () => {
             try {
@@ -51,14 +53,42 @@ export default function TeamInfo() {
     }, [teamId]);
 
     useEffect(() => {
-        if (store.user && team) {
+        if (store.user && team && users.length > 0) {
             const currentUser = users.find(user => user.id === store.user.id);
             setIsLeader(currentUser?.is_leader || false);
+
+            // Verificar si el usuario actual pertenece al equipo
+            if (!currentUser) {
+                toast.error('No tienes acceso a este equipo', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                navigate('/teams');
+            }
         }
-    }, [store.user, team, users]);
+    }, [store.user, team, users, navigate]);
 
     const handleApplication = async (applicationId, accepted) => {
         try {
+            // Si se intenta aceptar una solicitud y el equipo ya tiene 5 jugadores
+            if (accepted && users.length >= 5) {
+                toast.error('No se pueden aceptar más jugadores, el equipo ya está completo.', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                return;
+            }
+
             const response = await fetch(process.env.BACKEND_URL + '/api/handle_application', {
                 method: 'POST',
                 headers: {
@@ -76,11 +106,75 @@ export default function TeamInfo() {
                 throw new Error(errorData.error || 'Error al procesar la solicitud');
             }
 
+            // Mostrar toast de éxito
+            toast.success(accepted ? 'Solicitud aceptada exitosamente' : 'Solicitud rechazada exitosamente', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
             // Recargar la página después de procesar la solicitud
             window.location.reload();
         } catch (error) {
             console.error('Error handling application:', error);
-            alert('Error al procesar la solicitud: ' + error.message);
+            toast.error('Error al procesar la solicitud: ' + error.message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    };
+
+    const handleRemovePlayer = async (userId) => {
+        try {
+            const response = await fetch(process.env.BACKEND_URL + `/api/teams/${teamId}/remove_player`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    requesting_user_id: store.user?.id
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al eliminar al jugador');
+            }
+
+            toast.success('Jugador eliminado del equipo exitosamente', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
+            // Recargar la página para mostrar los cambios
+            window.location.reload();
+        } catch (error) {
+            console.error('Error removing player:', error);
+            toast.error('Error al eliminar al jugador: ' + error.message, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
         }
     };
 
@@ -102,7 +196,15 @@ export default function TeamInfo() {
         Apellido: user.last_name,
         Cedula: user.cedula,
         Correo: user.email,
-        Edad: user.age
+        Edad: user.age,
+        Acciones: isLeader && user.id !== store.user?.id ? (
+            <button 
+                className="team-info-button secondary" 
+                onClick={() => handleRemovePlayer(user.id)}
+            >
+                Eliminar
+            </button>
+        ) : null
     }));
 
     const usersColumns = [
@@ -110,7 +212,8 @@ export default function TeamInfo() {
         { header: "Apellido", accessor: "Apellido" },
         { header: "Cedula", accessor: "Cedula" },
         { header: "Correo", accessor: "Correo" },
-        { header: "Edad", accessor: "Edad" }
+        { header: "Edad", accessor: "Edad" },
+        ...(isLeader ? [{ header: "Acciones", accessor: "Acciones" }] : [])
     ];
 
     const applicationsData = applications
@@ -118,6 +221,13 @@ export default function TeamInfo() {
         .map(app => ({
             Usuario: app.user.first_name + ' ' + app.user.last_name,
             Estado: app.user.is_active ? 'Activo' : 'Inactivo',
+            'Fecha de Solicitud': new Date(app.created_at).toLocaleDateString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
             Acciones: (
                 <div className="team-info-buttons">
                     <button 
@@ -139,6 +249,7 @@ export default function TeamInfo() {
     const applicationsColumns = [
         { header: "Usuario", accessor: "Usuario" },
         { header: "Estado", accessor: "Estado" },
+        { header: "Fecha de Solicitud", accessor: "Fecha de Solicitud" },
         { header: "Acciones", accessor: "Acciones" }
     ];
 

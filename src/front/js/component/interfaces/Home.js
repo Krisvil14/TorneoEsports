@@ -1,5 +1,5 @@
 import React from 'react';
-import "../../../../styles/home.css";
+import "../../../styles/home.css";
 
 export default function HomeInterface() {
     return (
@@ -7,7 +7,7 @@ export default function HomeInterface() {
             {/* Hero Section */}
             <section className="hero-section">
                 <div className="hero-content">
-                    <h1>¡Bienvenido al Mundo de los Torneos Gaming!</h1>
+                    <h1>¡Bienvenido al sistema de torneos KuaiMisS!</h1>
                     <p>Compite, Conquista, Conviértete en Leyenda</p>
                     <button className="cta-button">Explorar Torneos</button>
                 </div>
@@ -36,51 +36,6 @@ export default function HomeInterface() {
                     <p>Comprueba tu posición en la clasificación</p>
                 </div>
             </div>
-
-            {/* Latest Tournaments Section */}
-            <section className="latest-tournaments">
-                <h2>Próximos Torneos</h2>
-                <div className="tournaments-grid">
-                    <div className="tournament-card">
-                        <div className="tournament-image"></div>
-                        <h4>Torneo League of Legends</h4>
-                        <p>Premio: $1000</p>
-                        <span className="date">Próximamente</span>
-                    </div>
-                    <div className="tournament-card">
-                        <div className="tournament-image"></div>
-                        <h4>Torneo Valorant</h4>
-                        <p>Premio: $800</p>
-                        <span className="date">Próximamente</span>
-                    </div>
-                    <div className="tournament-card">
-                        <div className="tournament-image"></div>
-                        <h4>Torneo CS:GO</h4>
-                        <p>Premio: $1200</p>
-                        <span className="date">Próximamente</span>
-                    </div>
-                </div>
-            </section>
-
-            {/* Community Section */}
-            <section className="community-section">
-                <h2>Únete a Nuestra Comunidad Gaming</h2>
-                <p>Conecta con otros jugadores, forma tu equipo y participa en torneos emocionantes</p>
-                <div className="community-stats">
-                    <div className="stat">
-                        <h3>1000+</h3>
-                        <p>Jugadores</p>
-                    </div>
-                    <div className="stat">
-                        <h3>50+</h3>
-                        <p>Torneos</p>
-                    </div>
-                    <div className="stat">
-                        <h3>100+</h3>
-                        <p>Equipos</p>
-                    </div>
-                </div>
-            </section>
         </div>
     );
 }

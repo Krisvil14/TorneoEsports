@@ -268,6 +268,7 @@ def get_tournaments():
             num_teams = len(tournament.teams)
             tournament_data = tournament.serialize()
             tournament_data['num_teams'] = num_teams
+            tournament_data['num_max_teams'] = tournament.num_max_teams
             tournament_list.append(tournament_data)
         response = jsonify(tournament_list)
         response.headers.add('Access-Control-Allow-Origin', '*')
@@ -283,6 +284,7 @@ def get_tournament(tournament_id):
             return jsonify({"error": "Torneo no encontrado"}), 404
 
         tournament_data = tournament.serialize()
+        tournament_data['num_teams'] = len(tournament.teams)
         response = jsonify(tournament_data)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, 200
@@ -585,5 +587,144 @@ def create_team_request():
         db.session.commit()
 
         return jsonify({"message": "Solicitud creada exitosamente"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/teams/<int:team_id>/remove_player', methods=['POST'])
+def remove_player_from_team(team_id):
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        requesting_user_id = data.get('requesting_user_id')
+
+        if not user_id or not requesting_user_id:
+            return jsonify({"error": "Se requiere el ID del usuario y del solicitante"}), 400
+
+        # Obtener el equipo y el usuario
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        user_to_remove = User.query.get(user_id)
+        if not user_to_remove:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        # Verificar que el usuario esté en el equipo
+        if user_to_remove.team_id != team_id:
+            return jsonify({"error": "El usuario no pertenece a este equipo"}), 400
+
+        # Verificar que el usuario que hace la petición sea el líder del equipo
+        requesting_user = User.query.get(requesting_user_id)
+        if not requesting_user or not requesting_user.is_leader or requesting_user.team_id != team_id:
+            return jsonify({"error": "No tienes permiso para eliminar jugadores de este equipo"}), 403
+
+        # No permitir que el líder se elimine a sí mismo
+        if user_to_remove.id == requesting_user.id:
+            return jsonify({"error": "No puedes eliminarte a ti mismo del equipo"}), 400
+
+        # Eliminar al usuario del equipo
+        user_to_remove.team_id = None
+        user_to_remove.is_in_team = False
+
+        db.session.commit()
+
+        return jsonify({"message": "Jugador eliminado del equipo exitosamente"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/tournament-requests', methods=['POST'])
+def create_tournament_request():
+    try:
+        data = request.get_json()
+        team_id = data.get('team_id')
+        tournament_id = data.get('tournament_id')
+
+        if not team_id or not tournament_id:
+            return jsonify({"error": "Team ID and Tournament ID are required"}), 400
+
+        # Verificar si el equipo existe
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        # Verificar si el torneo existe
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+
+        # Verificar si el equipo ya está en un torneo
+        if team.tournament_id:
+            return jsonify({"error": "El equipo ya está participando en un torneo"}), 400
+
+        # Verificar si el juego del equipo coincide con el del torneo
+        if team.game != tournament.game:
+            return jsonify({"error": "El juego del equipo no coincide con el del torneo"}), 400
+
+        # Verificar si ya existe una solicitud activa
+        existing_request = Application.query.filter_by(
+            teamID=team_id,
+            tournamentID=tournament_id,
+            action=ActionEnum.join_tournament,
+            active=True
+        ).first()
+
+        if existing_request:
+            return jsonify({"error": "Ya has solicitado unirte a este torneo"}), 400
+
+        # Crear nueva solicitud
+        new_request = Application(
+            teamID=team_id,
+            tournamentID=tournament_id,
+            action=ActionEnum.join_tournament,
+            status=StatusEnum.pending,
+            active=True
+        )
+
+        db.session.add(new_request)
+        db.session.commit()
+
+        return jsonify({"message": "Solicitud creada exitosamente"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/tournaments/<tournament_id>/teams', methods=['GET'])
+def get_tournament_teams(tournament_id):
+    try:
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+
+        teams = [team.serialize() for team in tournament.teams]
+        return jsonify(teams), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/tournaments/<tournament_id>/applications', methods=['GET'])
+def get_tournament_applications(tournament_id):
+    try:
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+
+        # Obtener todas las solicitudes pendientes para este torneo
+        applications = Application.query.filter_by(
+            tournamentID=tournament_id,
+            action=ActionEnum.join_tournament,
+            status=StatusEnum.pending,
+            active=True
+        ).all()
+
+        # Serializar las solicitudes incluyendo información del equipo
+        applications_data = []
+        for app in applications:
+            team = Team.query.get(app.teamID)
+            if team:
+                app_data = app.serialize()
+                app_data['team_name'] = team.name
+                applications_data.append(app_data)
+
+        return jsonify(applications_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400

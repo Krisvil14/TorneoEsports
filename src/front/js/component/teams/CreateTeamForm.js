@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Context } from '../../store/appContext';
+import '../../../styles/createTeamForm.css';
 
 export default function CreateTeamForm() {
   const [name, setName] = useState('');
@@ -76,13 +77,13 @@ export default function CreateTeamForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="row mb-4 text-center">
-        <h1 className="w-75 mx-auto fs-1">Registrar Equipo</h1>
+    <div className="create-team-container">
+      <div className="create-team-hero">
+        <h1>Registrar Equipo</h1>
       </div>
-      <div className="row gy-3">
-        <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label htmlFor="name">Nombre del Equipo:</label>
+      <form onSubmit={handleSubmit} className="create-team-form">
+        <div className="form-group">
+          <label htmlFor="name">Nombre del Equipo</label>
           <input
             type="text"
             id="name"
@@ -90,33 +91,32 @@ export default function CreateTeamForm() {
             value={name}
             onChange={({ target }) => setName(target.value)}
             required
-            className="form-control"
+            placeholder="Ingresa el nombre del equipo"
           />
         </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label htmlFor="game">Juego:</label>
+        <div className="form-group">
+          <label htmlFor="game">Juego</label>
           <select
             id="game"
             name="game"
             value={game}
             onChange={({ target }) => setGame(target.value)}
             required
-            className="form-control"
           >
             <option value="">Seleccione un juego</option>
             <option value="league_of_legends">League of Legends</option>
             <option value="valorant">Valorant</option>
           </select>
         </div>
-        <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
-          <button type="submit" className="btn btn-primary w-100 w-md-75">
+        <div className="button-group">
+          <button type="submit" className="submit-button">
             Registrar Equipo
           </button>
-          <Link to="/teams" className="btn btn-secondary w-100 w-md-75">
+          <Link to="/teams" className="cancel-button">
             Volver
           </Link>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

@@ -31,6 +31,7 @@ import EditProfilePage from './pages/editProfile';
 import CreateTeamForm from './component/teams/CreateTeamForm';
 import BuscaEquipo from './pages/BuscaEquipo';
 import TeamInfoUser from './pages/teamInfoUser';
+import TournamentRequests from './component/interfaces/admin/tournaments/TournamentRequests';
 
 
 // Crear tu primer componente
@@ -68,6 +69,7 @@ const Layout = () => {
               <Route element={<Protected requiredRole="admin"> <TeamsAdminPage /> </Protected>} path="/admin/teams" />
               <Route element={<Protected requiredRole="admin"> <UsersAdminInterface /> </Protected>} path="/admin/users" />
               <Route element={<Protected requiredRole="admin"> <TournamentsAdminPage /> </Protected>} path="/admin/tournaments" />
+              <Route element={<Protected requiredRole="admin"> <TournamentRequests /> </Protected>} path="/admin/tournament-requests/:tournamentId" />
               <Route element={<Protected> <CreateTeamForm /> </Protected>} path="/create-team" />
               <Route element={<Protected> <BuscaEquipo /> </Protected>} path="/busca-equipo" />
 

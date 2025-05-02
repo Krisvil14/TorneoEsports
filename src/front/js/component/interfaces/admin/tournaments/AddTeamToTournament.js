@@ -66,7 +66,7 @@ export default function AddTeamToTournament() {
                     autoClose: 5000,
                     isLoading: false,
                 });
-                navigate(`/tournaments`);
+                navigate(`/admin/tournaments`);
             } else {
                 if (json.error === "Elija un equipo que no este registrado en este torneo") {
                     toast.update(notification, {
