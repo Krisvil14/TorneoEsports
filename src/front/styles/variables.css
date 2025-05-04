@@ -158,3 +158,12 @@
 .font-3xlg {
   font-size: var(--font-3xlg);
 }
+
+.column-separator {
+  border-right: 1px solid #000000;
+  border-left: 1px solid #000000;
+}
+
+.row-separator {
+  border-bottom: 2px solid black;
+}

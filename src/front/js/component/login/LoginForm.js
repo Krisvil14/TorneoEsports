@@ -28,7 +28,7 @@ export default function LoginForm() {
           const json = await response.json();
     
           if (ok) {
-            state.actions.login(json);
+            state.actions.login(json.user);
             toast.update(notification, {
               render: 'Sesion iniciada con exito',
               type: 'success',
@@ -56,7 +56,7 @@ export default function LoginForm() {
           </div>
           <div className="row gy-3">
             <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-              <label for="email">Correo:</label>
+              <label htmlFor="email">Correo:</label>
               <input
                 type="text"
                 id="email"
@@ -68,7 +68,7 @@ export default function LoginForm() {
                 />
             </div>
             <div className="d-flex flex-column gy-3 w-75 mx-auto">
-              <label for="password">Contraseña:</label>
+              <label htmlFor="password">Contraseña:</label>
               <input
                 onChange={({ target }) => setPassword(target.value)}
                 value={password}
@@ -79,8 +79,8 @@ export default function LoginForm() {
                 required
               />
             </div>
-            <button type="submit" class="btn btn-primary w-75 mx-auto">
-            Primary
+            <button type="submit" className="btn btn-primary w-75 mx-auto">
+            Ingresar al sistema
             </button>
             </div>
         </form>

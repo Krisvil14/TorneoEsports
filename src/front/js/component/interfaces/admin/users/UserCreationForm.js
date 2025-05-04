@@ -1,15 +1,16 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-export default function RegisterForm() {
+export default function CreateUserForm() {
   const [name, setName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [dni, setDni] = React.useState('');
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-    const [role, setRole] = React.useState('user');
+  const [role, setRole] = React.useState('user');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,11 +23,12 @@ export default function RegisterForm() {
     formData.append('age', age);
     formData.append('email', email);
     formData.append('password', password);
+    formData.append('role', role);
 
-    const notification = toast.loading('Registrando usuario...');
+    const notification = toast.loading('Creando usuario...');
 
     try {
-      const response = await fetch(process.env.BACKEND_URL + '/api/register', {
+      const response = await fetch(process.env.BACKEND_URL + '/api/admin/create_user', {
         method: 'POST',
         body: formData,
       });
@@ -40,7 +42,7 @@ export default function RegisterForm() {
           autoClose: 5000,
           isLoading: false,
         });
-        navigate('/inicio');
+        navigate('/admin/users');
       } else {
         toast.update(notification, {
           render: json.error,
@@ -57,7 +59,7 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="row mb-4 text-center">
-        <h1 className="w-75 mx-auto fs-1">Registrar usuario en el sistema</h1>
+        <h1 className="w-75 mx-auto fs-1">Crear Usuario</h1>
       </div>
       <div className="row gy-3">
         <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
@@ -108,6 +110,19 @@ export default function RegisterForm() {
             required
           />
         </div>
+         <div className="d-flex flex-column gy-3 w-75 mx-auto">
+          <label htmlFor="role">Rol:</label>
+          <select
+            className="form-control"
+            id="role"
+            name="role"
+            onChange={({ target }) => setRole(target.value)}
+            required
+          >
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
         <div className="d-flex flex-column gy-3 w-75 mx-auto">
           <label htmlFor="email">Correo Electrónico:</label>
           <input
@@ -132,9 +147,14 @@ export default function RegisterForm() {
             required
           />
         </div>
-        <button type="submit" className="btn btn-primary w-75 mx-auto">
-          Registrar Usuario
-        </button>
+        <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
+          <button type="submit" className="btn btn-primary w-100 w-md-75">
+            Crear Usuario
+          </button>
+          <Link to="/admin/users" className="btn btn-secondary w-100 w-md-75">
+            Volver
+          </Link>
+        </div>
       </div>
     </form>
   );

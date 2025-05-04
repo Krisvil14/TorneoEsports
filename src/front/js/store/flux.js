@@ -53,19 +53,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 
            
             login: (user) => {
-
-                        setStore({ user: user, isAuthenticated: true });
-                        localStorage.setItem("user", JSON.stringify(user));
-
+                setStore({ user: user, isAuthenticated: true });
+                localStorage.setItem("user", JSON.stringify(user));
+                localStorage.setItem("role", user.role);
             },
 
             
             logout: () => {
                 setStore({ user: null, isAuthenticated: false });
                 localStorage.removeItem("user");
+                localStorage.removeItem("role");
             },
 
-            // Acción para verificar el estado de autenticación
             checkAuth: () => {
                 const storedUser = localStorage.getItem("user");
                 if (storedUser && storedUser !== "undefined") {

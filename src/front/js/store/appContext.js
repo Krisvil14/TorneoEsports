@@ -29,7 +29,18 @@ const injectContext = PassedComponent => {
              * store, instead use actions, like this:
              **/
             state.actions.getMessage(); // <---- calling this function from the flux.js actions
-            state.actions.checkAuth(); // Verificar el estado de autenticación
+            const storedUser = localStorage.getItem("user");
+            if (storedUser && storedUser !== "undefined") {
+                try {
+                    const user = JSON.parse(storedUser);
+                    state.actions.login(user);
+                } catch (error) {
+                    console.error("Error parsing stored user data:", error);
+                    localStorage.removeItem("user");
+                }
+            } else {
+                state.actions.logout(); 
+            }
         }, []);
 
         // The initial value for the context is not null anymore, but the current state of this component,
