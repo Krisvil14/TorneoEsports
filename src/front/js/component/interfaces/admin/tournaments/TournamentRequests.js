@@ -60,7 +60,7 @@ export default function TournamentRequests() {
             window.location.reload();
         } catch (error) {
             console.error('Error handling application:', error);
-            toast.error('Error al procesar la solicitud: ' + error.message);
+            toast.error(error.message || 'Error al procesar la solicitud');
         }
     };
 

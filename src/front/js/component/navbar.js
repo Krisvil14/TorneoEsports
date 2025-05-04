@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Container from './html/Container';
 import Text from './html/Text';
@@ -10,6 +10,27 @@ import '../../styles/navbar.css';
 export const Navbar = () => {
   const { store, actions } = useContext(Context);
   const navigate = useNavigate();
+  const [teamInfo, setTeamInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchTeamInfo = async () => {
+      if (store.user && store.user.team_id) {
+        try {
+          const response = await fetch(process.env.BACKEND_URL + `/api/teams/${store.user.team_id}`);
+          if (response.ok) {
+            const data = await response.json();
+            setTeamInfo(data);
+          }
+        } catch (error) {
+          console.error('Error fetching team info:', error);
+        }
+      } else {
+        setTeamInfo(null);
+      }
+    };
+
+    fetchTeamInfo();
+  }, [store.user]);
 
   const handleLogout = () => {
     actions.logout();
@@ -43,6 +64,9 @@ export const Navbar = () => {
                     <Link to="/admin/tournaments" className="nav-item nav-link">
                       <Text>Torneos</Text>
                     </Link>
+                    <Link to="/admin/payments" className="nav-item nav-link">
+                      <Text>Pagos</Text>
+                    </Link>
                   </>
                 ) : (
                   <>
@@ -58,12 +82,28 @@ export const Navbar = () => {
                     <Link to="/tournaments" className="nav-item nav-link">
                       <Text>Torneos</Text>
                     </Link>
+                    {store.user && (store.user.is_leader || store.user.role === 'admin') && (
+                      <Link to="/payments" className="nav-item nav-link">
+                        <Text>Pagos</Text>
+                      </Link>
+                    )}
                   </>
                 )}
               </Container>
             )}
             {store.isAuthenticated && (
-              <Container className="ms-auto">
+              <Container className="ms-auto d-flex align-items-center">
+                {store.user && store.user.team_id && teamInfo && (
+                  <div className="team-balance me-3">
+                    <div className="balance-content">
+                      <span className="balance-icon">💰</span>
+                      <div className="balance-text">
+                        <span className="team-name">{teamInfo.name}</span>
+                        <span className="balance-amount">${teamInfo.balance}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <button onClick={handleLogout} className="btn-logout">
                   <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif', color: 'white' }}>Cerrar Sesión</Text>
                 </button>

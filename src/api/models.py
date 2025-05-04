@@ -24,8 +24,9 @@ class ActionEnum(enum.Enum):
     join_team = 'join_team'
     join_tournament = 'join_tournament'
     do_payment = 'do_payment'
+    receive_payment = 'receive_payment'
 
-action_enum = ENUM(ActionEnum, name='actionenum', create_type=False)
+action_enum = ENUM(ActionEnum, name='actionenum', create_type=True)
 
 class StatusEnum(enum.Enum):
     pending = 'pending'
@@ -96,6 +97,7 @@ class Tournament(db.Model):
     date_start = db.Column(db.String(50), nullable=False)
     num_max_teams = db.Column(db.Integer, nullable=False)
     game = db.Column(game_enum, nullable=False)
+    cost = db.Column(db.Integer, nullable=False, default=10)  # Costo del torneo
 
     # Relationships
     teams = relationship("Team", back_populates="tournament")
@@ -115,6 +117,7 @@ class Tournament(db.Model):
             "date_start": self.date_start,
             "num_max_teams": self.num_max_teams,
             "game": self.game.name,
+            "cost": self.cost
         }
 
 class Team(db.Model):
@@ -123,6 +126,7 @@ class Team(db.Model):
     max_players = db.Column(db.Integer, nullable=False, default=5)
     game = db.Column(game_enum, nullable=False)
     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
+    balance = db.Column(db.Integer, nullable=True, default=0)
 
     # Relationships
     tournament = relationship("Tournament", back_populates="teams")
@@ -140,7 +144,8 @@ class Team(db.Model):
             "current_players": len(self.members),
             "game": self.game.name,
             "tournament_id": str(self.tournament_id) if self.tournament_id else None,
-            "members": [member.email for member in self.members]
+            "members": [member.email for member in self.members],
+            "balance": self.balance if self.balance is not None else 0
         }
 
 class Application(db.Model):
@@ -192,7 +197,7 @@ class Payment(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     bank = db.Column(bank_enum, nullable=False)
     date = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    reference = db.Column(db.String(50), nullable=False)
+    reference = db.Column(db.String(50), nullable=True)
     cedula = db.Column(db.String(20), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
 

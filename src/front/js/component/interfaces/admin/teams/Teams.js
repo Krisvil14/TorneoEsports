@@ -35,7 +35,7 @@ export default function TeamsAdminInterface() {
             Cell: ({ row }) => (
                 <button
                     className="action-button"
-                    onClick={() => navigate(`/teamInfo/${row.id}`)}
+                    onClick={() => navigate(`/admin/teamInfo/${row.id}`)}
                 >
                     Ver Información
                 </button>

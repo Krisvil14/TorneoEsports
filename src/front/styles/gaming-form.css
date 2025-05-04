@@ -147,4 +147,171 @@ body {
         flex-direction: column;
         gap: 0.8rem;
     }
+}
+
+.gaming-alert-info {
+  background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%);
+  color: #00fff7;
+  border: 2px solid #00fff7;
+  border-radius: 12px;
+  box-shadow: 0 0 18px #00fff799, 0 0 4px #fff3;
+  font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+  font-size: 1.15rem;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  text-shadow: 0 0 8px #00fff7, 0 0 2px #fff;
+  animation: alertGlow 2s infinite alternate;
+}
+
+.volver-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+@keyframes alertGlow {
+  0% { box-shadow: 0 0 18px #00fff799, 0 0 4px #fff3; }
+  100% { box-shadow: 0 0 28px #00fff7cc, 0 0 8px #fff6; }
+}
+
+.gaming-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gaming-table th,
+.gaming-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.gaming-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.gaming-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Detalles de la Solicitud - Estilo Gaming */
+.payment-details {
+    background: linear-gradient(135deg, #181824 80%, #23233a 100%);
+    border: 2px solid #00fff7;
+    border-radius: 16px;
+    box-shadow: 0 0 24px #00fff799, 0 0 8px #fff3;
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin-top: 20px;
+    color: #fff;
+    font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+}
+
+.payment-details h2, .payment-details h3 {
+    color: #00fff7;
+    text-shadow: 0 0 12px #00fff7, 0 0 2px #fff;
+    font-weight: 900;
+    margin-bottom: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+.payment-details h2 {
+    font-size: 2.1rem;
+}
+
+.payment-details h3 {
+    font-size: 1.4rem;
+}
+
+.details-content {
+    margin-top: 1.5rem;
+}
+
+.details-content p {
+    margin: 0.7rem 0;
+    font-size: 1.15rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.details-content strong {
+    color: #00fff7;
+    font-weight: 700;
+    text-shadow: 0 0 6px #00fff7;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 18px;
+    margin-top: 2.5rem;
+    justify-content: center;
+}
+
+.action-buttons button {
+    flex: 1;
+    font-size: 1.1rem;
+    font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+    font-weight: bold;
+    letter-spacing: 2px;
+    border-radius: 8px;
+    border: 2px solid #00fff7;
+    background: rgba(0,255,247,0.08);
+    color: #00fff7;
+    box-shadow: 0 0 12px #00fff7;
+    transition: all 0.2s;
+}
+
+.action-buttons button:hover {
+    background: #00fff7;
+    color: #181824;
+    box-shadow: 0 0 24px #00fff7, 0 0 8px #fff3;
+    border-color: #00fff7;
+}
+
+/* Sobrescribir estilos de Bootstrap para tablas en modo oscuro */
+.table {
+    background-color: #181824 !important;
+    color: #fff !important;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th, .table thead th {
+    background-color: #22223b !important;
+    color: #00fff7 !important;
+    border: none !important;
+    font-weight: bold;
+    text-align: center;
+}
+
+.table td, .table tbody td {
+    background-color: #181824 !important;
+    color: #fff !important;
+    border: none !important;
+    text-align: center;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #23233a !important;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #2c2c44 !important;
+    color: #00fff7 !important;
+}
+
+.table-bordered {
+    border: 2px solid #00fff7 !important;
+}
+
+.table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
 } 

@@ -11,6 +11,7 @@ export default function TournamentsInterface() {
     const [isTeamLeader, setIsTeamLeader] = useState(false);
     const [teamGame, setTeamGame] = useState(null);
     const [teamId, setTeamId] = useState(null);
+    const [teamBalance, setTeamBalance] = useState(0);
     const { store } = useContext(Context);
     const user = store.user;
 
@@ -33,6 +34,7 @@ export default function TournamentsInterface() {
                     const teamData = await teamResponse.json();
                     setTeamGame(teamData.game);
                     setTeamId(teamData.id);
+                    setTeamBalance(teamData.balance || 0);
                     
                     // Obtener información de los miembros del equipo
                     const membersResponse = await fetch(process.env.BACKEND_URL + `/api/teams/${user.team_id}/users`);
@@ -55,8 +57,6 @@ export default function TournamentsInterface() {
                         } catch (error) {
                             console.error('Error fetching tournament:', error);
                         }
-                    } else {
-                        console.log('Team is not in any tournament');
                     }
                 } catch (error) {
                     console.error('Error fetching team information:', error);
@@ -97,6 +97,7 @@ export default function TournamentsInterface() {
         { header: 'Nombre', accessor: 'name' },
         { header: 'Fecha de Inicio', accessor: 'date_start' },
         { header: 'Juego', accessor: 'game' },
+        { header: 'Costo ($)', accessor: 'cost' },
         { 
             header: 'Cantidad de Equipos', 
             accessor: 'num_teams',
@@ -111,10 +112,13 @@ export default function TournamentsInterface() {
             accessor: 'actions',
             Cell: ({ row }) => {
                 if (isTeamLeader && !teamTournament) {
+                    const canJoin = teamBalance >= row.cost;
                     return (
                         <button 
                             onClick={() => handleJoinTournament(row.id)}
-                            className="join-tournament-button"
+                            className={`join-tournament-button ${!canJoin ? 'disabled' : ''}`}
+                            disabled={!canJoin}
+                            title={!canJoin ? 'Saldo insuficiente para unirse al torneo' : ''}
                         >
                             Solicitar Unirse
                         </button>
@@ -167,6 +171,7 @@ export default function TournamentsInterface() {
             <div className="tournaments-container">
                 <section className="tournaments-hero">
                     <h1>Gestión de Torneos</h1>
+                 
                 </section>
                 <div className="tournaments-content">
                     <div className="tournaments-table">
