@@ -78,9 +78,42 @@ const getState = ({ getStore, getActions, setStore }) => {
                 } else {
                     setStore({ user: null, isAuthenticated: false });
                 }
-            }
-        }
+            },
+
+           updateUser: async (updatedUser) => {
+                const store = getStore();
+                try {
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/users/" + store.user.id, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(updatedUser)
+                    });
+                    if (resp.ok) {
+                        setStore({ user: { ...store.user, ...updatedUser } }); // Actualiza el usuario en el estado global
+                    } else {
+                        console.error("Error updating user in backend", resp.status);
+                    }
+                } catch (error) {
+                    console.log("Error updating user in backend", error);
+                }
+            },
+
+            getUser: async () => {
+                try {
+                    const resp = await fetch(process.env.BACKEND_URL + "/api/users/" + getStore().user.id);
+                    const data = await resp.json();
+                    localStorage.setItem("user", JSON.stringify(data)); 
+                    setStore({ user: data });
+                    console.log("User data loaded from backend", data);
+                } catch (error) {
+                    console.log("Error loading user from backend", error);
+                }
+            },
+
+    }
+
     };
 };
-
 export default getState;

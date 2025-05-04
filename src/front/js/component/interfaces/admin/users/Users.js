@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../../../commons/Table';
 import { useNavigate } from 'react-router-dom';
-
+import "../../../../../styles/users.css";
 
 export default function UsersAdminInterface() {
     const [users, setUsers] = useState([]);
-     const navigate = useNavigate();
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -39,14 +38,14 @@ export default function UsersAdminInterface() {
             Cell: ({ row }) => {
                 return !row.is_in_team ? (
                     <button
-                        className="btn btn-primary"
+                        className="gaming-button primary"
                         onClick={() => navigate(`/admin/add_player_to_team/${row.id}`)}
                     >
                         Añadir A Equipo
                     </button>
                 ) : (
                     <button
-                        className="btn btn-danger"
+                        className="gaming-button danger"
                         onClick={async () => {
                             try {
                                 const response = await fetch(process.env.BACKEND_URL + `/api/admin/add_player_to_team/${row.id}`, {
@@ -80,17 +79,22 @@ export default function UsersAdminInterface() {
     ];
 
     return (
-        <div className="container text-center">
-            <h1 className="my-4">Gestión de Usuarios</h1>
-            <div className="row">
-                <div className="col">
-                    <button className="btn btn-primary my-2" onClick={() => navigate('/admin/create_user')}>
+        <div className="users-container">
+            <section className="users-hero">
+                <h1>Gestión de Usuarios</h1>
+            </section>
+            
+            <div className="users-content">
+                <div className="button-container">
+                    <button 
+                        className="gaming-button primary"
+                        onClick={() => navigate('/admin/create_user')}
+                    >
                         Crear Usuario
                     </button>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col">
+                
+                <div className="users-table">
                     <Table columns={columns} data={users} />
                 </div>
             </div>

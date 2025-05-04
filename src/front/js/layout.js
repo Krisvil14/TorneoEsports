@@ -17,7 +17,7 @@ import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
 import Protected from './component/commons/Protected';
 import RegTeamsForm from './component/teams/RegTeamsForm';
-import UsersPage from './pages/users';
+import ProfilePage from './pages/profile';
 import TournamentsPage from './pages/tournaments';
 import CreateTournamentForm from './component/interfaces/admin/tournaments/CreateTournamentForm';
 import AddTeamToTournament from './component/interfaces/admin/tournaments/AddTeamToTournament';
@@ -27,7 +27,11 @@ import TeamInfo from './pages/teamInfo';
 import TeamsAdminPage from './pages/admin/teams';
 import UsersAdminInterface from './component/interfaces/admin/users/Users'
 import TournamentsAdminPage from './pages/admin/tournaments';
-
+import EditProfilePage from './pages/editProfile';
+import CreateTeamForm from './component/teams/CreateTeamForm';
+import BuscaEquipo from './pages/BuscaEquipo';
+import TeamInfoUser from './pages/teamInfoUser';
+import TournamentRequests from './component/interfaces/admin/tournaments/TournamentRequests';
 
 
 // Crear tu primer componente
@@ -52,10 +56,12 @@ const Layout = () => {
               <Route element={<Recovery />} path="/recuperar" />
               <Route element={<Protected> <HomePage /> </Protected>} path="/inicio" />
               <Route element={<Protected> <TeamsInterface /> </Protected>} path="/teams" />
-              <Route element={<Protected> <RegTeamsForm /> </Protected>} path="/Regteams" />
-              <Route element={<Protected> <UsersPage /> </Protected>} path="/users" />
+              <Route element={<Protected> <ProfilePage /> </Protected>} path="/profile" />
+              <Route element={<Protected> <EditProfilePage /> </Protected>} path="/editProfile" />
               <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
+              <Route element={<Protected> <TeamInfoUser /> </Protected>} path="/busca-equipo/:teamId" />
               <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
+              <Route element={<Protected requiredRole="admin"> <RegTeamsForm /> </Protected>} path="/admin/Regteams" />
               <Route element={<Protected requiredRole="admin"> <CreateTournamentForm /> </Protected>} path="/admin/create_tournament" />
               <Route element={<Protected requiredRole="admin"> <AddTeamToTournament /> </Protected>} path="/admin/addteam/:tournament_id" />
               <Route element={<Protected requiredRole="admin"> <AddPlayerToTeam /> </Protected>} path="/admin/add_player_to_team/:user_id" />
@@ -63,7 +69,9 @@ const Layout = () => {
               <Route element={<Protected requiredRole="admin"> <TeamsAdminPage /> </Protected>} path="/admin/teams" />
               <Route element={<Protected requiredRole="admin"> <UsersAdminInterface /> </Protected>} path="/admin/users" />
               <Route element={<Protected requiredRole="admin"> <TournamentsAdminPage /> </Protected>} path="/admin/tournaments" />
-
+              <Route element={<Protected requiredRole="admin"> <TournamentRequests /> </Protected>} path="/admin/tournament-requests/:tournamentId" />
+              <Route element={<Protected> <CreateTeamForm /> </Protected>} path="/create-team" />
+              <Route element={<Protected> <BuscaEquipo /> </Protected>} path="/busca-equipo" />
 
               <Route element={<h1>Not found!</h1>} />
             </Routes>

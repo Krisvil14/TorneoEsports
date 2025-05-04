@@ -1,0 +1,169 @@
+/* Users Container */
+.users-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Hero Section */
+.users-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.users-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+/* Content Container */
+.users-content {
+    max-width: 1200px;
+    margin: -30px auto 20px;
+    padding: 0 20px;
+}
+
+/* Table Styles */
+.users-table {
+    background: #2a2a2a;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* Estilos específicos para la tabla del componente Table */
+.users-table div[class*="table"] {
+    color: #ffffff !important;
+}
+
+.users-table div[class*="table"] div {
+    color: #ffffff !important;
+}
+
+/* Excluir los headers del color blanco por defecto */
+.users-table div[class*="table"] div[class*="header"] {
+    color: #00ffff !important;
+}
+
+.users-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    margin-top: -8px;
+}
+
+.users-table th {
+    color: #00ffff !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 15px;
+    background: #333;
+    text-align: center;
+}
+
+.users-table td {
+    padding: 15px;
+    background: #333;
+    color: #ffffff !important;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.users-table tr td:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.users-table tr td:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+.users-table tbody tr {
+    transition: transform 0.3s ease;
+    color: #ffffff !important;
+}
+
+.users-table tbody tr:hover {
+    transform: translateY(-3px);
+}
+
+.users-table tbody tr:hover td {
+    background: #444;
+}
+
+/* Action Buttons */
+.gaming-button {
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    color: white !important;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.gaming-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+}
+
+.gaming-button.primary {
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+}
+
+.gaming-button.danger {
+    background: linear-gradient(45deg, #ff416c, #ff4b2b);
+}
+
+.button-container {
+    margin: 20px 0 40px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .users-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .users-content {
+        padding: 0 10px;
+        margin-top: -20px;
+    }
+    
+    .users-table {
+        padding: 10px;
+    }
+    
+    .users-table th,
+    .users-table td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .gaming-button {
+        width: 100%;
+        max-width: 300px;
+        margin: 5px 0;
+    }
+} 

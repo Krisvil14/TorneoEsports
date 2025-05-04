@@ -1,0 +1,279 @@
+/* Tournaments Container */
+.tournaments-container {
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.tournaments-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.05) 0%, transparent 25%),
+        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 25%);
+    pointer-events: none;
+}
+
+/* Hero Section */
+.tournaments-hero {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.tournaments-hero h1 {
+    font-size: 3.5rem;
+    color: #00ffff;
+    text-shadow: 
+        0 0 10px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 0.4),
+        0 0 30px rgba(0, 255, 255, 0.2);
+    font-family: 'Orbitron', Impact, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    animation: neonPulse 2s infinite;
+}
+
+/* Content Container */
+.tournaments-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(10, 10, 10, 0.8);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.2),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.tournaments-content::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff);
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0.3;
+    animation: borderGlow 3s infinite;
+}
+
+/* Table Styles */
+.tournaments-table {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+/* Table Header */
+.tournaments-table thead th {
+    background-color: #333 !important;
+    color: #00ffff !important;
+    padding: 15px !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #00ffff;
+}
+
+/* Table Body */
+.tournaments-table tbody td {
+    background-color: #333 !important;
+    color: white !important;
+    padding: 15px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tournaments-table tbody tr:hover td {
+    background-color: #444 !important;
+}
+
+/* Button Styles */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.action-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.action-button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+.action-button.secondary {
+    background-color: #f44336;
+}
+
+.action-button.secondary:hover {
+    background-color: #d32f2f;
+}
+
+.join-tournament-button {
+    background: linear-gradient(45deg, #6a0572 0%, #00ffff 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-family: 'Orbitron', Impact, sans-serif;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Create Tournament Button */
+.create-team-button {
+    background: linear-gradient(45deg, #8A2BE2, #FF00FF);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+
+.create-team-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
+    background: linear-gradient(45deg, #FF00FF, #8A2BE2);
+}
+
+.create-team-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
+}
+
+.button-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Messages */
+.tournaments-message {
+    text-align: center;
+    color: #fff;
+    font-size: 24px;
+    padding: 40px 20px;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    text-shadow: 
+        0 0 10px rgba(255, 255, 255, 0.5),
+        0 0 20px rgba(0, 255, 255, 0.3);
+    animation: messageGlow 2s infinite;
+}
+
+/* Animations */
+@keyframes neonPulse {
+    0% {
+        text-shadow: 
+            0 0 10px rgba(0, 255, 255, 0.8),
+            0 0 20px rgba(0, 255, 255, 0.4),
+            0 0 30px rgba(0, 255, 255, 0.2);
+    }
+    50% {
+        text-shadow: 
+            0 0 15px rgba(0, 255, 255, 0.9),
+            0 0 25px rgba(0, 255, 255, 0.5),
+            0 0 35px rgba(0, 255, 255, 0.3);
+    }
+    100% {
+        text-shadow: 
+            0 0 10px rgba(0, 255, 255, 0.8),
+            0 0 20px rgba(0, 255, 255, 0.4),
+            0 0 30px rgba(0, 255, 255, 0.2);
+    }
+}
+
+@keyframes borderGlow {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.3; }
+}
+
+@keyframes messageGlow {
+    0% {
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.5),
+            0 0 20px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+        text-shadow: 
+            0 0 15px rgba(255, 255, 255, 0.7),
+            0 0 25px rgba(0, 255, 255, 0.5),
+            0 0 35px rgba(255, 0, 255, 0.3);
+    }
+    100% {
+        text-shadow: 
+            0 0 10px rgba(255, 255, 255, 0.5),
+            0 0 20px rgba(0, 255, 255, 0.3);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tournaments-container {
+        padding: 10px;
+    }
+
+    .tournaments-hero h1 {
+        font-size: 2rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-button {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+}
+
+/* Section Styles */
+.tournaments-section {
+    margin-bottom: 30px;
+}
+
+.tournaments-section h2 {
+    color: #00ffff;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+} 

@@ -2,6 +2,7 @@ import React from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import '../../../../../styles/gaming-form.css';
 
 export default function CreateUserForm() {
   const [name, setName] = React.useState('');
@@ -57,105 +58,106 @@ export default function CreateUserForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="row mb-4 text-center">
-        <h1 className="w-75 mx-auto fs-1">Crear Usuario</h1>
-      </div>
-      <div className="row gy-3">
-        <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-          <label htmlFor="first_name">Nombre:</label>
-          <input
-            type="text"
-            id="first_name"
-            name="first_name"
-            value={name}
-            onChange={({ target }) => setName(target.value)}
-            required
-            className="form-control"
-          />
+    <div className="gaming-form-container">
+      <form onSubmit={handleSubmit}>
+        <div className="row mb-4 text-center">
+          <h1 className="w-75 mx-auto fs-1 gaming-form-title">Crear Usuario</h1>
         </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label htmlFor="last_name">Apellido:</label>
-          <input
-            className="form-control"
-            type="text"
-            id="last_name"
-            value={lastName}
-            name="last_name"
-            required
-            onChange={({ target }) => setLastName(target.value)}
-          />
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label htmlFor="cedula">Cédula:</label>
-          <input
-            onChange={({ target }) => setDni(target.value)}
-            value={dni}
-            className="form-control"
-            type="text"
-            id="cedula"
-            name="cedula"
-            required
-          />
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label htmlFor="age">Edad:</label>
-          <input
-            onChange={({ target }) => setAge(target.value)}
-            value={age}
-            className="form-control"
-            type="number"
-            id="age"
-            name="age"
-            required
-          />
-        </div>
-         <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label htmlFor="role">Rol:</label>
-          <select
-            className="form-control"
-            id="role"
-            name="role"
-            onChange={({ target }) => setRole(target.value)}
-            required
-          >
-            <option value="user">Usuario</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label htmlFor="email">Correo Electrónico:</label>
-          <input
-            onChange={({ target }) => setEmail(target.value)}
-            value={email}
-            className="form-control"
-            type="email"
-            id="email"
-            name="email"
-            required
-          />
-        </div>
-        <div className="d-flex flex-column gy-3 w-75 mx-auto">
-          <label htmlFor="password">Contraseña:</label>
-          <input
-            onChange={({ target }) => setPassword(target.value)}
-            value={password}
-            className="form-control"
-            type="password"
-            id="password"
-            name="password"
-            required
-          />
-        </div>
-        <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
-          <button type="submit" className="btn btn-primary w-100 w-md-75">
+        <div className="row gy-3">
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="first_name" className="gaming-form-label">Nombre:</label>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              value={name}
+              onChange={({ target }) => setName(target.value)}
+              required
+              className="form-control gaming-form-input"
+            />
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="last_name" className="gaming-form-label">Apellido:</label>
+            <input
+              type="text"
+              id="last_name"
+              value={lastName}
+              name="last_name"
+              required
+              onChange={({ target }) => setLastName(target.value)}
+              className="form-control gaming-form-input"
+            />
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="cedula" className="gaming-form-label">Cédula:</label>
+            <input
+              type="text"
+              id="cedula"
+              name="cedula"
+              value={dni}
+              onChange={({ target }) => setDni(target.value)}
+              required
+              className="form-control gaming-form-input"
+            />
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="age" className="gaming-form-label">Edad:</label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              value={age}
+              onChange={({ target }) => setAge(target.value)}
+              required
+              className="form-control gaming-form-input"
+            />
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="role" className="gaming-form-label">Rol:</label>
+            <select
+              id="role"
+              name="role"
+              value={role}
+              onChange={({ target }) => setRole(target.value)}
+              required
+              className="form-control gaming-form-input"
+            >
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="email" className="gaming-form-label">Correo Electrónico:</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={({ target }) => setEmail(target.value)}
+              required
+              className="form-control gaming-form-input"
+            />
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
+            <label htmlFor="password" className="gaming-form-label">Contraseña:</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={({ target }) => setPassword(target.value)}
+              required
+              className="form-control gaming-form-input"
+            />
+          </div>
+          <button type="submit" className="gaming-form-button primary w-75 mx-auto">
             Crear Usuario
           </button>
-          <Link to="/admin/users" className="btn btn-secondary w-100 w-md-75">
+          <Link to="/admin/users" className="gaming-form-button secondary w-75 mx-auto">
             Volver
           </Link>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }

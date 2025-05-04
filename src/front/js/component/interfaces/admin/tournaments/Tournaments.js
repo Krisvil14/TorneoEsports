@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../../../commons/Table';
 import { useNavigate } from 'react-router-dom';
+import "../../../../../styles/tournaments.css";
 
 export default function TournamentsAdminInterface() {
     const [tournaments, setTournaments] = useState([]);
@@ -28,33 +29,50 @@ export default function TournamentsAdminInterface() {
         { header: 'Nombre', accessor: 'name' },
         { header: 'Fecha de Inicio', accessor: 'date_start' },
         { header: 'Juego', accessor: 'game' },
-        { header: 'Cantidad de Equipos', accessor: 'num_teams' },
+        { 
+            header: 'Cantidad de Equipos', 
+            accessor: 'num_teams',
+            Cell: ({ row }) => `${row.num_teams}/${row.num_max_teams}`
+        },
         {
             header: 'Acciones',
             accessor: 'id',
             Cell: ({ value }) => (
-                <button
-                    className="btn btn-primary"
-                    onClick={() => navigate(`/admin/addteam/${value}`)}
-                >
-                    Añadir Equipo
-                </button>
+                <div className="action-buttons">
+                    <button
+                        className="action-button"
+                        onClick={() => navigate(`/admin/addteam/${value}`)}
+                    >
+                        Añadir Equipo
+                    </button>
+                    <button
+                        className="action-button"
+                        onClick={() => navigate(`/admin/tournament-requests/${value}`)}
+                    >
+                        Ver Solicitudes
+                    </button>
+                </div>
             ),
         },
     ];
 
     return (
-        <div className="container text-center">
-            <h1 className="my-4">Gestión de Torneos</h1>
-            <div className="row">
-                <div className="col">
-                    <button className="btn btn-primary my-2" onClick={handleCreateTournament}>
+        <div className="tournaments-container">
+            <section className="tournaments-hero">
+                <h1>Gestión de Torneos</h1>
+            </section>
+            
+            <div className="tournaments-content">
+                <div className="button-container">
+                    <button 
+                        className="create-team-button"
+                        onClick={handleCreateTournament}
+                    >
                         Crear Torneo
                     </button>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col">
+                
+                <div className="tournaments-table">
                     <Table columns={columns} data={tournaments} />
                 </div>
             </div>

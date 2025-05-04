@@ -5,6 +5,7 @@ import Text from './html/Text';
 import { Context } from '../store/appContext';
 import { useNavigate } from 'react-router-dom';
 import controlImageUrl from '../../img/control.png';
+import '../../styles/navbar.css';
 
 export const Navbar = () => {
   const { store, actions } = useContext(Context);
@@ -16,10 +17,10 @@ export const Navbar = () => {
   };
 
   return (
-    <Container as="nav" className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: 'purple' }}>
+    <Container as="nav" className="gaming-navbar navbar navbar-expand-lg navbar-dark">
       <Container className="container-fluid">
         <div style={{ height: '56px', display: 'flex', alignItems: 'center' }}>
-          <img src={controlImageUrl} style={{ height: '100%' }} />
+          <img src={controlImageUrl} className="gaming-logo" alt="Logo" />
         </div>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
@@ -30,32 +31,32 @@ export const Navbar = () => {
               <Container className="d-flex">
                 {store.user && store.user.role === 'admin' ? (
                   <>
-                    <Link to="/inicio" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Inicio</Text>
+                    <Link to="/inicio" className="nav-item nav-link">
+                      <Text>Inicio</Text>
                     </Link>
-                    <Link to="/admin/teams" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Equipos</Text>
+                    <Link to="/admin/teams" className="nav-item nav-link">
+                      <Text>Equipos</Text>
                     </Link>
-                    <Link to="/admin/users" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Usuarios</Text>
+                    <Link to="/admin/users" className="nav-item nav-link">
+                      <Text>Usuarios</Text>
                     </Link>
-                     <Link to="/admin/tournaments" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Torneos</Text>
+                    <Link to="/admin/tournaments" className="nav-item nav-link">
+                      <Text>Torneos</Text>
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link to="/inicio" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Inicio</Text>
+                    <Link to="/inicio" className="nav-item nav-link">
+                      <Text>Inicio</Text>
                     </Link>
-                    <Link to="/teams" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Equipos</Text>
+                    <Link to="/teams" className="nav-item nav-link">
+                      <Text>Equipos</Text>
                     </Link>
-                    <Link to="/users" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Usuarios</Text>
+                    <Link to="/profile" className="nav-item nav-link">
+                      <Text>Perfil</Text>
                     </Link>
-                    <Link to="/tournaments" className="nav-item nav-link" style={{ marginRight: '10px' }}>
-                      <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif', color: '' }}>Torneos</Text>
+                    <Link to="/tournaments" className="nav-item nav-link">
+                      <Text>Torneos</Text>
                     </Link>
                   </>
                 )}
@@ -63,8 +64,8 @@ export const Navbar = () => {
             )}
             {store.isAuthenticated && (
               <Container className="ms-auto">
-                <button onClick={handleLogout} className="btn btn-danger" style={{ marginLeft: '10px' }}>
-                <Text style={{ fontSize: '1.5rem', fontFamily: 'Impact, sans-serif',color:'white' }}>Cerrar Sesión</Text>
+                <button onClick={handleLogout} className="btn-logout">
+                  <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif', color: 'white' }}>Cerrar Sesión</Text>
                 </button>
               </Container>
             )}

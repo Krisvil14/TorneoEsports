@@ -1,0 +1,173 @@
+/* Busca Equipo Container */
+.busca-equipo-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+/* Hero Section */
+.busca-equipo-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                url('https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.busca-equipo-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+/* Content Container */
+.busca-equipo-content {
+    max-width: 1200px;
+    margin: -30px auto 20px;
+    padding: 0 20px;
+}
+
+/* Teams Button */
+.teams-button {
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    font-weight: 800;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.teams-button:hover {
+    background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Table Styles */
+.teams-table {
+    background: #2a2a2a;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* Estilos específicos para la tabla del componente Table */
+.teams-table div[class*="table"] {
+    color: #ffffff !important;
+}
+
+.teams-table div[class*="table"] div {
+    color: #ffffff !important;
+}
+
+/* Excluir los headers del color blanco por defecto */
+.teams-table div[class*="table"] div[class*="header"] {
+    color: #00ffff !important;
+}
+
+.teams-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    margin-top: -8px;
+}
+
+.teams-table th {
+    color: #00ffff !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 15px;
+    background: #333;
+    text-align: center;
+}
+
+.teams-table td {
+    padding: 15px;
+    background: #333;
+    color: #ffffff !important;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.teams-table tr td:first-child {
+    border-radius: 8px 0 0 8px;
+}
+
+.teams-table tr td:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+.teams-table tbody tr {
+    transition: transform 0.3s ease;
+    color: #ffffff !important;
+}
+
+.teams-table tbody tr:hover {
+    transform: translateY(-3px);
+}
+
+/* Action Button */
+.action-button {
+    background: linear-gradient(90deg, #005bea 0%, #00c6fb 100%);
+    color: #fff;
+    font-weight: 800;
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px #00fff7a0;
+    transition: background 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: linear-gradient(90deg, #00c6fb 0%, #005bea 100%);
+    transform: scale(1.03);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .busca-equipo-hero h1 {
+        font-size: 2rem;
+    }
+
+    .busca-equipo-content {
+        padding: 0 10px;
+    }
+
+    .teams-table {
+        padding: 10px;
+    }
+
+    .teams-table th,
+    .teams-table td {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .teams-button {
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+    }
+}
+
+/* Centrado del botón Volver solo en BuscaEquipo */
+.volver-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+} 

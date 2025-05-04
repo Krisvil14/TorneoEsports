@@ -1,0 +1,154 @@
+/* Team Info Gaming Style */
+.team-info-container {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    min-height: 100vh;
+    padding: 2rem;
+    color: #fff;
+}
+
+.team-info-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.4);
+}
+
+.team-info-hero h1 {
+    font-family: 'Orbitron', Impact, sans-serif;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff80;
+}
+
+.team-info-content {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.4);
+}
+
+.team-info-table {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow: visible;
+    margin-bottom: 2rem;
+    width: 100%;
+    display: table;
+}
+
+.team-info-table table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.team-info-table th {
+    background: linear-gradient(90deg, #6a0572 0%, #00ffff 100%);
+    color: white;
+    font-family: 'Orbitron', Impact, sans-serif;
+    padding: 1rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.team-info-table td {
+    color: #fff !important;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Eliminar cualquier efecto de hover en las filas */
+.team-info-table tr {
+    transition: none !important;
+}
+
+.team-info-table tr:hover {
+    background: none !important;
+    transform: none !important;
+}
+
+.team-info-table tr:hover td {
+    color: #fff !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.team-info-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+.team-info-button {
+    background: linear-gradient(45deg, #6a0572 0%, #00ffff 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-family: 'Orbitron', Impact, sans-serif;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.team-info-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.team-info-button.secondary {
+    background: linear-gradient(45deg, #333 0%, #666 100%);
+}
+
+.team-info-section {
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.team-info-section h3 {
+    color: #00ffff;
+    font-family: 'Orbitron', Impact, sans-serif;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 8px #00ffff80;
+    position: relative;
+    z-index: 1;
+}
+
+.team-info-section p {
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .team-info-container {
+        padding: 1rem;
+    }
+
+    .team-info-hero h1 {
+        font-size: 2rem;
+    }
+
+    .team-info-buttons {
+        flex-direction: column;
+    }
+
+    .team-info-button {
+        width: 100%;
+    }
+} 
