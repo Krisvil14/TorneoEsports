@@ -21,7 +21,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 # Enable CORS
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/api/*": {"origins": os.environ.get('FRONT_URL', "http://localhost:3000")}})
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
