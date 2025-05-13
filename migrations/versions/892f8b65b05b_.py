@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c12e45438ebd
+Revision ID: 892f8b65b05b
 Revises: 
-Create Date: 2025-05-03 18:47:28.704682
+Create Date: 2025-05-13 19:38:24.163056
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'c12e45438ebd'
+revision = '892f8b65b05b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,6 +24,7 @@ def upgrade():
     sa.Column('date_start', sa.String(length=50), nullable=False),
     sa.Column('num_max_teams', sa.Integer(), nullable=False),
     sa.Column('game', postgresql.ENUM('league_of_legends', 'valorant', name='gameenum'), nullable=False),
+    sa.Column('cost', sa.Integer(), nullable=False),
     sa.CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('id')
@@ -79,7 +80,7 @@ def upgrade():
     sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('bank', postgresql.ENUM('banco_de_venezuela', 'mercantil', 'banesco', 'provincial', 'bnc', 'banco_plaza', 'banco_exterior', 'bancaribe', name='bankenum'), nullable=False),
     sa.Column('date', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('reference', sa.String(length=50), nullable=False),
+    sa.Column('reference', sa.String(length=50), nullable=True),
     sa.Column('cedula', sa.String(length=20), nullable=False),
     sa.Column('phone_number', sa.String(length=20), nullable=False),
     sa.ForeignKeyConstraint(['application_id'], ['application.id'], ),
