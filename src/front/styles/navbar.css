@@ -174,4 +174,95 @@
     100% {
         transform: scale(1);
     }
+}
+
+/* --- Mejoras para escritorio --- */
+@media (min-width: 993px) {
+    .gaming-navbar .navbar-nav {
+        justify-content: flex-start;
+    }
+    .gaming-navbar .navbar-actions {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+}
+
+/* --- Mejoras para móvil (overlay y menú) --- */
+@media (max-width: 992px) {
+    .gaming-navbar .navbar-collapse.show-navbar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        background: linear-gradient(135deg, #b57cff 60%, #7ee8fa 100%) !important;
+        z-index: 3000 !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 40px;
+        box-shadow: 0 0 30px #000a;
+        animation: fadeIn 0.2s;
+        overflow-y: auto;
+    }
+    .gaming-navbar .navbar-close-btn {
+        position: absolute;
+        top: 24px;
+        right: 32px;
+        font-size: 2.2rem;
+        color: #fff;
+        background: none;
+        border: none;
+        z-index: 2100;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .gaming-navbar .navbar-close-btn:hover {
+        color: #00ffff;
+    }
+    .gaming-navbar .gaming-logo {
+        height: 48px;
+        margin: 0 auto 24px auto;
+        display: block;
+    }
+    .gaming-navbar .navbar-nav {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 32px;
+    }
+    .gaming-navbar .nav-link {
+        margin: 18px 0;
+        font-size: 1.4rem;
+        text-align: center;
+        width: 100%;
+    }
+    .gaming-navbar .navbar-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        margin-top: auto;
+        margin-bottom: 32px;
+    }
+    .gaming-navbar .btn-logout {
+        width: 80%;
+        margin: 0 auto;
+        display: block;
+    }
+    .gaming-navbar .team-balance {
+        margin: 0 auto;
+        width: 80%;
+        justify-content: center;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 } 
