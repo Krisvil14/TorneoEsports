@@ -166,7 +166,13 @@ export default function AdminPaymentsInterface() {
                 </div>
             ) : (
                 <div className="payment-requests-table">
-                    <Table columns={columns} data={paymentRequests} />
+                    {paymentRequests.length === 0 ? (
+                        <div className="no-requests-message">
+                            <h3>No hay solicitudes de pago pendientes</h3>
+                        </div>
+                    ) : (
+                        <Table columns={columns} data={paymentRequests} />
+                    )}
                 </div>
             )}
         </div>

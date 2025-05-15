@@ -5,21 +5,93 @@ import "../../../../../styles/users.css";
 
 export default function UsersAdminInterface() {
     const [users, setUsers] = useState([]);
+    const [teams, setTeams] = useState([]);
+    const [sortConfig, setSortConfig] = useState({
+        key: 'first_name',
+        direction: 'asc'
+    });
+    const [filters, setFilters] = useState({
+        teamStatus: '',  // '' = todos, 'true' = en equipo, 'false' = sin equipo
+        teamId: ''      // filtro por ID de equipo
+    });
     const navigate = useNavigate();
 
+    const resetFilters = () => {
+        setFilters({
+            teamStatus: '',
+            teamId: ''
+        });
+        setSortConfig({
+            key: 'first_name',
+            direction: 'asc'
+        });
+    };
+
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/users');
-                const data = await response.json();
-                setUsers(data);
+                // Obtener usuarios
+                const usersResponse = await fetch(process.env.BACKEND_URL + '/api/users');
+                const usersData = await usersResponse.json();
+                setUsers(usersData);
+
+                // Obtener equipos
+                const teamsResponse = await fetch(process.env.BACKEND_URL + '/api/teams');
+                const teamsData = await teamsResponse.json();
+                setTeams(teamsData);
             } catch (error) {
-                console.error('Error fetching users:', error);
+                console.error('Error fetching data:', error);
             }
         };
 
-        fetchUsers();
+        fetchData();
     }, []);
+
+    // Función para ordenar usuarios
+    const sortUsers = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    // Función para obtener usuarios filtrados y ordenados
+    const getFilteredAndSortedUsers = () => {
+        let filteredUsers = [...users];
+
+        // Aplicar filtro por estado de equipo
+        if (filters.teamStatus !== '') {
+            filteredUsers = filteredUsers.filter(user => 
+                user.is_in_team === (filters.teamStatus === 'true')
+            );
+        }
+
+        // Aplicar filtro por equipo específico
+        if (filters.teamId) {
+            filteredUsers = filteredUsers.filter(user => 
+                user.team_id === parseInt(filters.teamId)
+            );
+        }
+
+        // Aplicar ordenamiento
+        if (sortConfig.key) {
+            filteredUsers.sort((a, b) => {
+                const aValue = a[sortConfig.key] || '';
+                const bValue = b[sortConfig.key] || '';
+                
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'asc' ? -1 : 1;
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+
+        return filteredUsers;
+    };
 
     const columns = [
         { header: 'Nombre', accessor: 'first_name' },
@@ -93,9 +165,71 @@ export default function UsersAdminInterface() {
                         Crear Usuario
                     </button>
                 </div>
+
+                <div className="users-filters">
+                    <div className="filters-header">
+                        <h2>Filtros y Ordenamiento</h2>
+                        <button 
+                            className="gaming-button secondary reset-button"
+                            onClick={resetFilters}
+                        >
+                            Reestablecer Filtros
+                        </button>
+                    </div>
+                    <div className="sort-group">
+                        <label>Ordenar por:</label>
+                        <button
+                            onClick={() => sortUsers('first_name')}
+                            className={`sort-button ${sortConfig.key === 'first_name' ? 'active' : ''}`}
+                        >
+                            Nombre {sortConfig.key === 'first_name' && (sortConfig.direction === 'asc' ? '(A-Z)' : '(Z-A)')}
+                        </button>
+                        <button
+                            onClick={() => sortUsers('last_name')}
+                            className={`sort-button ${sortConfig.key === 'last_name' ? 'active' : ''}`}
+                        >
+                            Apellido {sortConfig.key === 'last_name' && (sortConfig.direction === 'asc' ? '(A-Z)' : '(Z-A)')}
+                        </button>
+                        <button
+                            onClick={() => sortUsers('email')}
+                            className={`sort-button ${sortConfig.key === 'email' ? 'active' : ''}`}
+                        >
+                            Email {sortConfig.key === 'email' && (sortConfig.direction === 'asc' ? '(A-Z)' : '(Z-A)')}
+                        </button>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="teamStatus">Estado en Equipo:</label>
+                        <select
+                            id="teamStatus"
+                            value={filters.teamStatus}
+                            onChange={(e) => setFilters({...filters, teamStatus: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos</option>
+                            <option value="true">En Equipo</option>
+                            <option value="false">Sin Equipo</option>
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="teamId">Filtrar por Equipo:</label>
+                        <select
+                            id="teamId"
+                            value={filters.teamId}
+                            onChange={(e) => setFilters({...filters, teamId: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos los equipos</option>
+                            {teams.map(team => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name} ({team.game})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
                 
                 <div className="users-table">
-                    <Table columns={columns} data={users} />
+                    <Table columns={columns} data={getFilteredAndSortedUsers()} />
                 </div>
             </div>
         </div>

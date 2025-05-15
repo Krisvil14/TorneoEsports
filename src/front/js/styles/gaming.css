@@ -1,0 +1,149 @@
+.gaming-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 2rem;
+}
+
+.gaming-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.gaming-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.gaming-title {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    margin: 0;
+}
+
+.gaming-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.gaming-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.gaming-label {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.gaming-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    padding: 0.8rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.gaming-select:hover {
+    border-color: #00ffcc;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+}
+
+.gaming-select:focus {
+    outline: none;
+    border-color: #00ffcc;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+}
+
+.gaming-select option {
+    background: #16213e;
+    color: #fff;
+}
+
+.gaming-button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.gaming-button {
+    flex: none;
+    min-width: 140px;
+    max-width: 220px;
+    width: 100%;
+    padding: 0.7rem 1.2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 0 12px 0 rgba(0,255,255,0.15);
+}
+
+.gaming-button-primary {
+    background: linear-gradient(90deg, #00eaff 0%, #b721ff 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
+}
+
+.gaming-button-primary:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 20px rgba(0, 255, 204, 0.4);
+}
+
+.gaming-button-secondary {
+    background: #23272f;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(183, 33, 255, 0.15);
+}
+
+.gaming-button-secondary:hover {
+    background: #343a40;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 20px rgba(183, 33, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+    .gaming-button-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    .gaming-button {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .gaming-card {
+        padding: 1.5rem;
+    }
+    
+    .gaming-title {
+        font-size: 1.5rem;
+    }
+} 
