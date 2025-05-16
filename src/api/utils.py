@@ -48,6 +48,8 @@ def approved_join_team(application):
     user.is_in_team = True 
     application.status = 'approved'
 
+    application.active = False
+
 def approved_join_tournament(application):
     team = Team.query.get(application.teamID)
     tournament = Tournament.query.get(application.tournamentID)
@@ -60,6 +62,9 @@ def approved_join_tournament(application):
     team.balance -= tournament.cost
     team.tournament_id = tournament.id
     application.status = 'approved'
+
+    # Desactivar la aplicación
+    application.active = False
 
 def approved_do_payment(application):
     # Actualizar el estado de la aplicación a aprobado

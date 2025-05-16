@@ -97,7 +97,7 @@ class Tournament(db.Model):
     date_start = db.Column(db.String(50), nullable=False)
     num_max_teams = db.Column(db.Integer, nullable=False)
     game = db.Column(game_enum, nullable=False)
-    cost = db.Column(db.Integer, nullable=False, default=10)  # Costo del torneo
+    cost = db.Column(db.Integer, nullable=False, default=10) 
 
     # Relationships
     teams = relationship("Team", back_populates="tournament")

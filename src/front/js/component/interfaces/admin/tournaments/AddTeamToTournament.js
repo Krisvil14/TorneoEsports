@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import '../../../../styles/gaming.css';
 
 export default function AddTeamToTournament() {
     const [teams, setTeams] = useState([]);
@@ -96,40 +97,40 @@ export default function AddTeamToTournament() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <div className="row mb-4 text-center">
-                <h1 className="w-75 mx-auto fs-1">Añadir Equipo al Torneo</h1>
-            </div>
-            <div className="row gy-3">
-                <div className="d-flex flex-column gy-3 w-75 mx-auto form-group">
-                    <label htmlFor="team">Equipo:</label>
-                    <select
-                        id="team"
-                        name="team"
-                        value={selectedTeam}
-                        onChange={(e) => setSelectedTeam(e.target.value)}
-                        required
-                        className="form-control"
-                    >
-                        <option value="">Seleccione un equipo</option>
-                        {tournament && teams.map((team) => {
-                            return (
+        <div className="gaming-container">
+            <div className="gaming-card">
+                <div className="gaming-header">
+                    <h1 className="gaming-title">Añadir Equipo al Torneo</h1>
+                </div>
+                <form onSubmit={handleSubmit} className="gaming-form">
+                    <div className="gaming-form-group">
+                        <label htmlFor="team" className="gaming-label">Equipo:</label>
+                        <select
+                            id="team"
+                            name="team"
+                            value={selectedTeam}
+                            onChange={(e) => setSelectedTeam(e.target.value)}
+                            required
+                            className="gaming-select"
+                        >
+                            <option value="">Seleccione un equipo</option>
+                            {tournament && teams.map((team) => (
                                 <option key={team.id} value={team.id}>
                                     {team.name}
                                 </option>
-                            );
-                        })}
-                    </select>
-                </div>
-                <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">
-                          <button type="submit" className="btn btn-primary w-100 w-md-75">
+                            ))}
+                        </select>
+                    </div>
+                    <div className="gaming-button-group">
+                        <button type="submit" className="gaming-button gaming-button-primary">
                             Añadir equipo al torneo
-                          </button>
-                          <Link to="/tournaments" className="btn btn-secondary w-100 w-md-75">
+                        </button>
+                        <Link to="/admin/tournaments" className="gaming-button gaming-button-secondary">
                             Volver
-                          </Link>
-                        </div>
+                        </Link>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     );
 }
