@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment
 from flask_cors import CORS
 import re
@@ -178,14 +178,16 @@ def create_tournament():
     date_start = data.get('date_start')
     num_max_teams = data.get('num_max_teams')
     game = data.get('game')
+    cost = data.get('cost', 10)  # Por defecto el costo es 10
 
     if not name or not date_start or not num_max_teams or not game:
         return jsonify({"error": "Faltan datos"}), 400
 
     try:
         num_max_teams = int(num_max_teams)
+        cost = int(cost)
     except ValueError:
-        return jsonify({"error": "Cantidad de equipos debe ser un número entero válido"}), 400
+        return jsonify({"error": "Cantidad de equipos y costo deben ser números enteros válidos"}), 400
 
     try:
         new_tournament = Tournament(
@@ -193,12 +195,13 @@ def create_tournament():
             date_start=date_start,
             num_max_teams=num_max_teams,
             game=GameEnum[game],
+            cost=cost
         )
         db.session.add(new_tournament)
         db.session.commit()
 
         response = jsonify({"message": "Torneo creado exitosamente"})
-        response.headers.add('Access-Control-Allow-Origin', '*')  # Add CORS header
+        response.headers.add('Access-Control-Allow-Origin', '*')
         return response, 201
     except Exception as e:
         return jsonify({"error": str(e)}), 400
@@ -498,32 +501,37 @@ def add_player_to_team_route():
 @api.route('/handle_application', methods=['POST'])
 def handle_application():
     try:
-        data = request.get_json()  # Cambiar de request.form a request.get_json()
-        application_id = data.get('application_id')    # application id
-        accepted = data.get('accepted') # boolean Approved or Rejetected
+        data = request.get_json()
+        application_id = data.get('application_id')
+        accepted = data.get('accepted')
 
-        # get application
         application = Application.query.filter_by(id=application_id).first()
         if not application:
             return jsonify({"error": "Application not found"}), 404
 
         if not accepted:
             application.status = 'rejected'
+            application.active = False
+            db.session.commit()
+            return jsonify({"message": "La aplicación ha sido rechazada exitosamente"}), 200
 
-        if accepted and application.action == ActionEnum.join_team:
-            approved_join_team(application)
-        if accepted and application.action == ActionEnum.join_tournament:
-            approved_join_tournament(application)
-        if accepted and application.action == ActionEnum.do_payment:
-            approved_do_payment(application)
+        try:
+            if accepted and application.action == ActionEnum.join_team:
+                approved_join_team(application)
+            if accepted and application.action == ActionEnum.join_tournament:
+                approved_join_tournament(application)
+            if accepted and (application.action == ActionEnum.do_payment or application.action == ActionEnum.receive_payment):
+                approved_do_payment(application)
 
-        db.session.commit()
+            db.session.commit()
+            return jsonify({"message": "La aplicación ha sido procesada exitosamente"}), 200
+        except APIException as e:
+            return jsonify({"error": str(e)}), e.status_code
+        except Exception as e:
+            return jsonify({"error": "Error al procesar la solicitud"}), 400
 
-        response = jsonify({"message": f"La aplicación ha sido procesada exitosamente"})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response, 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": "Error al procesar la solicitud"}), 400
 
 @api.route('/applications/team/<int:team_id>', methods=['GET'])
 def get_team_applications(team_id):
@@ -540,12 +548,13 @@ def check_team_request(team_id):
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400
 
-        # Verificar si ya existe una solicitud activa para este usuario y equipo
+        # Verificar si ya existe una solicitud activa y pendiente para este usuario y equipo
         existing_request = Application.query.filter_by(
             userID=int(user_id),
             teamID=team_id,
             action=ActionEnum.join_team,
-            active=True
+            active=True,
+            status=StatusEnum.pending
         ).first()
 
         has_requested = existing_request is not None
@@ -563,16 +572,17 @@ def create_team_request():
         if not user_id or not team_id:
             return jsonify({"error": "User ID and Team ID are required"}), 400
 
-        # Verificar si ya existe una solicitud activa
+        # Verificar si ya existe una solicitud activa y pendiente
         existing_request = Application.query.filter_by(
             userID=user_id,
             teamID=team_id,
             action=ActionEnum.join_team,
-            active=True
+            active=True,
+            status=StatusEnum.pending
         ).first()
 
         if existing_request:
-            return jsonify({"error": "Ya has solicitado unirte a este equipo"}), 400
+            return jsonify({"error": "Ya tienes una solicitud pendiente para este equipo"}), 400
 
         # Crear nueva solicitud
         new_request = Application(
@@ -662,16 +672,17 @@ def create_tournament_request():
         if team.game != tournament.game:
             return jsonify({"error": "El juego del equipo no coincide con el del torneo"}), 400
 
-        # Verificar si ya existe una solicitud activa
+        # Verificar si ya existe una solicitud activa y pendiente
         existing_request = Application.query.filter_by(
             teamID=team_id,
             tournamentID=tournament_id,
             action=ActionEnum.join_tournament,
-            active=True
+            active=True,
+            status=StatusEnum.pending
         ).first()
 
         if existing_request:
-            return jsonify({"error": "Ya has solicitado unirte a este torneo"}), 400
+            return jsonify({"error": "Ya tienes una solicitud pendiente para este torneo"}), 400
 
         # Crear nueva solicitud
         new_request = Application(
@@ -724,6 +735,160 @@ def get_tournament_applications(tournament_id):
                 app_data = app.serialize()
                 app_data['team_name'] = team.name
                 applications_data.append(app_data)
+
+        return jsonify(applications_data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/team/balance', methods=['GET'])
+def get_team_balance():
+    try:
+        user_id = request.headers.get('user_id')
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        user = User.query.get(int(user_id))
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        if not user.team_id:
+            return jsonify({"error": "El usuario no pertenece a ningún equipo"}), 400
+
+        team = Team.query.get(user.team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        return jsonify({
+            "balance": team.balance,
+            "team_name": team.name
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/payment-requests/check/<int:team_id>', methods=['GET'])
+def check_payment_request(team_id):
+    try:
+        user_id = request.headers.get('user_id')
+        action = request.headers.get('action', 'do_payment')  # Por defecto es do_payment
+
+        if not user_id:
+            return jsonify({"error": "User ID is required"}), 400
+
+        # Verificar si ya existe una solicitud activa y pendiente para este usuario y equipo
+        existing_request = Application.query.filter_by(
+            userID=int(user_id),
+            teamID=team_id,
+            action=ActionEnum[action],
+            active=True,
+            status=StatusEnum.pending
+        ).first()
+
+        has_requested = existing_request is not None
+        return jsonify({"hasRequested": has_requested}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/payment-requests', methods=['POST'])
+def create_payment_request():
+    try:
+        data = request.get_json()
+        print('Datos recibidos:', data)  # Log para depuración
+        
+        user_id = data.get('user_id')
+        team_id = data.get('team_id')
+        amount = data.get('amount')
+        bank = data.get('bank')
+        reference = data.get('reference')
+        cedula = data.get('cedula')
+        phone_number = data.get('phone_number')
+        payment_type = data.get('payment_type', 'incoming')
+        action = data.get('action', 'do_payment')  # Por defecto es do_payment
+
+        # Validar que todos los campos requeridos estén presentes
+        required_fields = {
+            'user_id': user_id,
+            'team_id': team_id,
+            'amount': amount,
+            'bank': bank,
+            'cedula': cedula,
+            'phone_number': phone_number
+        }
+        
+        # Solo requerir referencia para pagos entrantes
+        if payment_type == 'incoming':
+            required_fields['reference'] = reference
+        
+        missing_fields = [field for field, value in required_fields.items() if not value]
+        if missing_fields:
+            return jsonify({"error": f"Faltan datos requeridos: {', '.join(missing_fields)}"}), 400
+
+        # Convertir el nombre del banco al formato correcto
+        try:
+            bank_enum = BankEnum[bank]
+        except KeyError:
+            return jsonify({"error": f"Banco inválido: {bank}"}), 400
+
+        # Primero crear la solicitud
+        new_request = Application(
+            userID=user_id,
+            teamID=team_id,
+            action=ActionEnum[action],
+            status=StatusEnum.pending,
+            active=True
+        )
+        db.session.add(new_request)
+        db.session.commit()
+
+        # Luego crear el pago con el ID de la aplicación
+        new_payment = Payment(
+            user_id=user_id,
+            application_id=new_request.id,
+            type=PaymentTypeEnum[payment_type],
+            amount=amount,
+            bank=bank_enum,
+            reference=reference,
+            cedula=cedula,
+            phone_number=phone_number
+        )
+        db.session.add(new_payment)
+        db.session.commit()
+
+        # Actualizar la aplicación con el ID del pago
+        new_request.payment = new_payment.id
+        db.session.commit()
+
+        return jsonify({
+            "message": "Solicitud de pago creada exitosamente",
+            "payment_id": new_payment.id,
+            "application_id": new_request.id
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        print('Error:', str(e))  # Log para depuración
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/payment-requests', methods=['GET'])
+def get_payment_requests():
+    try:
+        # Obtener todas las solicitudes de pago pendientes
+        applications = Application.query.filter(
+            Application.active == True,
+            Application.status == StatusEnum.pending,
+            Application.action.in_([ActionEnum.do_payment, ActionEnum.receive_payment])
+        ).all()
+
+        # Serializar las solicitudes incluyendo información del usuario y el pago
+        applications_data = []
+        for app in applications:
+            payment = Payment.query.filter_by(application_id=app.id).first()
+            user = User.query.get(app.userID)
+            team = Team.query.get(app.teamID)
+            
+            app_data = app.serialize()
+            app_data['payment_details'] = payment.serialize() if payment else None
+            app_data['user_name'] = f"{user.first_name} {user.last_name}" if user else None
+            app_data['team_name'] = team.name if team else None
+            applications_data.append(app_data)
 
         return jsonify(applications_data), 200
     except Exception as e:

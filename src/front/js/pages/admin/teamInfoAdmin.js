@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Table from '../component/commons/Table';
+import Table from '../../component/commons/Table';
 import { Link } from 'react-router-dom';
-import { Context } from '../store/appContext';
+import { Context } from '../../store/appContext';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../styles/teamInfo.css';
+import '../../../styles/teamInfo.css';
 
 export default function TeamInfo() {
     const { teamId } = useParams();
     const { store, actions } = useContext(Context);
     const [team, setTeam] = useState(null);
     const [users, setUsers] = useState([]);
-    const [applications, setApplications] = useState([]);
     const [isLeader, setIsLeader] = useState(false);
     const navigate = useNavigate();
 
@@ -37,19 +36,11 @@ export default function TeamInfo() {
             }
         };
 
-        const fetchApplications = async () => {
-            try {
-                const response = await fetch(process.env.BACKEND_URL + `/api/applications/team/${teamId}`);
-                const data = await response.json();
-                setApplications(data);
-            } catch (error) {
-                console.error('Error fetching applications:', error);
-            }
-        };
+        
 
         fetchTeam();
         fetchUsers();
-        fetchApplications();
+        
     }, [teamId]);
 
     useEffect(() => {
@@ -73,65 +64,7 @@ export default function TeamInfo() {
         }
     }, [store.user, team, users, navigate]);
 
-    const handleApplication = async (applicationId, accepted) => {
-        try {
-            // Si se intenta aceptar una solicitud y el equipo ya tiene 5 jugadores
-            if (accepted && users.length >= 5) {
-                toast.error('No se pueden aceptar más jugadores, el equipo ya está completo.', {
-                    position: "top-right",
-                    autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-                return;
-            }
-
-            const response = await fetch(process.env.BACKEND_URL + '/api/handle_application', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    application_id: applicationId,
-                    accepted: accepted
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al procesar la solicitud');
-            }
-
-            // Mostrar toast de éxito
-            toast.success(accepted ? 'Solicitud aceptada exitosamente' : 'Solicitud rechazada exitosamente', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-
-            // Recargar la página después de procesar la solicitud
-            window.location.reload();
-        } catch (error) {
-            console.error('Error handling application:', error);
-            toast.error('Error al procesar la solicitud: ' + error.message, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        }
-    };
+    
 
     const handleRemovePlayer = async (userId) => {
         try {
@@ -213,45 +146,10 @@ export default function TeamInfo() {
         { header: "Cedula", accessor: "Cedula" },
         { header: "Correo", accessor: "Correo" },
         { header: "Edad", accessor: "Edad" },
-        ...(isLeader ? [{ header: "Acciones", accessor: "Acciones" }] : [])
+        ...(isLeader || store.user.role === 'admin' ? [{ header: "Acciones", accessor: "Acciones" }] : [])
     ];
 
-    const applicationsData = applications
-        .filter(app => app.action === 'join_team' && app.status === 'pending' && app.user)
-        .map(app => ({
-            Usuario: app.user.first_name + ' ' + app.user.last_name,
-            Estado: app.user.is_active ? 'Activo' : 'Inactivo',
-            'Fecha de Solicitud': new Date(app.created_at).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }),
-            Acciones: (
-                <div className="team-info-buttons">
-                    <button 
-                        className="team-info-button" 
-                        onClick={() => handleApplication(app.id, true)}
-                    >
-                        Aceptar
-                    </button>
-                    <button 
-                        className="team-info-button secondary" 
-                        onClick={() => handleApplication(app.id, false)}
-                    >
-                        Rechazar
-                    </button>
-                </div>
-            )
-        }));
-
-    const applicationsColumns = [
-        { header: "Usuario", accessor: "Usuario" },
-        { header: "Estado", accessor: "Estado" },
-        { header: "Fecha de Solicitud", accessor: "Fecha de Solicitud" },
-        { header: "Acciones", accessor: "Acciones" }
-    ];
+    
 
     return (
         <div className="team-info-container">
@@ -261,7 +159,7 @@ export default function TeamInfo() {
             
             <div className="team-info-content">
                 <div className="team-info-buttons">
-                    <Link to="/teams" className="team-info-button">
+                    <Link to="/admin/teams" className="team-info-button">
                         Volver
                     </Link>
                 </div>
@@ -280,18 +178,7 @@ export default function TeamInfo() {
                     </div>
                 </div>
                 
-                {(isLeader || store.user.role === 'admin') && (
-                    <div className="team-info-section">
-                        <h3>Solicitudes</h3>
-                        {applicationsData.length > 0 ? (
-                            <div className="team-info-table">
-                                <Table data={applicationsData} columns={applicationsColumns} />
-                            </div>
-                        ) : (
-                            <p>No hay solicitudes pendientes</p>
-                        )}
-                    </div>
-                )}
+                
             </div>
         </div>
     );

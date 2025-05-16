@@ -32,6 +32,11 @@ import CreateTeamForm from './component/teams/CreateTeamForm';
 import BuscaEquipo from './pages/BuscaEquipo';
 import TeamInfoUser from './pages/teamInfoUser';
 import TournamentRequests from './component/interfaces/admin/tournaments/TournamentRequests';
+import MakePaymentsPage from './pages/makepayments';
+import PaymentsPage from './pages/payments';
+import RecievePaymentsPage from './pages/receivepayments';
+import TeamInfoAdmin from './pages/admin/teamInfoAdmin';
+import PaymentsAdmin from './pages/admin/payments';
 
 
 // Crear tu primer componente
@@ -61,6 +66,10 @@ const Layout = () => {
               <Route element={<Protected> <TournamentsPage /> </Protected>} path="/tournaments" />
               <Route element={<Protected> <TeamInfoUser /> </Protected>} path="/busca-equipo/:teamId" />
               <Route element={<Protected> <TeamInfo /> </Protected>} path="/teamInfo/:teamId" />
+              <Route element={<Protected> <TeamInfoAdmin /> </Protected>} path="/admin/teamInfo/:teamId" />
+              <Route element={<Protected> <PaymentsPage /> </Protected>} path="/payments" />
+              <Route element={<Protected> <MakePaymentsPage /> </Protected>} path="/make-payments" />
+              <Route element={<Protected> <RecievePaymentsPage /> </Protected>} path="/receive-payments" />
               <Route element={<Protected requiredRole="admin"> <RegTeamsForm /> </Protected>} path="/admin/Regteams" />
               <Route element={<Protected requiredRole="admin"> <CreateTournamentForm /> </Protected>} path="/admin/create_tournament" />
               <Route element={<Protected requiredRole="admin"> <AddTeamToTournament /> </Protected>} path="/admin/addteam/:tournament_id" />
@@ -70,6 +79,7 @@ const Layout = () => {
               <Route element={<Protected requiredRole="admin"> <UsersAdminInterface /> </Protected>} path="/admin/users" />
               <Route element={<Protected requiredRole="admin"> <TournamentsAdminPage /> </Protected>} path="/admin/tournaments" />
               <Route element={<Protected requiredRole="admin"> <TournamentRequests /> </Protected>} path="/admin/tournament-requests/:tournamentId" />
+              <Route element={<Protected requiredRole="admin"> <PaymentsAdmin /> </Protected>} path="/admin/payments" />
               <Route element={<Protected> <CreateTeamForm /> </Protected>} path="/create-team" />
               <Route element={<Protected> <BuscaEquipo /> </Protected>} path="/busca-equipo" />
 
