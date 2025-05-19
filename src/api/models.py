@@ -221,3 +221,34 @@ class Payment(db.Model):
             "cedula": self.cedula,
             "phone_number": self.phone_number
         }
+
+class Match(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=False)
+    team1_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
+    team2_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
+    score1 = db.Column(db.Integer, nullable=True)
+    score2 = db.Column(db.Integer, nullable=True)
+    date = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+
+    # Relationships
+    tournament = relationship("Tournament")
+    team1 = relationship("Team", foreign_keys=[team1_id])
+    team2 = relationship("Team", foreign_keys=[team2_id])
+
+    def __repr__(self):
+        return f'<Match {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "tournament_id": str(self.tournament_id),
+            "team1_id": self.team1_id,
+            "team2_id": self.team2_id,
+            "score1": self.score1,
+            "score2": self.score2,
+            "date": self.date.isoformat(),
+            "team1": self.team1.serialize() if self.team1 else None,
+            "team2": self.team2.serialize() if self.team2 else None
+        }
+
