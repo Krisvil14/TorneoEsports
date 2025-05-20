@@ -135,6 +135,86 @@
     z-index: 1;
 }
 
+.team-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.team-stat-card {
+    background: rgba(30, 30, 30, 0.85);
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.team-stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.team-stat-icon {
+    font-size: 2rem;
+    background: var(--accent-color);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+}
+
+.team-stat-info {
+    flex: 1;
+}
+
+.team-stat-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+.team-stat-info p {
+    margin: 0.5rem 0 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Estilos específicos para cada tipo de estadística */
+.team-stat-card.games .team-stat-icon {
+    background: #4a90e2;
+}
+
+.team-stat-card.wins .team-stat-icon {
+    background: #2ecc71;
+}
+
+.team-stat-card.losses .team-stat-icon {
+    background: #e74c3c;
+}
+
+.team-stat-card.kills .team-stat-icon {
+    background: #f1c40f;
+}
+
+.team-stat-card.assists .team-stat-icon {
+    background: #9b59b6;
+}
+
+.team-stat-card.deaths .team-stat-icon {
+    background: #34495e;
+}
+
+.team-stat-card.kda .team-stat-icon {
+    background: #1abc9c;
+}
+
 @media (max-width: 768px) {
     .team-info-container {
         padding: 1rem;

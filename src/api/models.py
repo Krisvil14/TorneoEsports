@@ -133,7 +133,7 @@ class Team(db.Model):
     max_players = db.Column(db.Integer, nullable=False, default=5)
     game = db.Column(game_enum, nullable=False)
     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
-    balance = db.Column(db.Integer, nullable=True, default=0)
+    balance = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships
     tournament = relationship("Tournament", back_populates="teams")
@@ -205,7 +205,7 @@ class Payment(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     bank = db.Column(bank_enum, nullable=False)
     date = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    reference = db.Column(db.String(50), nullable=True)
+    reference = db.Column(db.String(50), nullable=False)
     cedula = db.Column(db.String(20), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
 
@@ -278,8 +278,8 @@ class User_Stats(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     kills = db.Column(db.Integer, nullable=False, default=0)
     assists = db.Column(db.Integer, nullable=False, default=0)
-    deaths = db.Column(db.Integer, nullable=True, default=0)
-    kda = db.Column(db.Float, nullable=True, default=0.0)
+    deaths = db.Column(db.Integer, nullable=False, default=0)
+    kda = db.Column(db.Float, nullable=False, default=0.0)
 
     # Relationships
     user = relationship("User", back_populates="stats")
@@ -322,6 +322,10 @@ class Team_Stats(db.Model):
     tournament_win = db.Column(db.Integer, nullable=False, default=0)
     tournament_loses = db.Column(db.Integer, nullable=False, default=0)
     tournament_count = db.Column(db.Integer, nullable=False, default=0)
+    total_kills = db.Column(db.Integer, nullable=False, default=0)
+    total_assists = db.Column(db.Integer, nullable=False, default=0)
+    total_deaths = db.Column(db.Integer, nullable=False, default=0)
+    team_kda = db.Column(db.Float, nullable=False, default=0.0)
 
     # Relationships
     team = relationship("Team", backref="team_stats")
@@ -333,7 +337,16 @@ class Team_Stats(db.Model):
         CheckConstraint('tournament_win >= 0', name='check_tournament_win_positive'),
         CheckConstraint('tournament_loses >= 0', name='check_tournament_loses_positive'),
         CheckConstraint('tournament_count >= 0', name='check_tournament_count_positive'),
+        CheckConstraint('total_kills >= 0', name='check_total_kills_positive'),
+        CheckConstraint('total_assists >= 0', name='check_total_assists_positive'),
+        CheckConstraint('total_deaths >= 0', name='check_total_deaths_positive'),
     )
+
+    def calculate_team_kda(self):
+        if self.total_kills == 0 and self.total_assists == 0:
+            return 0.0
+        effective_deaths = max(1, self.total_deaths)
+        return (self.total_kills + self.total_assists) / effective_deaths
 
     def __repr__(self):
         return f'<Team_Stats {self.id}>'
@@ -348,6 +361,10 @@ class Team_Stats(db.Model):
             "tournament_win": self.tournament_win,
             "tournament_loses": self.tournament_loses,
             "tournament_count": self.tournament_count,
+            "total_kills": self.total_kills,
+            "total_assists": self.total_assists,
+            "total_deaths": self.total_deaths,
+            "team_kda": self.calculate_team_kda(),
             "team": self.team.serialize() if self.team else None
         }
 

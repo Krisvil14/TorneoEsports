@@ -993,3 +993,34 @@ def get_user_stats(user_id):
         return jsonify(stats.serialize()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@api.route('/teams/<int:team_id>/stats', methods=['GET'])
+def get_team_stats(team_id):
+    try:
+        # Verificar que el equipo existe
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        # Obtener las estadísticas del equipo
+        stats = Team_Stats.query.filter_by(team_id=team_id).first()
+        if not stats:
+            # Si no existen estadísticas, crear unas nuevas
+            stats = Team_Stats(
+                team_id=team_id,
+                games_win=0,
+                games_lose=0,
+                games_count=0,
+                tournament_win=0,
+                tournament_loses=0,
+                tournament_count=0,
+                total_kills=0,
+                total_assists=0,
+                total_deaths=0
+            )
+            db.session.add(stats)
+            db.session.commit()
+
+        return jsonify(stats.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
