@@ -1,5 +1,5 @@
 from flask import jsonify, url_for
-from api.models import User, Team, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, db
+from api.models import User, Team, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, db
 
 class APIException(Exception):
     status_code = 400
@@ -44,11 +44,29 @@ def generate_sitemap(app):
 def approved_join_team(application):
     user = User.query.get(application.userID)
     team = Team.query.get(application.teamID)
+    
+    # Actualizar el usuario
     user.team_id = team.id
     user.is_in_team = True 
     application.status = 'approved'
-
     application.active = False
+
+    # Actualizar o crear las estadísticas del usuario
+    user_stats = User_Stats.query.filter_by(user_id=user.id).first()
+    if user_stats:
+        user_stats.team_id = team.id
+    else:
+        # Si no existen las estadísticas, las creamos
+        user_stats = User_Stats(
+            user_id=user.id,
+            team_id=team.id,
+            kills=0,
+            assists=0
+        )
+        db.session.add(user_stats)
+
+    # Guardar los cambios
+    db.session.commit()
 
 def approved_join_tournament(application):
     team = Team.query.get(application.teamID)

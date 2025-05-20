@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment
 from flask_cors import CORS
 import re
@@ -126,6 +126,17 @@ def register_user():
     db.session.add(new_user)
     try:
         db.session.commit()
+        
+        # Crear estadísticas iniciales para el usuario
+        user_stats = User_Stats(
+            user_id=new_user.id,
+            team_id=None,  # Inicialmente no tiene equipo
+            kills=0,
+            assists=0
+        )
+        db.session.add(user_stats)
+        db.session.commit()
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
@@ -142,14 +153,31 @@ def register_team():
      if not name or not game:
          return jsonify({"error": "Faltan datos"}), 400
 
-     new_team = Team(
-         name=name,
-         game=GameEnum[game],
-     )
-     db.session.add(new_team)
-     db.session.commit()
+     try:
+         new_team = Team(
+             name=name,
+             game=GameEnum[game],
+         )
+         db.session.add(new_team)
+         db.session.commit()
 
-     return jsonify({"message": "Equipo registrado exitosamente", "team_id": new_team.id}), 201
+         # Crear estadísticas iniciales para el equipo
+         team_stats = Team_Stats(
+             team_id=new_team.id,
+             games_win=0,
+             games_lose=0,
+             games_count=0,
+             tournament_win=0,
+             tournament_loses=0,
+             tournament_count=0
+         )
+         db.session.add(team_stats)
+         db.session.commit()
+
+         return jsonify({"message": "Equipo registrado exitosamente", "team_id": new_team.id}), 201
+     except Exception as e:
+         db.session.rollback()
+         return jsonify({"error": str(e)}), 400
 
 @api.route('/admin/Regteams', methods=['POST'])
 def register_team_admin():
@@ -161,14 +189,31 @@ def register_team_admin():
      if not name or not game:
          return jsonify({"error": "Faltan datos"}), 400
 
-     new_team = Team(
-         name=name,
-         game=GameEnum[game],
-     )
-     db.session.add(new_team)
-     db.session.commit()
+     try:
+         new_team = Team(
+             name=name,
+             game=GameEnum[game],
+         )
+         db.session.add(new_team)
+         db.session.commit()
 
-     return jsonify({"message": "Equipo registrado exitosamente", "team_id": new_team.id}), 201
+         # Crear estadísticas iniciales para el equipo
+         team_stats = Team_Stats(
+             team_id=new_team.id,
+             games_win=0,
+             games_lose=0,
+             games_count=0,
+             tournament_win=0,
+             tournament_loses=0,
+             tournament_count=0
+         )
+         db.session.add(team_stats)
+         db.session.commit()
+
+         return jsonify({"message": "Equipo registrado exitosamente", "team_id": new_team.id}), 201
+     except Exception as e:
+         db.session.rollback()
+         return jsonify({"error": str(e)}), 400
 
 @api.route('/admin/create_tournament', methods=['POST'])
 def create_tournament():
@@ -469,6 +514,17 @@ def create_user():
     db.session.add(new_user)
     try:
         db.session.commit()
+        
+        # Crear estadísticas iniciales para el usuario
+        user_stats = User_Stats(
+            user_id=new_user.id,
+            team_id=None,  # Inicialmente no tiene equipo
+            kills=0,
+            assists=0
+        )
+        db.session.add(user_stats)
+        db.session.commit()
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
@@ -492,11 +548,30 @@ def add_player_to_team_route():
     if not team:
         return jsonify({"error": "Equipo no encontrado"}), 404
 
-    user.team_id = team_id
-    user.is_in_team = True
-    db.session.commit()
+    try:
+        # Actualizar el usuario
+        user.team_id = team_id
+        user.is_in_team = True
 
-    return jsonify({"message": "Usuario añadido al equipo exitosamente"}), 200
+        # Actualizar las estadísticas del usuario
+        user_stats = User_Stats.query.filter_by(user_id=user_id).first()
+        if user_stats:
+            user_stats.team_id = team_id
+        else:
+            # Si por alguna razón no existen las estadísticas, las creamos
+            user_stats = User_Stats(
+                user_id=user_id,
+                team_id=team_id,
+                kills=0,
+                assists=0
+            )
+            db.session.add(user_stats)
+
+        db.session.commit()
+        return jsonify({"message": "Usuario añadido al equipo exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
 
 @api.route('/handle_application', methods=['POST'])
 def handle_application():

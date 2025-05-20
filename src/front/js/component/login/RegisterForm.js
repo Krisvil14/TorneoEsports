@@ -11,11 +11,38 @@ export default function RegisterForm() {
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-    const [role, setRole] = React.useState('user');
+  const [role, setRole] = React.useState('user');
   const navigate = useNavigate();
+
+  const handleDniChange = (e) => {
+    const value = e.target.value;
+    // Solo permite números y asegura que sea positivo
+    if (/^\d*$/.test(value)) {
+      setDni(value);
+    }
+  };
+
+  const handleAgeChange = (e) => {
+    const value = e.target.value;
+    // Solo permite números positivos
+    if (/^\d*$/.test(value)) {
+      setAge(value);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validaciones adicionales
+    if (parseInt(dni) <= 0) {
+      toast.error('La cédula debe ser un número positivo');
+      return;
+    }
+
+    if (parseInt(age) <= 0) {
+      toast.error('La edad debe ser un número positivo');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('first_name', name);
@@ -90,25 +117,29 @@ export default function RegisterForm() {
           <div className="d-flex flex-column gy-3 w-75 mx-auto">
             <label htmlFor="cedula" className="gaming-form-label">Cédula:</label>
             <input
-              onChange={({ target }) => setDni(target.value)}
+              onChange={handleDniChange}
               value={dni}
               className="form-control gaming-form-input"
               type="text"
               id="cedula"
               name="cedula"
               required
+              pattern="[0-9]*"
+              inputMode="numeric"
+              min="1"
             />
           </div>
           <div className="d-flex flex-column gy-3 w-75 mx-auto">
             <label htmlFor="age" className="gaming-form-label">Edad:</label>
             <input
-              onChange={({ target }) => setAge(target.value)}
+              onChange={handleAgeChange}
               value={age}
               className="form-control gaming-form-input"
               type="number"
               id="age"
               name="age"
               required
+              min="1"
             />
           </div>
           <div className="d-flex flex-column gy-3 w-75 mx-auto">

@@ -72,6 +72,12 @@ class User(db.Model):
     team = relationship("Team", back_populates="members")
     applications = relationship("Application", back_populates="user")
     payments = relationship("Payment", back_populates="user")
+    stats = relationship("User_Stats", back_populates="user", uselist=False)
+
+    __table_args__ = (
+        CheckConstraint('age > 0', name='check_age_positive'),
+        CheckConstraint("cedula ~ '^[0-9]+$'", name='check_cedula_numeric'),
+    )
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -90,6 +96,7 @@ class User(db.Model):
             "team_id": self.team_id,
             "role": self.role.name if self.role else None,
         }
+
 
 class Tournament(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
@@ -132,6 +139,7 @@ class Team(db.Model):
     tournament = relationship("Tournament", back_populates="teams")
     members = relationship("User", back_populates="team")
     applications = relationship('Application', back_populates="team")
+    user_stats = relationship("User_Stats", back_populates="team")
 
     def __repr__(self):
         return f'<Team {self.name}>'
@@ -205,6 +213,13 @@ class Payment(db.Model):
     user = relationship('User', back_populates="payments")
     application = relationship('Application', back_populates="payments")
 
+    __table_args__ = (
+        CheckConstraint('amount > 0', name='check_amount_positive'),
+        CheckConstraint("cedula ~ '^[0-9]+$'", name='check_payment_cedula_numeric'),
+        CheckConstraint("phone_number ~ '^[0-9]+$'", name='check_phone_numeric'),
+        CheckConstraint("reference ~ '^[0-9]+$'", name='check_reference_numeric'),
+    )
+
     def __repr__(self):
         return f'<Payment {self.id}>'
 
@@ -236,6 +251,11 @@ class Match(db.Model):
     team1 = relationship("Team", foreign_keys=[team1_id])
     team2 = relationship("Team", foreign_keys=[team2_id])
 
+    __table_args__ = (
+        CheckConstraint('score1 >= 0', name='check_score1_positive'),
+        CheckConstraint('score2 >= 0', name='check_score2_positive'),
+    )
+
     def __repr__(self):
         return f'<Match {self.id}>'
 
@@ -250,5 +270,73 @@ class Match(db.Model):
             "date": self.date.isoformat(),
             "team1": self.team1.serialize() if self.team1 else None,
             "team2": self.team2.serialize() if self.team2 else None
+        }
+
+class User_Stats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
+    kills = db.Column(db.Integer, nullable=False, default=0)
+    assists = db.Column(db.Integer, nullable=False, default=0)
+
+    # Relationships
+    user = relationship("User", back_populates="stats")
+    team = relationship("Team", back_populates="user_stats")
+
+    __table_args__ = (
+        CheckConstraint('kills >= 0', name='check_kills_positive'),
+        CheckConstraint('assists >= 0', name='check_assists_positive'),
+    )
+
+    def __repr__(self):
+        return f'<User_Stats {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "team_id": self.team_id,
+            "kills": self.kills,
+            "assists": self.assists,
+            "user": self.user.serialize() if self.user else None,
+            "team": self.team.serialize() if self.team else None
+        }
+
+class Team_Stats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
+    games_win = db.Column(db.Integer, nullable=False, default=0)
+    games_lose = db.Column(db.Integer, nullable=False, default=0)
+    games_count = db.Column(db.Integer, nullable=False, default=0)
+    tournament_win = db.Column(db.Integer, nullable=False, default=0)
+    tournament_loses = db.Column(db.Integer, nullable=False, default=0)
+    tournament_count = db.Column(db.Integer, nullable=False, default=0)
+
+    # Relationships
+    team = relationship("Team", backref="team_stats")
+
+    __table_args__ = (
+        CheckConstraint('games_win >= 0', name='check_games_win_positive'),
+        CheckConstraint('games_lose >= 0', name='check_games_lose_positive'),
+        CheckConstraint('games_count >= 0', name='check_games_count_positive'),
+        CheckConstraint('tournament_win >= 0', name='check_tournament_win_positive'),
+        CheckConstraint('tournament_loses >= 0', name='check_tournament_loses_positive'),
+        CheckConstraint('tournament_count >= 0', name='check_tournament_count_positive'),
+    )
+
+    def __repr__(self):
+        return f'<Team_Stats {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "team_id": self.team_id,
+            "games_win": self.games_win,
+            "games_lose": self.games_lose,
+            "games_count": self.games_count,
+            "tournament_win": self.tournament_win,
+            "tournament_loses": self.tournament_loses,
+            "tournament_count": self.tournament_count,
+            "team": self.team.serialize() if self.team else None
         }
 
