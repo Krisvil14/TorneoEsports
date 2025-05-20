@@ -278,6 +278,8 @@ class User_Stats(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     kills = db.Column(db.Integer, nullable=False, default=0)
     assists = db.Column(db.Integer, nullable=False, default=0)
+    deaths = db.Column(db.Integer, nullable=True, default=0)
+    kda = db.Column(db.Float, nullable=True, default=0.0)
 
     # Relationships
     user = relationship("User", back_populates="stats")
@@ -286,10 +288,17 @@ class User_Stats(db.Model):
     __table_args__ = (
         CheckConstraint('kills >= 0', name='check_kills_positive'),
         CheckConstraint('assists >= 0', name='check_assists_positive'),
+        CheckConstraint('deaths >= 0', name='check_deaths_positive'),
     )
 
     def __repr__(self):
         return f'<User_Stats {self.id}>'
+
+    def calculate_kda(self):
+        if self.kills == 0 and self.assists == 0:
+            return 0.0
+        effective_deaths = max(1, self.deaths)  # Si deaths es 0, usamos 1 para el cálculo
+        return (self.kills + self.assists) / effective_deaths
 
     def serialize(self):
         return {
@@ -298,6 +307,8 @@ class User_Stats(db.Model):
             "team_id": self.team_id,
             "kills": self.kills,
             "assists": self.assists,
+            "deaths": self.deaths,
+            "kda": self.calculate_kda(),
             "user": self.user.serialize() if self.user else None,
             "team": self.team.serialize() if self.team else None
         }

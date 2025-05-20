@@ -1,10 +1,27 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Context } from '../../../store/appContext';
 import "../../../../styles/profile.css";
 
 export default function ProfileInterface() {
     const { store, actions } = useContext(Context);
     const user = store.user;
+    const [stats, setStats] = useState(null);
+
+    useEffect(() => {
+        const fetchUserStats = async () => {
+            if (user) {
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/users/${user.id}/stats`);
+                    const data = await response.json();
+                    setStats(data);
+                } catch (error) {
+                    console.error('Error fetching user stats:', error);
+                }
+            }
+        };
+
+        fetchUserStats();
+    }, [user]);
 
     // Función para obtener las iniciales del nombre
     const getInitials = (firstName, lastName) => {
@@ -42,6 +59,41 @@ export default function ProfileInterface() {
                         <div className="info-card">
                             <strong>Edad</strong>
                             <p>{user.age}</p>
+                        </div>
+                    </div>
+
+                    {/* Sección de Estadísticas */}
+                    <div className="stats-section">
+                        <h2 className="stats-title">Estadísticas del Jugador</h2>
+                        <div className="stats-grid">
+                            <div className="stat-card kills">
+                                <div className="stat-icon">🎯</div>
+                                <div className="stat-info">
+                                    <h3>Kills</h3>
+                                    <p>{stats?.kills || 0}</p>
+                                </div>
+                            </div>
+                            <div className="stat-card assists">
+                                <div className="stat-icon">🤝</div>
+                                <div className="stat-info">
+                                    <h3>Asistencias</h3>
+                                    <p>{stats?.assists || 0}</p>
+                                </div>
+                            </div>
+                            <div className="stat-card deaths">
+                                <div className="stat-icon">💀</div>
+                                <div className="stat-info">
+                                    <h3>Muertes</h3>
+                                    <p>{stats?.deaths || 0}</p>
+                                </div>
+                            </div>
+                            <div className="stat-card kda">
+                                <div className="stat-icon">📊</div>
+                                <div className="stat-info">
+                                    <h3>KDA</h3>
+                                    <p>{stats?.kda ? stats.kda.toFixed(2) : '0.00'}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

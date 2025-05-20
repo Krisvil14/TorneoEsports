@@ -968,3 +968,28 @@ def get_payment_requests():
         return jsonify(applications_data), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+@api.route('/users/<int:user_id>/stats', methods=['GET'])
+def get_user_stats(user_id):
+    try:
+        # Verificar que el usuario existe
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        # Obtener las estadísticas del usuario
+        stats = User_Stats.query.filter_by(user_id=user_id).first()
+        if not stats:
+            # Si no existen estadísticas, crear unas nuevas
+            stats = User_Stats(
+                user_id=user_id,
+                team_id=None,
+                kills=0,
+                assists=0
+            )
+            db.session.add(stats)
+            db.session.commit()
+
+        return jsonify(stats.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

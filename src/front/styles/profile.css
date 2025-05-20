@@ -122,7 +122,136 @@
     text-decoration: none;
 }
 
+/* Sección de Estadísticas */
+.stats-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: rgba(20, 20, 20, 0.95);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+.stats-title {
+    color: #00ffff;
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.9), rgba(20, 20, 20, 0.9));
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    background: rgba(0, 255, 255, 0.1);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-info h3 {
+    color: #00ffff;
+    margin: 0;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-info p {
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 0.5rem 0 0;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Estilos específicos para cada tipo de estadística */
+.stat-card.kills {
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+.stat-card.kills .stat-icon {
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+.stat-card.kills h3 {
+    color: #ff4444;
+}
+
+.stat-card.assists {
+    border-color: rgba(0, 255, 0, 0.3);
+}
+
+.stat-card.assists .stat-icon {
+    border-color: rgba(0, 255, 0, 0.3);
+}
+
+.stat-card.assists h3 {
+    color: #44ff44;
+}
+
+.stat-card.deaths {
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+.stat-card.deaths .stat-icon {
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+.stat-card.deaths h3 {
+    color: #ff4444;
+}
+
+.stat-card.kda {
+    border-color: rgba(255, 255, 0, 0.3);
+}
+
+.stat-card.kda .stat-icon {
+    border-color: rgba(255, 255, 0, 0.3);
+}
+
+.stat-card.kda h3 {
+    color: #ffff44;
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     .profile-hero h1 {
         font-size: 2rem;
@@ -135,5 +264,27 @@
     
     .info-grid {
         grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        font-size: 1rem;
+    }
+
+    .stat-info p {
+        font-size: 1.5rem;
     }
 } 
