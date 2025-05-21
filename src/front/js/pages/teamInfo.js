@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Context } from '../store/appContext';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../styles/teamInfo.css';
+import '../../../styles/teamInfo.css'
 
 export default function TeamInfo() {
     const { teamId } = useParams();
@@ -15,6 +15,9 @@ export default function TeamInfo() {
     const [applications, setApplications] = useState([]);
     const [isLeader, setIsLeader] = useState(false);
     const [teamStats, setTeamStats] = useState(null);
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+    const [showNewLeaderModal, setShowNewLeaderModal] = useState(false);
+    const [selectedNewLeader, setSelectedNewLeader] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -84,6 +87,15 @@ export default function TeamInfo() {
             }
         }
     }, [store.user, team, users, navigate]);
+
+    useEffect(() => {
+        if (showLeaveModal || showNewLeaderModal) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+        return () => document.body.classList.remove('modal-open');
+    }, [showLeaveModal, showNewLeaderModal]);
 
     const handleApplication = async (applicationId, accepted) => {
         try {
@@ -190,6 +202,51 @@ export default function TeamInfo() {
         }
     };
 
+    const handleLeaveTeam = async () => {
+        try {
+            const teamMembers = users.filter(user => user.id !== store.user.id);
+            
+            if (teamMembers.length > 0) {
+                setShowNewLeaderModal(true);
+            } else {
+                setShowLeaveModal(true);
+            }
+        } catch (error) {
+            console.error('Error al preparar la salida del equipo:', error);
+            toast.error('Error al preparar la salida del equipo');
+        }
+    };
+
+    const confirmLeaveTeam = async () => {
+        try {
+            const response = await fetch(process.env.BACKEND_URL + '/api/teams/leave', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_id: store.user.id,
+                    new_leader_id: selectedNewLeader
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.success(data.message);
+                if (data.team_disabled) {
+                    toast.warning('El equipo ha sido desactivado por no tener más miembros');
+                }
+                navigate('/teams');
+            } else {
+                toast.error(data.error || 'Error al salir del equipo');
+            }
+        } catch (error) {
+            console.error('Error al salir del equipo:', error);
+            toast.error('Error al salir del equipo');
+        }
+    };
+
     if (!team) {
         return <div className="team-info-container">Loading...</div>;
     }
@@ -276,7 +333,26 @@ export default function TeamInfo() {
                     <Link to="/teams" className="team-info-button">
                         Volver
                     </Link>
+                    {isLeader && (
+                        <button 
+                            className="team-info-button danger" 
+                            onClick={handleLeaveTeam}
+                        >
+                            Salir del Equipo
+                        </button>
+                    )}
                 </div>
+
+                {showLeaveModal && (
+                    <div className="gaming-confirm-box">
+                        <h3>Confirmar Salida</h3>
+                        <p>¿Estás seguro de que deseas salir del equipo? Al ser el último miembro, el equipo será desactivado.</p>
+                        <div className="gaming-confirm-buttons">
+                            <button onClick={() => setShowLeaveModal(false)}>Cancelar</button>
+                            <button onClick={confirmLeaveTeam}>Confirmar</button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="team-info-section">
                     <h3>Detalles del Equipo</h3>
@@ -378,6 +454,41 @@ export default function TeamInfo() {
                         ) : (
                             <p>No hay solicitudes pendientes</p>
                         )}
+                    </div>
+                )}
+
+                {/* Modal para seleccionar nuevo líder */}
+                {showNewLeaderModal && (
+                    <div className="custom-modal-overlay">
+                        <div className="custom-modal-content">
+                            <h3>Seleccionar Nuevo Líder</h3>
+                            <p>Debes seleccionar un nuevo líder antes de salir del equipo.</p>
+                            <select 
+                                value={selectedNewLeader || ''} 
+                                onChange={(e) => setSelectedNewLeader(e.target.value)}
+                                className="form-control"
+                            >
+                                <option value="">Selecciona un nuevo líder</option>
+                                {users
+                                    .filter(user => user.id !== store.user.id)
+                                    .map(user => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.first_name} {user.last_name}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                            <div className="custom-modal-buttons">
+                                <button onClick={() => setShowNewLeaderModal(false)}>Cancelar</button>
+                                <button 
+                                    onClick={confirmLeaveTeam} 
+                                    className="primary"
+                                    disabled={!selectedNewLeader}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>

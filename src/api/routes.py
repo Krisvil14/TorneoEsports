@@ -157,6 +157,7 @@ def register_team():
          new_team = Team(
              name=name,
              game=GameEnum[game],
+             is_active=True,
          )
          db.session.add(new_team)
          db.session.commit()
@@ -193,6 +194,7 @@ def register_team_admin():
          new_team = Team(
              name=name,
              game=GameEnum[game],
+             is_active=True,
          )
          db.session.add(new_team)
          db.session.commit()
@@ -1023,4 +1025,61 @@ def get_team_stats(team_id):
 
         return jsonify(stats.serialize()), 200
     except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/teams/leave', methods=['POST'])
+def leave_team():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        new_leader_id = data.get('new_leader_id')  # Opcional, solo necesario si hay más miembros
+
+        if not user_id:
+            return jsonify({"error": "Se requiere el ID del usuario"}), 400
+
+        # Obtener el usuario y verificar que sea líder
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        if not user.is_leader:
+            return jsonify({"error": "Solo los líderes pueden salir del equipo"}), 403
+
+        # Obtener el equipo
+        team = Team.query.get(user.team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        # Obtener todos los miembros del equipo
+        team_members = User.query.filter_by(team_id=team.id).all()
+        
+        # Si hay más miembros, se requiere un nuevo líder
+        if len(team_members) > 1:
+            if not new_leader_id:
+                return jsonify({"error": "Se requiere designar un nuevo líder"}), 400
+
+            new_leader = User.query.get(new_leader_id)
+            if not new_leader or new_leader.team_id != team.id:
+                return jsonify({"error": "El nuevo líder debe ser un miembro del equipo"}), 400
+
+            # Designar nuevo líder
+            new_leader.is_leader = True
+        else:
+            # Si es el último miembro, desactivar el equipo
+            team.is_active = False
+
+        # Actualizar el usuario que sale
+        user.team_id = None
+        user.is_in_team = False
+        user.is_leader = False
+
+        db.session.commit()
+
+        return jsonify({
+            "message": "Has salido del equipo exitosamente",
+            "team_disabled": len(team_members) <= 1
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 400

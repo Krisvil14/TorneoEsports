@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Context } from '../store/appContext';
-import '../../styles/teamInfo.css';
+import '../../styles/teamInfoo.css';
 
 export default function TeamInfoUser() {
     const { teamId } = useParams();

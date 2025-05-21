@@ -101,7 +101,7 @@ export default function UsersAdminInterface() {
         {
             header: 'En Equipo',
             accessor: 'is_in_team',
-            Cell: ({ row }) => (row.is_in_team ? '✔' : 'X'),
+            Cell: ({ row }) => (row.is_in_team ? '✅' : '❌'),
         },
         { header: 'Equipo asignado', accessor: 'team_name' },
         {

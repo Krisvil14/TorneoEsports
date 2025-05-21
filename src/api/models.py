@@ -130,6 +130,7 @@ class Tournament(db.Model):
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
+    is_active = db.Column(db.Boolean(), nullable=True, default=True)
     max_players = db.Column(db.Integer, nullable=False, default=5)
     game = db.Column(game_enum, nullable=False)
     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
@@ -148,6 +149,7 @@ class Team(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "is_active": self.is_active,
             "max_players": self.max_players,
             "current_players": len(self.members),
             "game": self.game.name,
