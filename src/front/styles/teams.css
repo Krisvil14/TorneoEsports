@@ -283,4 +283,51 @@
     .sort-group label {
         grid-column: 1 / -1;
     }
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-badge.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.status-badge.inactive {
+    background-color: #f44336;
+    color: white;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.toggle-status-button {
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+
+.toggle-status-button.activate {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+}
+
+.toggle-status-button.deactivate {
+    background: linear-gradient(45deg, #f44336, #d32f2f);
+}
+
+.toggle-status-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 } 

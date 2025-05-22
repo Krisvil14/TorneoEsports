@@ -90,7 +90,7 @@ def register_user():
     age = data.get('age')
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role', 'user')  # Default to 'user' if not specified
+    role = data.get('role', 'user') 
 
     if not first_name or not last_name or not cedula or not age or not email or not password:
         return jsonify({"error": "Faltan datos"}), 400
@@ -225,7 +225,7 @@ def create_tournament():
     date_start = data.get('date_start')
     num_max_teams = data.get('num_max_teams')
     game = data.get('game')
-    cost = data.get('cost', 10)  # Por defecto el costo es 10
+    cost = data.get('cost', 10)  
 
     if not name or not date_start or not num_max_teams or not game:
         return jsonify({"error": "Faltan datos"}), 400
@@ -683,6 +683,7 @@ def remove_player_from_team(team_id):
         data = request.get_json()
         user_id = data.get('user_id')
         requesting_user_id = data.get('requesting_user_id')
+        new_leader_id = data.get('new_leader_id')
 
         if not user_id or not requesting_user_id:
             return jsonify({"error": "Se requiere el ID del usuario y del solicitante"}), 400
@@ -700,22 +701,39 @@ def remove_player_from_team(team_id):
         if user_to_remove.team_id != team_id:
             return jsonify({"error": "El usuario no pertenece a este equipo"}), 400
 
-        # Verificar que el usuario que hace la petición sea el líder del equipo
+        # Verificar que el usuario que hace la petición sea admin
         requesting_user = User.query.get(requesting_user_id)
-        if not requesting_user or not requesting_user.is_leader or requesting_user.team_id != team_id:
+        if not requesting_user or requesting_user.role != RoleEnum.admin:
             return jsonify({"error": "No tienes permiso para eliminar jugadores de este equipo"}), 403
 
-        # No permitir que el líder se elimine a sí mismo
-        if user_to_remove.id == requesting_user.id:
-            return jsonify({"error": "No puedes eliminarte a ti mismo del equipo"}), 400
+        # Si el usuario a eliminar es el líder y hay más miembros, se requiere un nuevo líder
+        if user_to_remove.is_leader:
+            remaining_members = User.query.filter(User.team_id == team_id, User.id != user_id).all()
+            if remaining_members and not new_leader_id:
+                return jsonify({"error": "Se requiere designar un nuevo líder"}), 400
+
+            if new_leader_id:
+                new_leader = User.query.get(new_leader_id)
+                if not new_leader or new_leader.team_id != team_id:
+                    return jsonify({"error": "El nuevo líder debe ser un miembro del equipo"}), 400
+                new_leader.is_leader = True
+
+        # Si es el último miembro, desactivar el equipo
+        remaining_members = User.query.filter(User.team_id == team_id, User.id != user_id).all()
+        if not remaining_members:
+            team.is_active = False
 
         # Eliminar al usuario del equipo
         user_to_remove.team_id = None
         user_to_remove.is_in_team = False
+        user_to_remove.is_leader = False
 
         db.session.commit()
 
-        return jsonify({"message": "Jugador eliminado del equipo exitosamente"}), 200
+        return jsonify({
+            "message": "Jugador eliminado del equipo exitosamente",
+            "team_disabled": not remaining_members
+        }), 200
 
     except Exception as e:
         db.session.rollback()
@@ -1083,3 +1101,78 @@ def leave_team():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
+
+@api.route('/teams/<int:team_id>/toggle-status', methods=['PUT'])
+def toggle_team_status(team_id):
+    try:
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        # Cambiar el estado del equipo
+        team.is_active = not team.is_active
+        db.session.commit()
+
+        return jsonify({
+            "message": f"Estado del equipo actualizado exitosamente a {'activo' if team.is_active else 'inactivo'}",
+            "team": team.serialize()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/users/<int:user_id>', methods=['PUT'])
+def admin_update_user(user_id):
+    user = User.query.get(user_id)
+    if user is None:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    cedula = data.get('cedula')
+    age = data.get('age')
+    role = data.get('role')
+
+    if not first_name or not last_name or not cedula or not age or not role:
+        return jsonify({"error": "Todos los campos son obligatorios"}), 400
+
+    # Validar que la cédula sea numérica
+    if not cedula.isdigit():
+        return jsonify({"error": "La cédula debe contener solo números"}), 400
+
+    # Validar que la edad sea un número positivo
+    try:
+        age = int(age)
+        if age <= 0:
+            return jsonify({"error": "La edad debe ser un número positivo"}), 400
+    except ValueError:
+        return jsonify({"error": "La edad debe ser un número válido"}), 400
+
+    # Validar que el rol sea válido
+    try:
+        role_enum = RoleEnum[role]
+    except KeyError:
+        return jsonify({"error": "Rol inválido"}), 400
+
+    # Verificar que la cédula no esté en uso por otro usuario
+    existing_user = User.query.filter(User.cedula == cedula, User.id != user_id).first()
+    if existing_user:
+        return jsonify({"error": "La cédula ya está registrada por otro usuario"}), 400
+
+    # Actualizar los datos del usuario
+    user.first_name = first_name
+    user.last_name = last_name
+    user.cedula = cedula
+    user.age = age
+    user.role = role_enum
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Usuario actualizado exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500

@@ -7,6 +7,7 @@ export default function TeamsAdminInterface() {
     const navigate = useNavigate();
     const [teams, setTeams] = useState([]);
     const [selectedGame, setSelectedGame] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
     const [sortConfig, setSortConfig] = useState({
         key: 'name',
         direction: 'asc'
@@ -18,23 +19,44 @@ export default function TeamsAdminInterface() {
 
     const resetFilters = () => {
         setSelectedGame('');
+        setSelectedStatus('');
         setSortConfig({ key: 'name', direction: 'asc' });
     };
 
-    useEffect(() => {
-        // Obtener los datos de los equipos desde el backend
-        const fetchTeams = async () => {
-            try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/teams');
-                const data = await response.json();
-                setTeams(data);
-            } catch (error) {
-                console.error('Error fetching teams:', error);
-            }
-        };
+    const fetchTeams = async () => {
+        try {
+            const response = await fetch(process.env.BACKEND_URL + '/api/teams');
+            const data = await response.json();
+            setTeams(data);
+        } catch (error) {
+            console.error('Error fetching teams:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchTeams();
     }, []);
+
+    const handleToggleStatus = async (teamId, currentStatus) => {
+        try {
+            const response = await fetch(`${process.env.BACKEND_URL}/api/teams/${teamId}/toggle-status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cambiar el estado del equipo');
+            }
+
+            // Actualizar la lista de equipos después de cambiar el estado
+            await fetchTeams();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al cambiar el estado del equipo');
+        }
+    };
 
     // Función para ordenar los equipos
     const sortTeams = (key) => {
@@ -52,6 +74,12 @@ export default function TeamsAdminInterface() {
         // Aplicar filtro por juego
         if (selectedGame) {
             filteredTeams = filteredTeams.filter(team => team.game === selectedGame);
+        }
+
+        // Aplicar filtro por estado
+        if (selectedStatus !== '') {
+            const isActive = selectedStatus === 'true';
+            filteredTeams = filteredTeams.filter(team => team.is_active === isActive);
         }
 
         // Aplicar ordenamiento
@@ -73,16 +101,33 @@ export default function TeamsAdminInterface() {
     const columns = [
         { header: 'Nombre del Equipo', accessor: 'name' },
         { header: 'Juego', accessor: 'game' },
+        { 
+            header: 'Estado', 
+            accessor: 'is_active',
+            Cell: ({ value }) => (
+                <span className={`status-badge ${value ? 'active' : 'inactive'}`}>
+                    {value ? 'Activo' : 'Inactivo'}
+                </span>
+            )
+        },
         {
-            header: 'Ver Información',
-            accessor: 'verInformacion',
+            header: 'Acciones',
+            accessor: 'acciones',
             Cell: ({ row }) => (
-                <button
-                    className="action-button"
-                    onClick={() => navigate(`/admin/teamInfo/${row.id}`)}
-                >
-                    Ver Información
-                </button>
+                <div className="action-buttons">
+                    <button
+                        className="action-button"
+                        onClick={() => navigate(`/admin/teamInfo/${row.id}`)}
+                    >
+                        Ver Información
+                    </button>
+                    <button
+                        className={`toggle-status-button ${row.is_active ? 'deactivate' : 'activate'}`}
+                        onClick={() => handleToggleStatus(row.id, row.is_active)}
+                    >
+                        {row.is_active ? 'Desactivar' : 'Activar'}
+                    </button>
+                </div>
             ),
         },
     ];
@@ -125,6 +170,19 @@ export default function TeamsAdminInterface() {
                                 <option value="">Todos los juegos</option>
                                 <option value="league_of_legends">League of Legends</option>
                                 <option value="valorant">Valorant</option>
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label htmlFor="statusFilter">Filtrar por Estado:</label>
+                            <select
+                                id="statusFilter"
+                                value={selectedStatus}
+                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                className="form-control"
+                            >
+                                <option value="">Todos los estados</option>
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
                             </select>
                         </div>
                     </div>

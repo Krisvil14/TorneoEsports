@@ -105,45 +105,15 @@ export default function UsersAdminInterface() {
         },
         { header: 'Equipo asignado', accessor: 'team_name' },
         {
-            header: 'Actions',
+            header: 'Acciones',
             accessor: 'actions',
             Cell: ({ row }) => {
-                return !row.is_in_team ? (
+                return (
                     <button
                         className="gaming-button primary"
-                        onClick={() => navigate(`/admin/add_player_to_team/${row.id}`)}
+                        onClick={() => navigate(`/admin/edit_user/${row.id}`)}
                     >
-                        Añadir A Equipo
-                    </button>
-                ) : (
-                    <button
-                        className="gaming-button danger"
-                        onClick={async () => {
-                            try {
-                                const response = await fetch(process.env.BACKEND_URL + `/api/admin/add_player_to_team/${row.id}`, {
-                                    method: 'POST',
-                                    body: new FormData(),
-                                });
-                                if (response.ok) {
-                                    const fetchUsers = async () => {
-                                        try {
-                                            const response = await fetch(process.env.BACKEND_URL + '/api/users');
-                                            const data = await response.json();
-                                            setUsers(data);
-                                        } catch (error) {
-                                            console.error('Error fetching users:', error);
-                                        }
-                                    };
-                                    fetchUsers();
-                                } else {
-                                    console.error('Error removing user from team');
-                                }
-                            } catch (error) {
-                                console.error('Error removing user from team:', error);
-                            }
-                        }}
-                    >
-                        Remover De Equipo
+                        Editar Usuario
                     </button>
                 );
             },

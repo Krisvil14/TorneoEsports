@@ -37,7 +37,7 @@ import PaymentsPage from './pages/payments';
 import RecievePaymentsPage from './pages/receivepayments';
 import TeamInfoAdmin from './pages/admin/teamInfoAdmin';
 import PaymentsAdmin from './pages/admin/payments';
-
+import EditUserForm from './component/interfaces/admin/users/EditUserForm';
 
 // Crear tu primer componente
 const Layout = () => {
@@ -77,6 +77,7 @@ const Layout = () => {
               <Route element={<Protected requiredRole="admin"> <CreateUserPage /> </Protected>} path="/admin/create_user" />
               <Route element={<Protected requiredRole="admin"> <TeamsAdminPage /> </Protected>} path="/admin/teams" />
               <Route element={<Protected requiredRole="admin"> <UsersAdminInterface /> </Protected>} path="/admin/users" />
+              <Route element={<Protected requiredRole="admin"> <EditUserForm /> </Protected>} path="/admin/edit_user/:userId" />
               <Route element={<Protected requiredRole="admin"> <TournamentsAdminPage /> </Protected>} path="/admin/tournaments" />
               <Route element={<Protected requiredRole="admin"> <TournamentRequests /> </Protected>} path="/admin/tournament-requests/:tournamentId" />
               <Route element={<Protected requiredRole="admin"> <PaymentsAdmin /> </Protected>} path="/admin/payments" />

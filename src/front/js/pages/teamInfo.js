@@ -266,14 +266,25 @@ export default function TeamInfo() {
         Cedula: user.cedula,
         Correo: user.email,
         Edad: user.age,
-        Acciones: (isLeader || store.user.role === 'admin') && user.id !== store.user?.id ? (
-            <button 
-                className="team-info-button secondary" 
-                onClick={() => handleRemovePlayer(user.id)}
-            >
-                Eliminar
-            </button>
-        ) : null
+        Acciones:
+            // Si es el usuario logueado y es líder, mostrar botón de salir
+            (user.id === store.user?.id && user.is_leader) ? (
+                <button 
+                    className="team-info-button danger" 
+                    onClick={handleLeaveTeam}
+                >
+                    Salir del Equipo
+                </button>
+            ) :
+            // Si el usuario logueado es líder o admin y la fila es otro miembro, mostrar eliminar
+            ((isLeader || store.user.role === 'admin') && user.id !== store.user?.id) ? (
+                <button 
+                    className="team-info-button secondary" 
+                    onClick={() => handleRemovePlayer(user.id)}
+                >
+                    Eliminar
+                </button>
+            ) : null
     }));
 
     const usersColumns = [
@@ -333,23 +344,17 @@ export default function TeamInfo() {
                     <Link to="/teams" className="team-info-button">
                         Volver
                     </Link>
-                    {isLeader && (
-                        <button 
-                            className="team-info-button danger" 
-                            onClick={handleLeaveTeam}
-                        >
-                            Salir del Equipo
-                        </button>
-                    )}
                 </div>
 
                 {showLeaveModal && (
-                    <div className="gaming-confirm-box">
-                        <h3>Confirmar Salida</h3>
-                        <p>¿Estás seguro de que deseas salir del equipo? Al ser el último miembro, el equipo será desactivado.</p>
-                        <div className="gaming-confirm-buttons">
-                            <button onClick={() => setShowLeaveModal(false)}>Cancelar</button>
-                            <button onClick={confirmLeaveTeam}>Confirmar</button>
+                    <div className="custom-modal-overlay">
+                        <div className="custom-modal-content">
+                            <h3>Confirmar Salida</h3>
+                            <p>¿Estás seguro de que deseas salir del equipo? Al ser el último miembro, el equipo será desactivado.</p>
+                            <div className="custom-modal-buttons">
+                                <button onClick={() => setShowLeaveModal(false)}>Cancelar</button>
+                                <button onClick={confirmLeaveTeam} className="danger">Confirmar</button>
+                            </div>
                         </div>
                     </div>
                 )}

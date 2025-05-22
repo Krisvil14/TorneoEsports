@@ -14,6 +14,10 @@ export default function TeamInfo() {
     const [users, setUsers] = useState([]);
     const [isLeader, setIsLeader] = useState(false);
     const [teamStats, setTeamStats] = useState(null);
+    const [showLastPlayerModal, setShowLastPlayerModal] = useState(false);
+    const [showNewLeaderModal, setShowNewLeaderModal] = useState(false);
+    const [selectedNewLeader, setSelectedNewLeader] = useState(null);
+    const [userToRemove, setUserToRemove] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -73,7 +77,38 @@ export default function TeamInfo() {
         }
     }, [store.user, team, users, navigate]);
 
+    useEffect(() => {
+        if (showLastPlayerModal || showNewLeaderModal) {
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
+        return () => document.body.classList.remove('modal-open');
+    }, [showLastPlayerModal, showNewLeaderModal]);
+
     const handleRemovePlayer = async (userId) => {
+        const userToRemove = users.find(user => user.id === userId);
+        const remainingUsers = users.filter(user => user.id !== userId);
+
+        // Si es el último jugador
+        if (remainingUsers.length === 0) {
+            setUserToRemove(userToRemove);
+            setShowLastPlayerModal(true);
+            return;
+        }
+
+        // Si el usuario a eliminar es el líder
+        if (userToRemove.is_leader) {
+            setUserToRemove(userToRemove);
+            setShowNewLeaderModal(true);
+            return;
+        }
+
+        // Si no es ninguno de los casos anteriores, proceder con la eliminación
+        await confirmRemovePlayer(userId);
+    };
+
+    const confirmRemovePlayer = async (userId, newLeaderId = null) => {
         try {
             const response = await fetch(process.env.BACKEND_URL + `/api/teams/${teamId}/remove_player`, {
                 method: 'POST',
@@ -83,7 +118,8 @@ export default function TeamInfo() {
                 },
                 body: JSON.stringify({
                     user_id: userId,
-                    requesting_user_id: store.user?.id
+                    requesting_user_id: store.user?.id,
+                    new_leader_id: newLeaderId
                 })
             });
 
@@ -137,14 +173,15 @@ export default function TeamInfo() {
         Cedula: user.cedula,
         Correo: user.email,
         Edad: user.age,
-        Acciones: (isLeader || store.user.role === 'admin') && user.id !== store.user?.id ? (
+        'Es Líder': user.is_leader ? 'Sí' : 'No',
+        Acciones: (
             <button 
                 className="team-info-button secondary" 
                 onClick={() => handleRemovePlayer(user.id)}
             >
                 Eliminar
             </button>
-        ) : null
+        )
     }));
 
     const usersColumns = [
@@ -153,7 +190,8 @@ export default function TeamInfo() {
         { header: "Cedula", accessor: "Cedula" },
         { header: "Correo", accessor: "Correo" },
         { header: "Edad", accessor: "Edad" },
-        ...(isLeader || store.user.role === 'admin' ? [{ header: "Acciones", accessor: "Acciones" }] : [])
+        { header: "Es Líder", accessor: "Es Líder" },
+        { header: "Acciones", accessor: "Acciones" }
     ];
 
     return (
@@ -169,6 +207,66 @@ export default function TeamInfo() {
                     </Link>
                 </div>
 
+                {/* Modal para último jugador */}
+                {showLastPlayerModal && (
+                    <div className="custom-modal-overlay">
+                        <div className="custom-modal-content">
+                            <h3>Confirmar Eliminación</h3>
+                            <p>Al eliminar a este jugador, el equipo quedará sin miembros y será desactivado. ¿Desea continuar?</p>
+                            <div className="custom-modal-buttons">
+                                <button onClick={() => setShowLastPlayerModal(false)}>Cancelar</button>
+                                <button 
+                                    onClick={() => {
+                                        confirmRemovePlayer(userToRemove.id);
+                                        setShowLastPlayerModal(false);
+                                    }} 
+                                    className="danger"
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Modal para seleccionar nuevo líder */}
+                {showNewLeaderModal && (
+                    <div className="custom-modal-overlay">
+                        <div className="custom-modal-content">
+                            <h3>Seleccionar Nuevo Líder</h3>
+                            <p>Debes seleccionar un nuevo líder antes de eliminar al líder actual.</p>
+                            <select 
+                                value={selectedNewLeader || ''} 
+                                onChange={(e) => setSelectedNewLeader(e.target.value)}
+                                className="form-control"
+                            >
+                                <option value="">Selecciona un nuevo líder</option>
+                                {users
+                                    .filter(user => user.id !== userToRemove?.id)
+                                    .map(user => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.first_name} {user.last_name}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                            <div className="custom-modal-buttons">
+                                <button onClick={() => setShowNewLeaderModal(false)}>Cancelar</button>
+                                <button 
+                                    onClick={() => {
+                                        confirmRemovePlayer(userToRemove.id, selectedNewLeader);
+                                        setShowNewLeaderModal(false);
+                                    }} 
+                                    className="primary"
+                                    disabled={!selectedNewLeader}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="team-info-section">
                     <h3>Detalles del Equipo</h3>
                     <div className="team-info-table">
@@ -176,7 +274,7 @@ export default function TeamInfo() {
                     </div>
                 </div>
 
-                {/* Sección de Estadísticas del Equipo para Admin */}
+                {/* Sección de Estadísticas del Equipo */}
                 <div className="team-info-section">
                     <h3>Estadísticas del Equipo</h3>
                     <div className="team-stats-grid">
@@ -259,7 +357,6 @@ export default function TeamInfo() {
                         <Table data={usersData} columns={usersColumns} />
                     </div>
                 </div>
-                
             </div>
         </div>
     );
