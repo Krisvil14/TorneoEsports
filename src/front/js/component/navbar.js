@@ -126,6 +126,9 @@ export const Navbar = () => {
                     <Link to="/tournaments" className="nav-item nav-link" onClick={handleNavClick}>
                       <Text>Torneos</Text>
                     </Link>
+                    <Link to="/ranking" className="nav-item nav-link" onClick={handleNavClick}>
+                      <Text>Ranking</Text>
+                    </Link>
                     {store.user && (store.user.is_leader || store.user.role === 'admin') && (
                       <Link to="/payments" className="nav-item nav-link" onClick={handleNavClick}>
                         <Text>Pagos</Text>
