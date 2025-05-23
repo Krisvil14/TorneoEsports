@@ -246,17 +246,22 @@ class Match(db.Model):
     team2_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     score1 = db.Column(db.Integer, nullable=True)
     score2 = db.Column(db.Integer, nullable=True)
-    date = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
 
     # Relationships
     tournament = relationship("Tournament")
     team1 = relationship("Team", foreign_keys=[team1_id])
     team2 = relationship("Team", foreign_keys=[team2_id])
+    calendar = relationship("Calendar", back_populates="match", uselist=False)
 
     __table_args__ = (
         CheckConstraint('score1 >= 0', name='check_score1_positive'),
         CheckConstraint('score2 >= 0', name='check_score2_positive'),
     )
+
+    def __init__(self, **kwargs):
+        super(Match, self).__init__(**kwargs)
+        # Crear automáticamente una entrada en el calendario
+        self.calendar = Calendar(match=self)
 
     def __repr__(self):
         return f'<Match {self.id}>'
@@ -269,9 +274,10 @@ class Match(db.Model):
             "team2_id": self.team2_id,
             "score1": self.score1,
             "score2": self.score2,
-            "date": self.date.isoformat(),
+            "date": self.calendar.created_at.isoformat() if self.calendar else None,
             "team1": self.team1.serialize() if self.team1 else None,
-            "team2": self.team2.serialize() if self.team2 else None
+            "team2": self.team2.serialize() if self.team2 else None,
+            "calendar": self.calendar.serialize() if self.calendar else None
         }
 
 class User_Stats(db.Model):
@@ -368,5 +374,31 @@ class Team_Stats(db.Model):
             "total_deaths": self.total_deaths,
             "team_kda": self.calculate_team_kda(),
             "team": self.team.serialize() if self.team else None
+        }
+
+class Calendar(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    scheduled_date = db.Column(db.DateTime, nullable=False)
+    is_confirmed = db.Column(db.Boolean(), nullable=False, default=False)
+    created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now())
+
+    # Relationships
+    match = relationship("Match", back_populates="calendar")
+
+    def __repr__(self):
+        return f'<Calendar {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "match_id": self.match_id,
+            "scheduled_date": self.scheduled_date.isoformat(),
+            "is_confirmed": self.is_confirmed,
+            "notes": self.notes,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "match": self.match.serialize() if self.match else None
         }
 
