@@ -4,6 +4,7 @@ from api.utils import generate_sitemap, APIException, approved_join_team, approv
 from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user
 from flask_cors import CORS
 import re
+from datetime import datetime
 
 api = Blueprint('api', __name__)
 
@@ -76,8 +77,25 @@ def recover_user():
     if not user:
         return jsonify({"error": "Correo no asociado a un usuario"}), 401
 
-    return jsonify({"message": "En breve recibirá un email con instrucciones para recuperar su contraseña"}), 200
-    # TO DO // TODO: enviar email de recuperación al usuario
+    # Generar y enviar código OTP
+    otp_code = set_otp_for_user(user)
+    print(f"\n=== Generación de OTP para recuperación ===")
+    print(f"Email del usuario: {user.email}")
+    print(f"Nuevo OTP generado: {otp_code}")
+    print(f"OTP almacenado: {user.otp_code}")
+    print(f"OTP expira: {user.otp_expires}")
+    
+    try:
+        db.session.commit()  # Guardar el OTP en la base de datos
+    except Exception as e:
+        print(f"Error al guardar OTP: {str(e)}")
+        db.session.rollback()
+        return jsonify({"error": "Error al procesar la solicitud"}), 500
+    
+    if not send_verification_email(email, otp_code):
+        return jsonify({"error": "Error al enviar el email de verificación"}), 500
+
+    return jsonify({"message": "Se ha enviado un código de verificación a tu correo", "user_id": user.id}), 200
 
 
 @api.route('/register', methods=['GET'])
@@ -1232,6 +1250,67 @@ def admin_update_user(user_id):
     try:
         db.session.commit()
         return jsonify({"message": "Usuario actualizado exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+@api.route('/verify-reset-otp', methods=['POST'])
+def verify_reset_otp():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    otp_code = data.get('otp_code')
+
+    print("\n=== INICIO DE VERIFICACIÓN OTP ===")
+    print(f"Request data: {data}")
+    print(f"User ID recibido: {user_id}")
+    print(f"OTP recibido: {otp_code}")
+
+    if not user_id or not otp_code:
+        print("Error: Faltan datos")
+        return jsonify({"error": "Faltan datos"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        print("Error: Usuario no encontrado")
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    print(f"\nDatos del usuario:")
+    print(f"Email: {user.email}")
+    print(f"OTP almacenado: {user.otp_code}")
+    print(f"OTP expira: {user.otp_expires}")
+    print(f"Tiempo actual: {datetime.utcnow()}")
+
+    if verify_otp(user, otp_code):
+        print("OTP verificado exitosamente")
+        return jsonify({"message": "Código OTP verificado exitosamente"}), 200
+    else:
+        print("OTP inválido o expirado")
+        return jsonify({"error": "Código OTP inválido o expirado"}), 400
+
+@api.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    new_password = data.get('new_password')
+
+    if not user_id or not new_password:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    # Validar la contraseña
+    if not validate_password(new_password):
+        return jsonify({"error": "La contraseña debe tener al menos 1 mayúscula, 1 minúscula y 1 número y tener minimo 8 caracteres"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    user.password = new_password
+    user.otp_code = None
+    user.otp_expires = None
+    
+    try:
+        db.session.commit()
+        return jsonify({"message": "Contraseña actualizada exitosamente"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500

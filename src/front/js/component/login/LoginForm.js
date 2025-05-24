@@ -125,10 +125,12 @@ export default function LoginForm() {
           <button type="submit" className="gaming-form-button primary w-75 mx-auto">
             Iniciar Sesión
           </button>
-          <Link to="/registrar" className="gaming-form-button secondary w-75 mx-auto text-center mt-2">
+          <Link to="/register" className="gaming-form-button secondary w-75 mx-auto">
             Registrar Usuario
           </Link>
-          
+          <Link to="/reset-password" className="gaming-form-link w-75 mx-auto text-center">
+            ¿Olvidaste tu contraseña?
+          </Link>
         </div>
       </form>
     </div>

@@ -11,6 +11,7 @@ export default function RegisterForm() {
   const [age, setAge] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
   const [role, setRole] = React.useState('user');
   const navigate = useNavigate();
 
@@ -41,6 +42,11 @@ export default function RegisterForm() {
 
     if (parseInt(age) <= 0) {
       toast.error('La edad debe ser un número positivo');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error('Las contraseñas no coinciden');
       return;
     }
 
@@ -169,6 +175,18 @@ export default function RegisterForm() {
               type="password"
               id="password"
               name="password"
+              required
+            />
+          </div>
+          <div className="d-flex flex-column gy-3 w-75 mx-auto">
+            <label htmlFor="confirm_password" className="gaming-form-label">Confirmar Contraseña:</label>
+            <input
+              onChange={({ target }) => setConfirmPassword(target.value)}
+              value={confirmPassword}
+              className="form-control gaming-form-input"
+              type="password"
+              id="confirm_password"
+              name="confirm_password"
               required
             />
           </div>

@@ -69,7 +69,7 @@ export default function TeamsInterface() {
                             Crear Equipo
                         </button>
                         <button 
-                            className="search-team-button" 
+                            className="create-team-button" 
                             onClick={() => navigate('/busca-equipo')}
                         >
                             Buscar Equipo
