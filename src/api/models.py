@@ -108,7 +108,8 @@ class Tournament(db.Model):
     date_start = db.Column(db.String(50), nullable=False)
     num_max_teams = db.Column(db.Integer, nullable=False)
     game = db.Column(game_enum, nullable=False)
-    cost = db.Column(db.Integer, nullable=False, default=10) 
+    cost = db.Column(db.Integer, nullable=False, default=10)
+    started = db.Column(db.Boolean, default=False, nullable=True)
 
     # Relationships
     teams = relationship("Team", back_populates="tournament")
@@ -128,7 +129,8 @@ class Tournament(db.Model):
             "date_start": self.date_start,
             "num_max_teams": self.num_max_teams,
             "game": self.game.name,
-            "cost": self.cost
+            "cost": self.cost,
+            "started": self.started
         }
 
 class Team(db.Model):
@@ -250,11 +252,14 @@ class Match(db.Model):
     team2_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     score1 = db.Column(db.Integer, nullable=True)
     score2 = db.Column(db.Integer, nullable=True)
+    next_match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    depth = db.Column(db.Integer, default=0, nullable=True)
 
     # Relationships
     tournament = relationship("Tournament")
     team1 = relationship("Team", foreign_keys=[team1_id])
     team2 = relationship("Team", foreign_keys=[team2_id])
+    next_match = relationship("Match", foreign_keys=[next_match_id])
     calendar = relationship("Calendar", back_populates="match", uselist=False)
 
     __table_args__ = (
@@ -268,7 +273,7 @@ class Match(db.Model):
         self.calendar = Calendar(match=self)
 
     def __repr__(self):
-        return f'<Match {self.id}>'
+        return f'<Match {self.id, self.team1_id, self.team2_id, self.next_match}>'
 
     def serialize(self):
         return {
@@ -281,7 +286,8 @@ class Match(db.Model):
             "date": self.calendar.created_at.isoformat() if self.calendar else None,
             "team1": self.team1.serialize() if self.team1 else None,
             "team2": self.team2.serialize() if self.team2 else None,
-            "calendar": self.calendar.serialize() if self.calendar else None
+            "calendar": self.calendar.serialize() if self.calendar else None,
+            "depth": self.depth
         }
 
 class User_Stats(db.Model):

@@ -682,6 +682,7 @@ def handle_application():
         except APIException as e:
             return jsonify({"error": str(e)}), e.status_code
         except Exception as e:
+            print(e)
             return jsonify({"error": "Error al procesar la solicitud"}), 400
 
     except Exception as e:

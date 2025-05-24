@@ -1,5 +1,5 @@
 from flask import jsonify, url_for
-from api.models import User, Team, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, db
+from api.models import User, Team, Match, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, db
 
 class APIException(Exception):
     status_code = 400
@@ -40,6 +40,25 @@ def generate_sitemap(app):
         <p>Start working on your project by following the <a href="https://start.4geeksacademy.com/starters/full-stack" target="_blank">Quick Start</a></p>
         <p>Remember to specify a real endpoint path like: </p>
         <ul style="text-align: left;">"""+links_html+"</ul></div>"
+
+def create_brackets(teams_ids, tournament_id, depth):
+    matches = []
+
+    for i in range(0, len(team_ids), 2):
+        match = Match(
+            tournament_id=tournament_id,
+            team1_id=team_ids[i],
+            team2_id=team_ids[i+1],
+            score1=None,
+            score2=None,
+            next_match_id=None,  # Se asignará después
+            depth = depth
+        )
+        matches.append(match)
+    # Guardar todos los partidos en la base de datos
+    for match in matches:
+        db.session.add(match)
+    return matches
 
 def approved_join_team(application):
     user = User.query.get(application.userID)
@@ -83,6 +102,19 @@ def approved_join_tournament(application):
 
     # Desactivar la aplicación
     application.active = False
+    # start tournament
+    is_tournament_full = len(tournament.teams) == tournament.num_max_teams
+    if not is_tournament_full:
+        return
+    tournament.stated = True
+    create_brackets(tournament.teams, tournament, 0)
+
+    # EL BOTÓN ENVIARÁ UNA PROFUNIDAD
+    # EL BUSCARÁS TODOS LOS GAMES PARA ESA PROFUNDIDAD
+    # OBTENDRÁS LOS GANADORES.
+    # HARÁS UN ARREGLO DE EQUIPOS GANADORES
+    # LLAMARÁS create_brackets CON PROFUNIDAD + 1
+    # IDENTIFICAR CUANDO ES LA FINAL, LO SABRÁS CUANDO EL ARREGLO DE EQUIPOS SEA 2
 
 def approved_do_payment(application):
     # Actualizar el estado de la aplicación a aprobado
