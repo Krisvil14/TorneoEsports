@@ -11,6 +11,7 @@ from api.models import db
 from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
+from api.email_utils import init_mail
 
 # from models import Person
 
@@ -23,7 +24,7 @@ app.url_map.strict_slashes = False
 # Enable CORS
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-# database condiguration
+# database configuration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(
@@ -32,8 +33,11 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize extensions
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+init_mail(app)
 
 # add the admin
 setup_admin(app)

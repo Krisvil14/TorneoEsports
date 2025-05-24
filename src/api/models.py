@@ -67,6 +67,9 @@ class User(db.Model):
     is_in_team = db.Column(db.Boolean(), nullable=False, default=False)
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=True)
     role = db.Column(role_enum, nullable=False, default=RoleEnum.user)
+    email_verified = db.Column(db.Boolean(), nullable=False, default=False)
+    otp_code = db.Column(db.String(6), nullable=True)
+    otp_expires = db.Column(db.DateTime(timezone=True), nullable=True)
 
     # Relationships
     team = relationship("Team", back_populates="members")
@@ -95,6 +98,7 @@ class User(db.Model):
             "is_in_team": self.is_in_team,
             "team_id": self.team_id,
             "role": self.role.name if self.role else None,
+            "email_verified": self.email_verified
         }
 
 

@@ -39,12 +39,54 @@ export default function LoginForm() {
         });
         navigate('/inicio');
       } else {
-        toast.update(notification, {
-          render: json.error,
-          type: 'error',
-          autoClose: 5000,
-          isLoading: false,
-        });
+        if (json.error === "Por favor, verifica tu email antes de iniciar sesión.") {
+          // Obtener el ID del usuario por email
+          const userResponse = await fetch(process.env.BACKEND_URL + '/api/users');
+          const users = await userResponse.json();
+          const user = users.find(u => u.email === email);
+          
+          if (user) {
+            toast.update(notification, {
+              render: () => (
+                <div>
+                  {json.error}
+                  <br />
+                  <button 
+                    onClick={() => navigate('/verify-email', { state: { user_id: user.id } })}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#007bff',
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      padding: '0',
+                      marginTop: '5px'
+                    }}
+                  >
+                    Pulsa aquí para verificar el email
+                  </button>
+                </div>
+              ),
+              type: 'error',
+              autoClose: 10000,
+              isLoading: false,
+            });
+          } else {
+            toast.update(notification, {
+              render: json.error,
+              type: 'error',
+              autoClose: 10000,
+              isLoading: false,
+            });
+          }
+        } else {
+          toast.update(notification, {
+            render: json.error,
+            type: 'error',
+            autoClose: 10000,
+            isLoading: false,
+          });
+        }
       }
     } catch (err) {
       console.log(err);

@@ -12,6 +12,7 @@ import injectContext from './store/appContext';
 import Register from './pages/register';
 import Login from './pages/login';
 import Recovery from './pages/recovery';
+import EmailVerification from './component/login/EmailVerification';
 import TeamsInterface from './component/interfaces/user/Teams';
 import HomePage from './pages/start';
 import 'react-toastify/dist/ReactToastify.css';
@@ -60,6 +61,7 @@ const Layout = () => {
               <Route element={<Register />} path="/registrar" />
               <Route element={<Login />} path="/login" />
               <Route element={<Recovery />} path="/recuperar" />
+              <Route element={<EmailVerification />} path="/verify-email" />
               <Route element={<Protected> <HomePage /> </Protected>} path="/inicio" />
               <Route element={<Protected> <TeamsInterface /> </Protected>} path="/teams" />
               <Route element={<Protected> <ProfilePage /> </Protected>} path="/profile" />

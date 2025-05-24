@@ -59,20 +59,20 @@ export default function RegisterForm() {
         method: 'POST',
         body: formData,
       });
-      const { ok } = response;
-      const json = await response.json();
+      const data = await response.json();
 
-      if (ok) {
+      if (response.ok) {
         toast.update(notification, {
-          render: 'Se ha registrado al usuario exitosamente',
+          render: 'Usuario registrado exitosamente. Por favor, verifica tu email.',
           type: 'success',
           autoClose: 5000,
           isLoading: false,
         });
-        navigate('/inicio');
+        // Redirigir a la página de verificación con el ID del usuario
+        navigate('/verify-email', { state: { user_id: data.user_id } });
       } else {
         toast.update(notification, {
-          render: json.error,
+          render: data.error,
           type: 'error',
           autoClose: 5000,
           isLoading: false,
@@ -80,6 +80,12 @@ export default function RegisterForm() {
       }
     } catch (err) {
       console.log(err);
+      toast.update(notification, {
+        render: 'Error al registrar usuario',
+        type: 'error',
+        autoClose: 5000,
+        isLoading: false,
+      });
     }
   };
 

@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
 from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment
+from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user
 from flask_cors import CORS
 import re
 
@@ -41,6 +42,9 @@ def login_user():
 
     if not user or user.password != password:
         return jsonify({"error": "Credenciales inválidas"}), 401
+
+    if not user.email_verified:
+        return jsonify({"error": "Por favor, verifica tu email antes de iniciar sesión"}), 401
 
     team = Team.query.get(user.team_id)
     team_name = team.name if team else None
@@ -122,26 +126,81 @@ def register_user():
         password=password,
         role=role_enum,
         is_active=True,
+        email_verified=False
     )
     db.session.add(new_user)
     try:
         db.session.commit()
         
+        # Generar y enviar código OTP
+        otp_code = set_otp_for_user(new_user)
+        if not send_verification_email(email, otp_code):
+            return jsonify({"error": "Error al enviar el email de verificación"}), 500
+        
         # Crear estadísticas iniciales para el usuario
         user_stats = User_Stats(
             user_id=new_user.id,
-            team_id=None,  # Inicialmente no tiene equipo
+            team_id=None,
             kills=0,
             assists=0
         )
         db.session.add(user_stats)
         db.session.commit()
         
+        return jsonify({
+            "message": "Usuario registrado exitosamente. Por favor, verifica tu email.",
+            "user_id": new_user.id
+        }), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-    return jsonify({"message": "Usuario registrado exitosamente"}), 201
+@api.route('/verify-email', methods=['POST'])
+def verify_email():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    otp_code = data.get('otp_code')
+
+    if not user_id or not otp_code:
+        return jsonify({"error": "Faltan datos"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    if user.email_verified:
+        return jsonify({"error": "El email ya está verificado"}), 400
+
+    if verify_otp(user, otp_code):
+        user.email_verified = True
+        user.otp_code = None
+        user.otp_expires = None
+        db.session.commit()
+        return jsonify({"message": "Email verificado exitosamente"}), 200
+    else:
+        return jsonify({"error": "Código OTP inválido o expirado"}), 400
+
+@api.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    data = request.get_json()
+    user_id = data.get('user_id')
+
+    if not user_id:
+        return jsonify({"error": "Falta el ID del usuario"}), 400
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    if user.email_verified:
+        return jsonify({"error": "El email ya está verificado"}), 400
+
+    otp_code = set_otp_for_user(user)
+    if not send_verification_email(user.email, otp_code):
+        return jsonify({"error": "Error al enviar el email de verificación"}), 500
+
+    db.session.commit()
+    return jsonify({"message": "Código de verificación reenviado exitosamente"}), 200
 
 @api.route('/Regteams', methods=['POST'])
 def register_team():
