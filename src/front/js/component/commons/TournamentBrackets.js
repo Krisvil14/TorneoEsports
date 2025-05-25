@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import "../../../styles/tournament-brackets.css";
+import React, { useEffect, useState } from 'react';
+import '../../../styles/tournament-brackets.css';
 
 function groupMatchesByDepth(matches) {
   const rounds = {};
@@ -31,10 +31,10 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
         if (res.ok) {
           setMatches(data);
         } else {
-          setError(data.error || "Error al cargar los brackets");
+          setError(data.error || 'Error al cargar los brackets');
         }
       } catch (e) {
-        setError("Error de red");
+        setError('Error de red');
       } finally {
         setLoading(false);
       }
@@ -52,7 +52,10 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
         if (finalMatch.score1 !== null && finalMatch.score2 !== null) {
           if (finalMatch.score1 > finalMatch.score2 && finalMatch.team1) {
             setWinner(finalMatch.team1.name);
-          } else if (finalMatch.score2 > finalMatch.score1 && finalMatch.team2) {
+          } else if (
+            finalMatch.score2 > finalMatch.score1 &&
+            finalMatch.team2
+          ) {
             setWinner(finalMatch.team2.name);
           } else {
             setWinner(null);
@@ -75,17 +78,21 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
   const rounds = groupMatchesByDepth(matches);
   const currentDepth = rounds.length - 1;
   const currentRound = rounds[currentDepth];
-  const allRegistered = currentRound.every(match => match.registered);
+  const allRegistered = currentRound.every((match) => match.registered);
 
   const handleAdvanceRound = async () => {
     setAdvancing(true);
     try {
-      await fetch(process.env.BACKEND_URL + `/api/tournaments/${tournamentId}/advance-round`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ current_depth: currentDepth })
-      });
-      setRefresh(r => !r);
+      await fetch(
+        process.env.BACKEND_URL +
+          `/api/tournaments/${tournamentId}/advance-round`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ current_depth: currentDepth }),
+        }
+      );
+      setRefresh((r) => !r);
     } catch (e) {
       alert('Error al avanzar la ronda');
     } finally {
@@ -98,25 +105,37 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
       {rounds.map((round, rIdx) => (
         <div className="bracket-simple-round" key={rIdx}>
           <div className="bracket-simple-title">
-            {rIdx === rounds.length - 1 ? "Ronda Final" : `Ronda ${rIdx + 1}`}
+            {rIdx === rounds.length - 1 ? 'Ronda Final' : `Ronda ${rIdx + 1}`}
           </div>
           {round.map((match, mIdx) => {
             // Agregar la clase connect-vertical a los partidos intermedios (no primero ni último)
-            let matchClass = "bracket-simple-match";
-            if (rIdx < rounds.length - 1 && round.length > 2 && mIdx !== 0 && mIdx !== round.length - 1) {
-              matchClass += " connect-vertical";
+            let matchClass = 'bracket-simple-match d-flex flex-column';
+            if (
+              rIdx < rounds.length - 1 &&
+              round.length > 2 &&
+              mIdx !== 0 &&
+              mIdx !== round.length - 1
+            ) {
+              matchClass += ' connect-vertical';
             }
             return (
               <button
                 className={matchClass}
                 key={match.id}
-                onClick={onMatchClick ? () => onMatchClick(match, setRefresh) : undefined}
+                onClick={
+                  onMatchClick
+                    ? () => onMatchClick(match, setRefresh)
+                    : undefined
+                }
               >
                 <span className="bracket-team bracket-team-left">
-                  {match.team1 ? match.team1.name : "TBD"}
+                  {match.team1 ? match.team1.name : 'TBD'}
                 </span>
+                <div className="w-100 bracket-button-separator">
+                  <span className="bracket-button-separator__span">vs</span>
+                </div>
                 <span className="bracket-team bracket-team-right">
-                  {match.team2 ? match.team2.name : "TBD"}
+                  {match.team2 ? match.team2.name : 'TBD'}
                 </span>
               </button>
             );
@@ -127,18 +146,33 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
       {winner && (
         <div className="bracket-simple-round">
           <div className="bracket-simple-title">Ganador</div>
-          <button className="advance-round-btn" style={{background:'#ffd600',color:'#333',fontWeight:'bold',fontSize:'1.1em',cursor:'default',marginTop:20}} disabled>
+          <button
+            className="advance-round-btn"
+            style={{
+              background: '#ffd600',
+              color: '#333',
+              fontWeight: 'bold',
+              fontSize: '1.1em',
+              cursor: 'default',
+              marginTop: 20,
+            }}
+            disabled
+          >
             {winner}
           </button>
         </div>
       )}
       {allRegistered && onMatchClick && (
         <div className="advance-round-container">
-          <button className="advance-round-btn" onClick={handleAdvanceRound} disabled={advancing}>
-            {advancing ? "Avanzando..." : "Actualizar Brackets (Avanzar Ronda)"}
+          <button
+            className="advance-round-btn"
+            onClick={handleAdvanceRound}
+            disabled={advancing}
+          >
+            {advancing ? 'Avanzando...' : 'Actualizar Brackets (Avanzar Ronda)'}
           </button>
         </div>
       )}
     </div>
   );
-} 
+}

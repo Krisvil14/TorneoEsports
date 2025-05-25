@@ -1,102 +1,102 @@
 .tournament-brackets {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    padding: 2rem;
-    overflow-x: auto;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  overflow-x: auto;
 }
 
 .bracket-round {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 250px;
 }
 
 .bracket-round h3 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 1rem;
+  text-align: center;
+  color: #333;
+  margin-bottom: 1rem;
 }
 
 .bracket-matches {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
 }
 
 .match-box {
-    background: white;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .team {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
 }
 
 .team:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .team-name {
-    font-weight: 500;
-    color: #333;
+  font-weight: 500;
+  color: #333;
 }
 
 .score-input {
-    width: 50px;
-    padding: 0.25rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-align: center;
+  width: 50px;
+  padding: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
 }
 
 .bracket-matches::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: -2rem;
-    width: 2rem;
-    height: 2px;
-    background: #ddd;
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -2rem;
+  width: 2rem;
+  height: 2px;
+  background: #ddd;
 }
 
 .bracket-round:last-child .bracket-matches::before {
-    display: none;
+  display: none;
 }
 
 .brackets-loading {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
+  text-align: center;
+  padding: 2rem;
+  color: #666;
 }
 
 /* Estilos para la final */
 .bracket-round:last-child .match-box {
-    border-color: #ffd700;
-    background: #fffdf0;
+  border-color: #ffd700;
+  background: #fffdf0;
 }
 
 .bracket-round:last-child .match-box::before {
-    content: 'Final';
-    position: absolute;
-    top: -1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ffd700;
-    color: #333;
-    padding: 0.25rem 1rem;
-    border-radius: 4px;
-    font-weight: bold;
+  content: 'Final';
+  position: absolute;
+  top: -1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffd700;
+  color: #333;
+  padding: 0.25rem 1rem;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 .bracket-horizontal-wrapper {
@@ -139,7 +139,7 @@
   min-width: 120px;
   text-align: center;
   margin: 0 auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   position: relative;
   z-index: 2;
 }
@@ -208,17 +208,62 @@
   position: relative;
   z-index: 2;
   background: #fffbe7;
-  border: 2px solid #ffd600;
   border-radius: 8px;
   overflow: hidden;
+  border: blue solid 3px;
   margin-bottom: 10px;
   font-size: 1.1em;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   padding: 0;
   width: 220px;
-  height: 48px;
+  height: fit-content;
   display: flex;
+  gap: 0.4rem;
+}
+
+.bracket-button-separator {
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.bracket-button-separator__span {
+  border: 3px solid blue;
+  display: flex;
+  width: fit-content;
+  padding: 0.2rem 0.4rem;
+  border-radius: 100%;
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.bracket-button-separator__span::before {
+  content: '';
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 43%;
+  height: 3px;
+  z-index: 0;
+  left: 0;
+  background-color: blue;
+}
+
+.bracket-button-separator__span::after {
+  content: '';
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 43%;
+  height: 3px;
+  z-index: 0;
+  right: 0;
+  background-color: blue;
 }
 
 /* Línea horizontal que conecta con la siguiente ronda (excepto la última columna) */
@@ -234,7 +279,8 @@
 }
 
 /* Línea vertical que conecta los matches de la siguiente ronda */
-.bracket-simple-round:not(:last-child) .bracket-simple-match.connect-vertical::before {
+.bracket-simple-round:not(:last-child)
+  .bracket-simple-match.connect-vertical::before {
   content: '';
   position: absolute;
   right: 0;
@@ -247,11 +293,13 @@
 }
 
 /* Ajuste para el primer y último match de cada ronda para que la línea vertical no sobresalga */
-.bracket-simple-round:not(:last-child) .bracket-simple-match:first-child.connect-vertical::before {
+.bracket-simple-round:not(:last-child)
+  .bracket-simple-match:first-child.connect-vertical::before {
   height: 40px;
   top: 75%;
 }
-.bracket-simple-round:not(:last-child) .bracket-simple-match:last-child.connect-vertical::before {
+.bracket-simple-round:not(:last-child)
+  .bracket-simple-match:last-child.connect-vertical::before {
   height: 40px;
   top: 25%;
 }
@@ -331,4 +379,4 @@
   background: #fff;
   color: #222;
   font-size: 1em;
-} 
+}
