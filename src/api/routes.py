@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats
-from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats, Match
+from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment, advance_tournament_round
 from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user
 from flask_cors import CORS
 import re
@@ -656,37 +656,61 @@ def add_player_to_team_route():
 def handle_application():
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({"error": "No se recibieron datos"}), 400
+
         application_id = data.get('application_id')
         accepted = data.get('accepted')
 
+        if application_id is None or accepted is None:
+            return jsonify({"error": "Faltan datos requeridos"}), 400
+
+        print(f"\n=== Procesando solicitud ===")
+        print(f"Application ID: {application_id}")
+        print(f"Accepted: {accepted}")
+
         application = Application.query.filter_by(id=application_id).first()
         if not application:
-            return jsonify({"error": "Application not found"}), 404
+            return jsonify({"error": "Solicitud no encontrada"}), 404
+
+        print(f"Tipo de acción: {application.action}")
+        print(f"Estado actual: {application.status}")
 
         if not accepted:
-            application.status = 'rejected'
+            application.status = StatusEnum.rejected
             application.active = False
             db.session.commit()
             return jsonify({"message": "La aplicación ha sido rechazada exitosamente"}), 200
 
         try:
             if accepted and application.action == ActionEnum.join_team:
+                print("Procesando solicitud de unirse a equipo")
                 approved_join_team(application)
-            if accepted and application.action == ActionEnum.join_tournament:
+            elif accepted and application.action == ActionEnum.join_tournament:
+                print("Procesando solicitud de unirse a torneo")
                 approved_join_tournament(application)
-            if accepted and (application.action == ActionEnum.do_payment or application.action == ActionEnum.receive_payment):
+            elif accepted and (application.action == ActionEnum.do_payment or application.action == ActionEnum.receive_payment):
+                print("Procesando solicitud de pago")
                 approved_do_payment(application)
+            else:
+                return jsonify({"error": "Tipo de acción no válida"}), 400
 
             db.session.commit()
+            print("Solicitud procesada exitosamente")
             return jsonify({"message": "La aplicación ha sido procesada exitosamente"}), 200
+
         except APIException as e:
+            print(f"Error API: {str(e)}")
+            db.session.rollback()
             return jsonify({"error": str(e)}), e.status_code
         except Exception as e:
-            print(e)
-            return jsonify({"error": "Error al procesar la solicitud"}), 400
+            print(f"Error inesperado: {str(e)}")
+            db.session.rollback()
+            return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
     except Exception as e:
-        return jsonify({"error": "Error al procesar la solicitud"}), 400
+        print(f"Error general: {str(e)}")
+        return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
 @api.route('/applications/team/<int:team_id>', methods=['GET'])
 def get_team_applications(team_id):
@@ -1315,3 +1339,106 @@ def reset_password():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@api.route('/tournaments/<tournament_id>/advance-round', methods=['POST'])
+def advance_tournament_round_route(tournament_id):
+    try:
+        data = request.get_json()
+        current_depth = data.get('current_depth')
+        
+        if current_depth is None:
+            return jsonify({"error": "Se requiere la profundidad actual"}), 400
+            
+        # Verificar que el torneo existe
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+            
+        # Verificar que el torneo ha comenzado
+        if not tournament.started:
+            return jsonify({"error": "El torneo aún no ha comenzado"}), 400
+            
+        # Avanzar a la siguiente ronda
+        advance_tournament_round(tournament_id, current_depth)
+        
+        return jsonify({"message": "Ronda avanzada exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/tournaments/<tournament_id>/matches', methods=['GET'])
+def get_tournament_matches(tournament_id):
+    try:
+        print(f"\n=== Obteniendo partidos del torneo {tournament_id} ===")
+        
+        # Verificar que el torneo existe
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            print("Torneo no encontrado")
+            return jsonify({"error": "Torneo no encontrado"}), 404
+            
+        # Obtener todos los partidos del torneo
+        matches = Match.query.filter_by(tournament_id=tournament_id).all()
+        print(f"Partidos encontrados: {len(matches)}")
+        
+        # Serializar los partidos
+        matches_data = []
+        for match in matches:
+            try:
+                match_data = match.serialize()
+                print(f"Partido {match.id}: {match_data}")
+                matches_data.append(match_data)
+            except Exception as e:
+                print(f"Error al serializar partido {match.id}: {str(e)}")
+                continue
+        
+        print(f"Partidos serializados: {len(matches_data)}")
+        return jsonify(matches_data), 200
+        
+    except Exception as e:
+        print(f"Error al obtener partidos: {str(e)}")
+        return jsonify({"error": f"Error al obtener los partidos: {str(e)}"}), 400
+
+@api.route('/matches/<int:match_id>/update-score', methods=['POST'])
+def update_match_score(match_id):
+    try:
+        data = request.get_json()
+        score1 = data.get('score1')
+        score2 = data.get('score2')
+        registered = data.get('registered', None)
+
+        if score1 is None or score2 is None:
+            return jsonify({"error": "Se requieren ambos scores"}), 400
+
+        match = Match.query.get(match_id)
+        if not match:
+            return jsonify({"error": "Partido no encontrado"}), 404
+
+        match.score1 = score1
+        match.score2 = score2
+        if registered is not None:
+            match.registered = registered
+        db.session.commit()
+
+        return jsonify({"message": "Score actualizado exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/api/matches/<int:match_id>', methods=['GET'])
+def get_match(match_id):
+    match = Match.query.get(match_id)
+    if not match:
+        return jsonify({'error': 'Partido no encontrado'}), 404
+    return jsonify(match.serialize()), 200
+
+@api.route('/teams/<int:team_id>/tournaments', methods=['GET'])
+def get_team_tournaments(team_id):
+    team = Team.query.get(team_id)
+    if not team:
+        return jsonify({"error": "Equipo no encontrado"}), 404
+
+    # Buscar todos los torneos donde el equipo haya jugado algún partido
+    matches = Match.query.filter((Match.team1_id == team_id) | (Match.team2_id == team_id)).all()
+    tournament_ids = list(set([str(m.tournament_id) for m in matches]))
+    tournaments = Tournament.query.filter(Tournament.id.in_(tournament_ids)).all()
+    return jsonify([t.serialize() for t in tournaments]), 200

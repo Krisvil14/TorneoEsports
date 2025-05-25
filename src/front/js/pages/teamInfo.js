@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Table from '../component/commons/Table';
+import TournamentBrackets from '../component/commons/TournamentBrackets';
 import { Link } from 'react-router-dom';
 import { Context } from '../store/appContext';
 import { toast } from 'react-toastify';
@@ -18,6 +19,9 @@ export default function TeamInfo() {
     const [showLeaveModal, setShowLeaveModal] = useState(false);
     const [showNewLeaderModal, setShowNewLeaderModal] = useState(false);
     const [selectedNewLeader, setSelectedNewLeader] = useState(null);
+    const [teamTournaments, setTeamTournaments] = useState([]);
+    const [showBracketModal, setShowBracketModal] = useState(false);
+    const [selectedTournamentId, setSelectedTournamentId] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -61,10 +65,21 @@ export default function TeamInfo() {
             }
         };
 
+        const fetchTeamTournaments = async () => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + `/api/teams/${teamId}/tournaments`);
+                const data = await response.json();
+                setTeamTournaments(data);
+            } catch (error) {
+                console.error('Error fetching team tournaments:', error);
+            }
+        };
+
         fetchTeam();
         fetchUsers();
         fetchApplications();
         fetchTeamStats();
+        fetchTeamTournaments();
     }, [teamId]);
 
     useEffect(() => {
@@ -333,6 +348,23 @@ export default function TeamInfo() {
         { header: "Acciones", accessor: "Acciones" }
     ];
 
+    // Tabla de torneos jugados
+    const tournamentsColumns = [
+        { header: 'Nombre', accessor: 'name' },
+        { header: 'Juego', accessor: 'game' },
+        { header: 'Fecha de Inicio', accessor: 'date_start' },
+        { header: 'Estado', accessor: 'started', Cell: ({ row }) => row.started ? 'En curso o finalizado' : 'Pendiente' },
+        {
+            header: 'Acciones',
+            accessor: 'actions',
+            Cell: ({ row }) => (
+                <button className="team-info-button" onClick={() => { setSelectedTournamentId(row.id); setShowBracketModal(true); }}>
+                    Ver Bracket
+                </button>
+            )
+        }
+    ];
+
     return (
         <div className="team-info-container">
             <section className="team-info-hero">
@@ -459,6 +491,39 @@ export default function TeamInfo() {
                         ) : (
                             <p>No hay solicitudes pendientes</p>
                         )}
+                    </div>
+                )}
+
+                <div className="team-info-section">
+                    <h3>Torneos Jugados</h3>
+                    <div className="team-info-table">
+                        <Table columns={tournamentsColumns} data={teamTournaments} />
+                    </div>
+                </div>
+
+                {showBracketModal && (
+                    <div className="custom-modal-overlay">
+                        <div className="custom-modal-content" style={{ minWidth: 400, maxWidth: 900, position: 'relative' }}>
+                            <button
+                                className="modal-close"
+                                onClick={() => setShowBracketModal(false)}
+                                style={{
+                                    position: 'absolute',
+                                    color: 'black',
+                                    top: 10,
+                                    right: 20,
+                                    fontSize: 28,
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                                aria-label="Cerrar"
+                            >
+                                ×
+                            </button>
+                            <h2 style={{ color: '#00e6e6', marginTop: 0 }}>Bracket del Torneo</h2>
+                            <TournamentBrackets tournamentId={selectedTournamentId} />
+                        </div>
                     </div>
                 )}
 

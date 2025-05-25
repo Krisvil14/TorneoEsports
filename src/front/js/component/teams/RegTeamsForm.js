@@ -84,6 +84,10 @@ export default function RegTeamsForm() {
             <option value="">Seleccione un juego</option>
             <option value="league_of_legends">League of Legends</option>
             <option value="valorant">Valorant</option>
+            <option value="csgo">Counter Strike: Global Offensive</option>
+            <option value="dota_2">Dota 2</option>
+            <option value="overwatch">Overwatch</option>
+            <option value="apex_legends">Apex Legends</option>
           </select>
         </div>
         <div className="d-flex w-75 justify-content-center flex-column flex-md-row gap-2 mx-auto">

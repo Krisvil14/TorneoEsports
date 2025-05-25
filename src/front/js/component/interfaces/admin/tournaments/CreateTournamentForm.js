@@ -116,6 +116,10 @@ export default function CreateTournamentForm() {
                         <option value="">Seleccione un juego</option>
                         <option value="league_of_legends">League of Legends</option>
                         <option value="valorant">Valorant</option>
+                        <option value="csgo">Counter Strike: Global Offensive</option>
+                        <option value="dota_2">Dota 2</option>
+                        <option value="overwatch">Overwatch</option>
+                        <option value="apex_legends">Apex Legends</option>
                     </select>
                 </div>
 

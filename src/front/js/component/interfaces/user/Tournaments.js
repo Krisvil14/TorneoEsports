@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Table from '../../commons/Table';
+import TournamentBrackets from '../../commons/TournamentBrackets';
 import { Context } from '../../../store/appContext';
 import '../../../../styles/tournaments.css';
 import { toast } from 'react-toastify';
@@ -129,8 +130,10 @@ export default function TournamentsInterface() {
         }
     ];
 
-    // Filtrar torneos por el juego del equipo
-    const filteredTournaments = tournaments.filter(tournament => tournament.game === teamGame);
+    // Filtrar torneos por el juego del equipo y que no estén finalizados
+    const filteredTournaments = tournaments.filter(tournament => 
+        tournament.game === teamGame && tournament.finished !== true
+    );
 
     if (!user) {
         return <div className="tournaments-container">Loading...</div>;
@@ -160,13 +163,19 @@ export default function TournamentsInterface() {
                     <div className="tournaments-table">
                         <Table columns={columns} data={[teamTournament]} />
                     </div>
+                    {teamTournament.started && (
+                        <div className="tournament-brackets-container">
+                            <h2>Brackets del Torneo</h2>
+                            <TournamentBrackets tournamentId={teamTournament.id} />
+                        </div>
+                    )}
                 </div>
             </div>
         );
     }
 
     // Si el equipo no está en un torneo y el usuario es líder, mostrar la lista de torneos filtrados
-    if (isTeamLeader) {
+    if (isTeamLeader ) {
         return (
             <div className="tournaments-container">
                 <section className="tournaments-hero">

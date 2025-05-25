@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5bb4c6f0261f
+Revision ID: e91c9c207947
 Revises: 
-Create Date: 2025-05-24 17:27:24.913177
+Create Date: 2025-05-24 23:14:54.734899
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '5bb4c6f0261f'
+revision = 'e91c9c207947'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -23,8 +23,9 @@ def upgrade():
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('date_start', sa.String(length=50), nullable=False),
     sa.Column('num_max_teams', sa.Integer(), nullable=False),
-    sa.Column('game', postgresql.ENUM('league_of_legends', 'valorant', name='gameenum'), nullable=False),
+    sa.Column('game', postgresql.ENUM('league_of_legends', 'valorant', 'csgo', 'dota_2', 'overwatch', 'apex_legends', name='gameenum'), nullable=False),
     sa.Column('cost', sa.Integer(), nullable=False),
+    sa.Column('started', sa.Boolean(), nullable=True),
     sa.CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('id')
@@ -34,7 +35,7 @@ def upgrade():
     sa.Column('name', sa.String(length=80), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('max_players', sa.Integer(), nullable=False),
-    sa.Column('game', postgresql.ENUM('league_of_legends', 'valorant', name='gameenum'), nullable=False),
+    sa.Column('game', postgresql.ENUM('league_of_legends', 'valorant', 'csgo', 'dota_2', 'overwatch', 'apex_legends', name='gameenum'), nullable=False),
     sa.Column('tournament_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('balance', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['tournament_id'], ['tournament.id'], ),
@@ -48,6 +49,9 @@ def upgrade():
     sa.Column('score1', sa.Integer(), nullable=True),
     sa.Column('score2', sa.Integer(), nullable=True),
     sa.Column('next_match_id', sa.Integer(), nullable=False),
+    sa.Column('depth', sa.Integer(), nullable=True),
+    sa.Column('is_final', sa.Boolean(), nullable=True),
+    sa.Column('registered', sa.Boolean(), nullable=True),
     sa.CheckConstraint('score1 >= 0', name='check_score1_positive'),
     sa.CheckConstraint('score2 >= 0', name='check_score2_positive'),
     sa.ForeignKeyConstraint(['next_match_id'], ['match.id'], ),

@@ -17,8 +17,14 @@ role_enum = ENUM(RoleEnum, name='roleenum', create_type=True)
 class GameEnum(enum.Enum):
     league_of_legends = 'League of Legends'
     valorant = 'Valorant'
+    csgo = 'Counter-Strike: Global Offensive'
+    dota_2 = 'Dota 2'
+    overwatch = 'Overwatch'
+    apex_legends = 'Apex Legends'
+    
 
-game_enum = ENUM(GameEnum, name='gameenum', create_type=False)
+
+game_enum = ENUM(GameEnum, name='gameenum', create_type=True)
 
 class ActionEnum(enum.Enum):
     join_team = 'join_team'
@@ -110,6 +116,7 @@ class Tournament(db.Model):
     game = db.Column(game_enum, nullable=False)
     cost = db.Column(db.Integer, nullable=False, default=10)
     started = db.Column(db.Boolean, default=False, nullable=True)
+    finished = db.Column(db.Boolean, default=False, nullable=True)
 
     # Relationships
     teams = relationship("Team", back_populates="tournament")
@@ -130,7 +137,8 @@ class Tournament(db.Model):
             "num_max_teams": self.num_max_teams,
             "game": self.game.name,
             "cost": self.cost,
-            "started": self.started
+            "started": self.started,
+            "finished": self.finished
         }
 
 class Team(db.Model):
@@ -252,8 +260,10 @@ class Match(db.Model):
     team2_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     score1 = db.Column(db.Integer, nullable=True)
     score2 = db.Column(db.Integer, nullable=True)
-    next_match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    next_match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=True)
     depth = db.Column(db.Integer, default=0, nullable=True)
+    is_final = db.Column(db.Boolean, default=False, nullable=True)
+    registered = db.Column(db.Boolean, default=False, nullable=True)
 
     # Relationships
     tournament = relationship("Tournament")
@@ -276,19 +286,37 @@ class Match(db.Model):
         return f'<Match {self.id, self.team1_id, self.team2_id, self.next_match}>'
 
     def serialize(self):
-        return {
-            "id": self.id,
-            "tournament_id": str(self.tournament_id),
-            "team1_id": self.team1_id,
-            "team2_id": self.team2_id,
-            "score1": self.score1,
-            "score2": self.score2,
-            "date": self.calendar.created_at.isoformat() if self.calendar else None,
-            "team1": self.team1.serialize() if self.team1 else None,
-            "team2": self.team2.serialize() if self.team2 else None,
-            "calendar": self.calendar.serialize() if self.calendar else None,
-            "depth": self.depth
-        }
+        try:
+            return {
+                "id": self.id,
+                "tournament_id": str(self.tournament_id),
+                "team1_id": self.team1_id,
+                "team2_id": self.team2_id,
+                "score1": self.score1,
+                "score2": self.score2,
+                "next_match_id": self.next_match_id,
+                "depth": self.depth,
+                "is_final": self.is_final,
+                "registered": self.registered,
+                "team1": self.team1.serialize() if self.team1 else None,
+                "team2": self.team2.serialize() if self.team2 else None,
+                "calendar": self.calendar.serialize() if self.calendar else None
+            }
+        except Exception as e:
+            print(f"Error al serializar partido {self.id}: {str(e)}")
+            return {
+                "id": self.id,
+                "tournament_id": str(self.tournament_id),
+                "team1_id": self.team1_id,
+                "team2_id": self.team2_id,
+                "score1": self.score1,
+                "score2": self.score2,
+                "next_match_id": self.next_match_id,
+                "depth": self.depth,
+                "is_final": self.is_final,
+                "registered": self.registered,
+                "error": "Error al serializar datos adicionales"
+            }
 
 class User_Stats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -406,9 +434,7 @@ class Calendar(db.Model):
             "match_id": self.match_id,
             "scheduled_date": self.scheduled_date.isoformat(),
             "is_confirmed": self.is_confirmed,
-            "notes": self.notes,
             "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
-            "match": self.match.serialize() if self.match else None
+            "updated_at": self.updated_at.isoformat()
         }
 
