@@ -183,8 +183,7 @@
   display: flex;
   flex-direction: row;
   gap: 40px;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: flex-start;
   margin: 40px 0;
   flex-wrap: nowrap;
   position: relative;
@@ -193,9 +192,9 @@
 .bracket-simple-round {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 40px;
   align-items: center;
-  position: relative;
 }
 
 .bracket-simple-title {
@@ -264,44 +263,6 @@
   z-index: 0;
   right: 0;
   background-color: blue;
-}
-
-/* Línea horizontal que conecta con la siguiente ronda (excepto la última columna) */
-.bracket-simple-round:not(:last-child) .bracket-simple-match::after {
-  content: '';
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  width: 40px;
-  height: 2px;
-  background: #ffd600;
-  z-index: 1;
-}
-
-/* Línea vertical que conecta los matches de la siguiente ronda */
-.bracket-simple-round:not(:last-child)
-  .bracket-simple-match.connect-vertical::before {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 2px;
-  height: 80px;
-  background: #ffd600;
-  z-index: 1;
-  transform: translateY(-50%);
-}
-
-/* Ajuste para el primer y último match de cada ronda para que la línea vertical no sobresalga */
-.bracket-simple-round:not(:last-child)
-  .bracket-simple-match:first-child.connect-vertical::before {
-  height: 40px;
-  top: 75%;
-}
-.bracket-simple-round:not(:last-child)
-  .bracket-simple-match:last-child.connect-vertical::before {
-  height: 40px;
-  top: 25%;
 }
 
 /* Puedes agregar la clase connect-vertical desde el JS si quieres líneas verticales entre matches */
