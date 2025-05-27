@@ -9,6 +9,7 @@ export default function CreateTournamentForm() {
     const [numMaxTeams, setNumMaxTeams] = useState('');
     const [dateStart, setDateStart] = useState('');
     const [game, setGame] = useState('');
+    const [prize, setPrize] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -19,6 +20,7 @@ export default function CreateTournamentForm() {
         formData.append('num_max_teams', numMaxTeams);
         formData.append('date_start', dateStart);
         formData.append('game', game);
+        formData.append('prize', prize);
 
         const notification = toast.loading('Creando torneo...');
 
@@ -85,6 +87,20 @@ export default function CreateTournamentForm() {
                         name="numMaxTeams"
                         value={numMaxTeams}
                         onChange={({ target }) => setNumMaxTeams(target.value)}
+                        required
+                        className="gaming-form-input form-control"
+                    />
+                </div>
+
+
+                <div className="gaming-form-group">
+                    <label className="gaming-form-label" htmlFor="prize">Valor del Premio:</label>
+                    <input
+                        type="number"
+                        id="prize"
+                        name="prize"
+                        value={prize}
+                        onChange={({ target }) => setPrize(target.value)}
                         required
                         className="gaming-form-input form-control"
                     />

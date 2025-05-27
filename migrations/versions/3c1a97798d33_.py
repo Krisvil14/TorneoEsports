@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 98e4ac80f6f1
+Revision ID: 3c1a97798d33
 Revises: 
-Create Date: 2025-05-25 10:50:27.418690
+Create Date: 2025-05-26 19:33:20.737499
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '98e4ac80f6f1'
+revision = '3c1a97798d33'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,7 +27,9 @@ def upgrade():
     sa.Column('cost', sa.Integer(), nullable=False),
     sa.Column('started', sa.Boolean(), nullable=True),
     sa.Column('finished', sa.Boolean(), nullable=True),
-    sa.CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
+    sa.Column('prize', sa.Integer(), nullable=False),
+    sa.CheckConstraint('(num_max_teams = 4) OR (num_max_teams = 8) OR (num_max_teams = 16)', name='num_max_teams_check'),
+    sa.CheckConstraint('prize > 0', name='prize_positive_check'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('id')
     )
@@ -53,6 +55,8 @@ def upgrade():
     sa.Column('depth', sa.Integer(), nullable=True),
     sa.Column('is_final', sa.Boolean(), nullable=True),
     sa.Column('registered', sa.Boolean(), nullable=True),
+    sa.Column('prize', sa.Integer(), nullable=True),
+    sa.CheckConstraint('prize >= 0', name='check_prize_positive'),
     sa.CheckConstraint('score1 >= 0', name='check_score1_positive'),
     sa.CheckConstraint('score2 >= 0', name='check_score2_positive'),
     sa.ForeignKeyConstraint(['next_match_id'], ['match.id'], ),

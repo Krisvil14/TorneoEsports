@@ -10,7 +10,7 @@ function groupMatchesByDepth(matches) {
   // Ordenar por profundidad ascendente (menor profundidad a la izquierda)
   return Object.keys(rounds)
     .sort((a, b) => Number(a) - Number(b))
-    .map((depth) => rounds[depth]);
+    .map((depth) => rounds[depth].sort((a, b) => a.id - b.id)); // Ordenar partidos por ID dentro de cada ronda
 }
 
 export default function TournamentBrackets({ tournamentId, onMatchClick }) {
@@ -79,6 +79,8 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
   const currentDepth = rounds.length - 1;
   const currentRound = rounds[currentDepth];
   const allRegistered = currentRound.every((match) => match.registered);
+  const isFinalRound = currentRound.length === 1 && currentRound[0].is_final;
+  const showAdvanceButton = !isFinalRound && allRegistered && onMatchClick && !winner;
 
   const handleAdvanceRound = async () => {
     setAdvancing(true);
@@ -148,21 +150,13 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
           <div className="bracket-simple-title">Ganador</div>
           <button
             className="advance-round-btn"
-            style={{
-              background: '#ffd600',
-              color: '#333',
-              fontWeight: 'bold',
-              fontSize: '1.1em',
-              cursor: 'default',
-              marginTop: 20,
-            }}
             disabled
           >
             {winner}
           </button>
         </div>
       )}
-      {allRegistered && onMatchClick && (
+      {showAdvanceButton && (
         <div className="advance-round-container">
           <button
             className="advance-round-btn"

@@ -1,5 +1,5 @@
 from flask import jsonify, url_for
-from api.models import User, Team, Match, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, db
+from api.models import User, Team, Match, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, Team_Stats, db
 from datetime import datetime, timedelta
 
 class APIException(Exception):
@@ -86,6 +86,8 @@ def create_brackets(team_ids, tournament_id, depth=0, is_final=False):
                     next_round_matches[i].next_match_id = next_round_matches[i+1].id
                     next_round_matches[i+1].next_match_id = next_round_matches[i].id
         
+        # Ordenar los partidos por ID antes de devolverlos
+        matches.sort(key=lambda x: x.id)
         print(f"Partidos creados: {len(matches)}")
         return matches
         
@@ -181,6 +183,17 @@ def final_brackets(tournament_id, team1_id, team2_id, final_depth):
     if not tournament:
         raise APIException("Torneo no encontrado", status_code=404)
     
+    # Cuando el partido final tenga scores, actualizar las derrotas y marcar el torneo como finalizado
+    if final_match.score1 is not None and final_match.score2 is not None:
+        # Determinar el equipo perdedor
+        losing_team_id = team2_id if final_match.score1 > final_match.score2 else team1_id
+        
+        # Actualizar las estadísticas del equipo perdedor
+        losing_team_stats = Team_Stats.query.filter_by(team_id=losing_team_id).first()
+        if losing_team_stats:
+            losing_team_stats.tournament_loses += 1
+        
+    
     # Limpiar el torneo (remover equipos)
     for team in tournament.teams:
         team.tournament_id = None
@@ -227,6 +240,23 @@ def approved_join_tournament(application):
         print("Torneo lleno, iniciando brackets...")
         # Iniciar el torneo
         tournament.started = True
+        
+        # Actualizar el contador de torneos jugados para todos los equipos
+        for team in tournament.teams:
+            team_stats = Team_Stats.query.filter_by(team_id=team.id).first()
+            if team_stats:
+                team_stats.tournament_count += 1
+            else:
+                team_stats = Team_Stats(
+                    team_id=team.id,
+                    games_win=0,
+                    games_lose=0,
+                    games_count=0,
+                    tournament_win=0,
+                    tournament_loses=0,
+                    tournament_count=1
+                )
+                db.session.add(team_stats)
         
         try:
             # Crear los brackets iniciales

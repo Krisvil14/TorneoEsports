@@ -117,13 +117,15 @@ class Tournament(db.Model):
     cost = db.Column(db.Integer, nullable=False, default=10)
     started = db.Column(db.Boolean, default=False, nullable=True)
     finished = db.Column(db.Boolean, default=False, nullable=True)
+    prize = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships
     teams = relationship("Team", back_populates="tournament")
     applications = relationship('Application', back_populates="tournament")
 
     __table_args__ = (
-        CheckConstraint('num_max_teams >= 5 AND num_max_teams <= 10', name='num_max_teams_check'),
+        CheckConstraint('(num_max_teams = 4) OR (num_max_teams = 8) OR (num_max_teams = 16)', name='num_max_teams_check'),
+        CheckConstraint('prize > 0', name='prize_positive_check'),
     )
 
     def __repr__(self):
@@ -264,6 +266,7 @@ class Match(db.Model):
     depth = db.Column(db.Integer, default=0, nullable=True)
     is_final = db.Column(db.Boolean, default=False, nullable=True)
     registered = db.Column(db.Boolean, default=False, nullable=True)
+    prize = db.Column(db.Integer, nullable=True)
 
     # Relationships
     tournament = relationship("Tournament")
@@ -275,6 +278,7 @@ class Match(db.Model):
     __table_args__ = (
         CheckConstraint('score1 >= 0', name='check_score1_positive'),
         CheckConstraint('score2 >= 0', name='check_score2_positive'),
+        CheckConstraint('prize >= 0', name='check_prize_positive'),
     )
 
     def __init__(self, **kwargs):
@@ -298,6 +302,7 @@ class Match(db.Model):
                 "depth": self.depth,
                 "is_final": self.is_final,
                 "registered": self.registered,
+                "prize": self.prize,
                 "team1": self.team1.serialize() if self.team1 else None,
                 "team2": self.team2.serialize() if self.team2 else None,
                 "calendar": self.calendar.serialize() if self.calendar else None
@@ -315,6 +320,7 @@ class Match(db.Model):
                 "depth": self.depth,
                 "is_final": self.is_final,
                 "registered": self.registered,
+                "prize": self.prize,
                 "error": "Error al serializar datos adicionales"
             }
 

@@ -13,6 +13,7 @@ function MatchEditModal({ match, onClose, onSave }) {
   const [team2Stats, setTeam2Stats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [scoreError, setScoreError] = useState(null);
 
   useEffect(() => {
     async function fetchPlayers() {
@@ -49,7 +50,30 @@ function MatchEditModal({ match, onClose, onSave }) {
     else setTeam2Stats(update(team2Stats));
   };
 
+  const handleScoreChange = (team, value) => {
+    const newValue = Number(value);
+    if (team === 1) {
+      setScore1(newValue);
+      if (newValue === score2) {
+        setScoreError('Los scores no pueden ser iguales');
+      } else {
+        setScoreError(null);
+      }
+    } else {
+      setScore2(newValue);
+      if (newValue === score1) {
+        setScoreError('Los scores no pueden ser iguales');
+      } else {
+        setScoreError(null);
+      }
+    }
+  };
+
   const handleSave = () => {
+    if (score1 === score2) {
+      setScoreError('Los scores no pueden ser iguales');
+      return;
+    }
     onSave({
       matchId: match.id,
       score1,
@@ -90,7 +114,7 @@ function MatchEditModal({ match, onClose, onSave }) {
               type="number"
               value={score1}
               min={0}
-              onChange={(e) => setScore1(Number(e.target.value))}
+              onChange={(e) => handleScoreChange(1, e.target.value)}
             />
           </div>
           <div className="modal-players-list">
@@ -159,7 +183,7 @@ function MatchEditModal({ match, onClose, onSave }) {
               type="number"
               value={score2}
               min={0}
-              onChange={(e) => setScore2(Number(e.target.value))}
+              onChange={(e) => handleScoreChange(2, e.target.value)}
             />
           </div>
           <div className="modal-players-list">
@@ -218,6 +242,11 @@ function MatchEditModal({ match, onClose, onSave }) {
                 ))}
           </div>
         </div>
+        {scoreError && (
+          <div style={{ color: 'red', marginTop: 10, textAlign: 'center' }}>
+            {scoreError}
+          </div>
+        )}
         <div
           className="custom-modal-buttons"
           style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}
@@ -225,7 +254,11 @@ function MatchEditModal({ match, onClose, onSave }) {
           <button onClick={onClose} style={{ marginRight: 10 }}>
             Cancelar
           </button>
-          <button className="primary" onClick={handleSave}>
+          <button 
+            className="primary" 
+            onClick={handleSave}
+            disabled={scoreError !== null}
+          >
             {match.is_final ? 'Finalizar Torneo' : 'Guardar'}
           </button>
         </div>
@@ -323,18 +356,40 @@ export default function TournamentRequests() {
     score2,
     team1Stats,
     team2Stats,
+    isFinal
   }) => {
-    await fetch(
-      process.env.BACKEND_URL + `/api/matches/${matchId}/update-score`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score1, score2, registered: true }),
+    try {
+      // Actualizar el score del partido
+      const response = await fetch(
+        process.env.BACKEND_URL + `/api/matches/${matchId}/update-score`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            score1, 
+            score2, 
+            registered: true,
+            isFinal,
+            team1Stats,
+            team2Stats
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al actualizar el partido');
       }
-    );
-    setSelectedMatch(null);
-    if (selectedMatch && selectedMatch.setRefresh)
-      selectedMatch.setRefresh((r) => !r);
+
+      toast.success(isFinal ? 'Torneo finalizado exitosamente' : 'Partido actualizado exitosamente');
+      setSelectedMatch(null);
+      if (selectedMatch && selectedMatch.setRefresh) {
+        selectedMatch.setRefresh((r) => !r);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error(error.message || 'Error al procesar la solicitud');
+    }
   };
 
   if (!tournament) {

@@ -221,6 +221,15 @@
   gap: 0.4rem;
 }
 
+.advance-round-btn {
+  background: linear-gradient(45deg, #6a0572 0%, #00ffff 100%);
+  color: white;
+  font-weight: bold;
+  font-size: 1.1em;
+  cursor: default;
+  margin-top: 20;
+}
+
 .bracket-button-separator {
   height: fit-content;
   display: flex;
