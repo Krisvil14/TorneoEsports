@@ -29,7 +29,7 @@ export default function PaymentsInterface() {
                         Realizar Pagos
                     </button>
                     <button 
-                        className="gaming-button secondary"
+                        className="gaming-button primary"
                         onClick={() => navigate('/receive-payments')}
                     >
                         Solicitar Pago

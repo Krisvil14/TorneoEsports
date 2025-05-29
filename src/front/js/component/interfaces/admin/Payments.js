@@ -97,7 +97,7 @@ export default function AdminPaymentsInterface() {
         { 
             header: 'Tipo', 
             accessor: 'action',
-            Cell: ({ value }) => value === 'do_payment' ? 'Solicitud de Pago' : 'Pago Entrante'
+            Cell: ({ value }) => value === 'do_payment' ? 'Pago entrante' : 'Solicitud de Pago'
         },
         { 
             header: 'Fecha', 
@@ -128,7 +128,7 @@ export default function AdminPaymentsInterface() {
                     <div className="details-content">
                         <p><strong>Usuario:</strong> {selectedRequest.user_name}</p>
                         <p><strong>Equipo:</strong> {selectedRequest.team_name}</p>
-                        <p><strong>Tipo de Solicitud:</strong> {selectedRequest.action === 'do_payment' ? 'Solicitud de Pago' : 'Pago Entrante'}</p>
+                        <p><strong>Tipo de Solicitud:</strong> {selectedRequest.action === 'do_payment' ? 'Pago entrante' : 'Solicitud de Pago'}</p>
                         <p><strong>Fecha:</strong> {new Date(selectedRequest.created_at).toLocaleDateString()}</p>
                         
                         {selectedRequest.payment_details && (

@@ -353,7 +353,7 @@ export default function TeamInfo() {
         { header: 'Nombre', accessor: 'name' },
         { header: 'Juego', accessor: 'game' },
         { header: 'Fecha de Inicio', accessor: 'date_start' },
-        { header: 'Estado', accessor: 'started', Cell: ({ row }) => row.started ? 'En curso o finalizado' : 'Pendiente' },
+        { header: 'Estado', accessor: 'started', Cell: ({ row }) => row.finished ? 'Finalizado' : 'En curso' },
         {
             header: 'Acciones',
             accessor: 'actions',

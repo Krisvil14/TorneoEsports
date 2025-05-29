@@ -11,6 +11,7 @@ import injectContext from './store/appContext';
 import EmailVerification from './component/login/EmailVerification';
 import TeamsInterface from './component/interfaces/user/Teams';
 import HomePage from './pages/start';
+import Landing from './pages/landing';
 import 'react-toastify/dist/ReactToastify.css';
 import Protected from './component/commons/Protected';
 import RegTeamsForm from './component/teams/RegTeamsForm';
@@ -53,9 +54,8 @@ const Layout = () => {
       <ToastContainer />
       <BrowserRouter basename={basename}>
         <ScrollToTop>
-          <Navbar />
           <Routes>
-            <Route element={<LoginForm />} path="/" />
+            <Route element={<Landing />} path="/" />
             <Route element={<Single />} path="/single/:theid" />
             <Route element={<LoginForm />} path="/login" />
             <Route element={<RegisterForm />} path="/register" />
@@ -66,7 +66,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <HomePage />
+                  <>
+                    <Navbar />
+                    <HomePage />
+                  </>
                 </Protected>
               }
               path="/inicio"
@@ -74,7 +77,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <TeamsInterface />
+                  <>
+                    <Navbar />
+                    <TeamsInterface />
+                  </>
                 </Protected>
               }
               path="/teams"
@@ -82,7 +88,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <ProfilePage />
+                  <>
+                    <Navbar />
+                    <ProfilePage />
+                  </>
                 </Protected>
               }
               path="/profile"
@@ -90,7 +99,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <EditProfilePage />
+                  <>
+                    <Navbar />
+                    <EditProfilePage />
+                  </>
                 </Protected>
               }
               path="/editProfile"
@@ -98,7 +110,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <TournamentsPage />
+                  <>
+                    <Navbar />
+                    <TournamentsPage />
+                  </>
                 </Protected>
               }
               path="/tournaments"
@@ -106,7 +121,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <TeamInfoUser />
+                  <>
+                    <Navbar />
+                    <TeamInfoUser />
+                  </>
                 </Protected>
               }
               path="/busca-equipo/:teamId"
@@ -114,7 +132,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <TeamInfo />
+                  <>
+                    <Navbar />
+                    <TeamInfo />
+                  </>
                 </Protected>
               }
               path="/teamInfo/:teamId"
@@ -122,7 +143,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <TeamInfoAdmin />
+                  <>
+                    <Navbar />
+                    <TeamInfoAdmin />
+                  </>
                 </Protected>
               }
               path="/admin/teamInfo/:teamId"
@@ -130,7 +154,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <PaymentsPage />
+                  <>
+                    <Navbar />
+                    <PaymentsPage />
+                  </>
                 </Protected>
               }
               path="/payments"
@@ -138,7 +165,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <MakePaymentsPage />
+                  <>
+                    <Navbar />
+                    <MakePaymentsPage />
+                  </>
                 </Protected>
               }
               path="/make-payments"
@@ -146,7 +176,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <RecievePaymentsPage />
+                  <>
+                    <Navbar />
+                    <RecievePaymentsPage />
+                  </>
                 </Protected>
               }
               path="/receive-payments"
@@ -154,7 +187,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <CreateTeamForm />
+                  <>
+                    <Navbar />
+                    <CreateTeamForm />
+                  </>
                 </Protected>
               }
               path="/create-team"
@@ -162,7 +198,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <BuscaEquipo />
+                  <>
+                    <Navbar />
+                    <BuscaEquipo />
+                  </>
                 </Protected>
               }
               path="/busca-equipo"
@@ -170,7 +209,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected>
-                  <RankingInterface />
+                  <>
+                    <Navbar />
+                    <RankingInterface />
+                  </>
                 </Protected>
               }
               path="/ranking"
@@ -179,7 +221,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <RegTeamsForm />
+                  <>
+                    <Navbar />
+                    <RegTeamsForm />
+                  </>
                 </Protected>
               }
               path="/admin/Regteams"
@@ -187,7 +232,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <CreateTournamentForm />
+                  <>
+                    <Navbar />
+                    <CreateTournamentForm />
+                  </>
                 </Protected>
               }
               path="/admin/create_tournament"
@@ -195,7 +243,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <AddTeamToTournament />
+                  <>
+                    <Navbar />
+                    <AddTeamToTournament />
+                  </>
                 </Protected>
               }
               path="/admin/addteam/:tournament_id"
@@ -203,7 +254,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <AddPlayerToTeam />
+                  <>
+                    <Navbar />
+                    <AddPlayerToTeam />
+                  </>
                 </Protected>
               }
               path="/admin/add_player_to_team/:user_id"
@@ -211,7 +265,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <CreateUserPage />
+                  <>
+                    <Navbar />
+                    <CreateUserPage />
+                  </>
                 </Protected>
               }
               path="/admin/create_user"
@@ -219,7 +276,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <TeamsAdminPage />
+                  <>
+                    <Navbar />
+                    <TeamsAdminPage />
+                  </>
                 </Protected>
               }
               path="/admin/teams"
@@ -227,7 +287,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <UsersAdminInterface />
+                  <>
+                    <Navbar />
+                    <UsersAdminInterface />
+                  </>
                 </Protected>
               }
               path="/admin/users"
@@ -235,7 +298,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <EditUserForm />
+                  <>
+                    <Navbar />
+                    <EditUserForm />
+                  </>
                 </Protected>
               }
               path="/admin/edit_user/:userId"
@@ -243,8 +309,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  {' '}
-                  <TournamentsAdminPage />{' '}
+                  <>
+                    <Navbar />
+                    <TournamentsAdminPage />
+                  </>
                 </Protected>
               }
               path="/admin/tournaments"
@@ -252,7 +320,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <TournamentRequests />
+                  <>
+                    <Navbar />
+                    <TournamentRequests />
+                  </>
                 </Protected>
               }
               path="/admin/tournament-requests/:tournamentId"
@@ -260,7 +331,10 @@ const Layout = () => {
             <Route
               element={
                 <Protected requiredRole="admin">
-                  <PaymentsAdmin />
+                  <>
+                    <Navbar />
+                    <PaymentsAdmin />
+                  </>
                 </Protected>
               }
               path="/admin/payments"

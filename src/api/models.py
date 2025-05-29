@@ -223,7 +223,7 @@ class Payment(db.Model):
     amount = db.Column(db.Integer, nullable=False)
     bank = db.Column(bank_enum, nullable=False)
     date = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
-    reference = db.Column(db.String(50), nullable=False)
+    reference = db.Column(db.String(50), nullable=True)
     cedula = db.Column(db.String(20), nullable=False)
     phone_number = db.Column(db.String(20), nullable=False)
 

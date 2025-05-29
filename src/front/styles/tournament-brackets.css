@@ -83,7 +83,7 @@
 /* Estilos para la final */
 .bracket-round:last-child .match-box {
   border-color: #ffd700;
-  background: #fffdf0;
+  background: linear-gradient(45deg, #00dbde, #fc00ff);
 }
 
 .bracket-round:last-child .match-box::before {
@@ -92,7 +92,7 @@
   top: -1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  background: #ffd700;
+  background: linear-gradient(45deg, #00dbde, #fc00ff);
   color: #333;
   padding: 0.25rem 1rem;
   border-radius: 4px;
@@ -343,7 +343,7 @@
 
 /* Estilos para el ganador */
 .bracket-simple-round:last-child .advance-round-btn {
-  background: linear-gradient(45deg, #ffd700, #ffa500);
+  background: linear-gradient(45deg, #00dbde, #fc00ff);
   color: #1a1a2e;
   font-size: 1.2rem;
   padding: 1.5rem 3rem;

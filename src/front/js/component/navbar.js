@@ -44,7 +44,7 @@ export const Navbar = () => {
 
   const handleLogout = () => {
     actions.logout();
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
     setMenuOpen(false);
   };
 

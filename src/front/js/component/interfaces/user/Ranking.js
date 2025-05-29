@@ -189,6 +189,10 @@ export default function RankingInterface() {
                             <option value="">Todos los juegos</option>
                             <option value="League of Legends">League of Legends</option>
                             <option value="Valorant">Valorant</option>
+                            <option value="csgo">Counter Strike: Global Offensive</option>
+                            <option value="dota_2">Dota 2</option>
+                            <option value="overwatch">Overwatch</option>
+                            <option value="apex_legends">Apex Legends</option>
                         </select>
                     </div>
                 </div>

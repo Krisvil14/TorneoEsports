@@ -116,6 +116,7 @@ export default function TournamentsInterface() {
     { header: 'Fecha de Inicio', accessor: 'date_start' },
     { header: 'Juego', accessor: 'game' },
     { header: 'Costo ($)', accessor: 'cost' },
+    {header: 'Premio ($)', accessor: 'prize'},
     {
       header: 'Cantidad de Equipos',
       accessor: 'num_teams',

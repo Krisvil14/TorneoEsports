@@ -8,6 +8,7 @@ import '../../../styles/gaming-form.css';
 export default function LoginForm() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   const navigate = useNavigate();
   const { actions } = React.useContext(Context);
 
@@ -113,14 +114,28 @@ export default function LoginForm() {
           </div>
           <div className="d-flex flex-column gy-3 w-75 mx-auto">
             <label htmlFor="password" className="gaming-form-label">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              className="gaming-form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                className="gaming-form-input password-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <i className="fas fa-eye-slash"></i>
+                ) : (
+                  <i className="fas fa-eye"></i>
+                )}
+              </button>
+            </div>
           </div>
           <button type="submit" className="gaming-form-button primary w-75 mx-auto">
             Iniciar Sesión
