@@ -44,10 +44,6 @@ def generate_sitemap(app):
 
 def create_brackets(team_ids, tournament_id, depth=0, is_final=False):
     try:
-        print("\n=== Creando brackets ===")
-        print(f"Profundidad: {depth}")
-        print(f"Es final: {is_final}")
-        print(f"IDs de equipos: {team_ids}")
         
         matches = []
         next_round_matches = []
@@ -88,11 +84,9 @@ def create_brackets(team_ids, tournament_id, depth=0, is_final=False):
         
         # Ordenar los partidos por ID antes de devolverlos
         matches.sort(key=lambda x: x.id)
-        print(f"Partidos creados: {len(matches)}")
         return matches
         
     except Exception as e:
-        print(f"Error al crear brackets: {str(e)}")
         db.session.rollback()
         raise APIException(f"Error al crear los brackets: {str(e)}", status_code=500)
 
@@ -203,17 +197,13 @@ def final_brackets(tournament_id, team1_id, team2_id, final_depth):
 
 def approved_join_tournament(application):
     try:
-        print("\n=== Procesando unión a torneo ===")
+
         team = Team.query.get(application.teamID)
         tournament = Tournament.query.get(application.tournamentID)
         
         if not team or not tournament:
             raise APIException("Equipo o torneo no encontrado", status_code=404)
-        
-        print(f"Equipo: {team.name}")
-        print(f"Torneo: {tournament.name}")
-        print(f"Balance actual: {team.balance}")
-        print(f"Costo del torneo: {tournament.cost}")
+
         
         # Verificar que el equipo tenga suficiente balance
         if team.balance is None or team.balance < tournament.cost:
@@ -228,16 +218,14 @@ def approved_join_tournament(application):
         # Verificar si el torneo está lleno
         current_teams = len(tournament.teams)
         max_teams = tournament.num_max_teams
-        print(f"Equipos actuales: {current_teams}")
-        print(f"Máximo de equipos: {max_teams}")
-        
+
         is_tournament_full = current_teams == max_teams
         if not is_tournament_full:
-            print("Torneo no está lleno, guardando cambios...")
+
             db.session.commit()
             return
             
-        print("Torneo lleno, iniciando brackets...")
+
         # Iniciar el torneo
         tournament.started = True
         
@@ -261,31 +249,27 @@ def approved_join_tournament(application):
         try:
             # Crear los brackets iniciales
             team_ids = [team.id for team in tournament.teams]
-            print(f"IDs de equipos: {team_ids}")
+
             
             if len(team_ids) < 2:
                 raise APIException("Se necesitan al menos 2 equipos para crear los brackets", status_code=400)
                 
             # Asegurarse de que el número de equipos sea par
             if len(team_ids) % 2 != 0:
-                print("Número impar de equipos, agregando equipo fantasma...")
+
                 team_ids.append(None)
                 
-            print("Creando brackets...")
             create_brackets(team_ids, tournament.id, 0)
-            print("Brackets creados exitosamente")
             db.session.commit()
             
         except Exception as e:
-            print(f"Error al crear brackets: {str(e)}")
+
             db.session.rollback()
             raise APIException(f"Error al crear los brackets: {str(e)}", status_code=500)
             
     except APIException as e:
-        print(f"Error API: {str(e)}")
         raise e
     except Exception as e:
-        print(f"Error inesperado: {str(e)}")
         db.session.rollback()
         raise APIException(f"Error al procesar la solicitud: {str(e)}", status_code=500)
 

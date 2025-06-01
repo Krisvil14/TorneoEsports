@@ -194,7 +194,7 @@ export default function RegisterForm() {
             Registrar Usuario
           </button>
           <Link to="/login" className="gaming-form-button secondary w-75 mx-auto">
-            Volver
+            Volver al Login
           </Link>
         </div>
       </form>

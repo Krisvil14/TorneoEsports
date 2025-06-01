@@ -3,20 +3,22 @@
     max-width: 100%;
     margin: 0 auto;
     padding: 0;
-    background-color: #1a1a1a;
+    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    background-size: cover;
+    background-position: center;
     color: #ffffff;
     min-height: 100vh;
 }
 
 /* Hero Section */
 .users-hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
-                url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
-    background-size: cover;
-    background-position: center;
+    background: rgba(0, 0, 0, 0.3);
     padding: 40px 20px;
     text-align: center;
     margin-bottom: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.4);
 }
 
 .users-hero h1 {

@@ -79,11 +79,7 @@ def recover_user():
 
     # Generar y enviar código OTP
     otp_code = set_otp_for_user(user)
-    print(f"\n=== Generación de OTP para recuperación ===")
-    print(f"Email del usuario: {user.email}")
-    print(f"Nuevo OTP generado: {otp_code}")
-    print(f"OTP almacenado: {user.otp_code}")
-    print(f"OTP expira: {user.otp_expires}")
+  
     
     try:
         db.session.commit()  # Guardar el OTP en la base de datos
@@ -355,7 +351,6 @@ def create_tournament():
         return response, 201
     except Exception as e:
         db.session.rollback()
-        print(f"Error al crear torneo: {str(e)}")  # Agregamos un log para depuración
         return jsonify({"error": str(e)}), 400
 
 @api.route('/admin/add_player_to_team/<int:user_id>', methods=['POST'])
@@ -693,16 +688,11 @@ def handle_application():
         if application_id is None or accepted is None:
             return jsonify({"error": "Faltan datos requeridos"}), 400
 
-        print(f"\n=== Procesando solicitud ===")
-        print(f"Application ID: {application_id}")
-        print(f"Accepted: {accepted}")
 
         application = Application.query.filter_by(id=application_id).first()
         if not application:
             return jsonify({"error": "Solicitud no encontrada"}), 404
 
-        print(f"Tipo de acción: {application.action}")
-        print(f"Estado actual: {application.status}")
 
         if not accepted:
             application.status = StatusEnum.rejected
@@ -712,32 +702,31 @@ def handle_application():
 
         try:
             if accepted and application.action == ActionEnum.join_team:
-                print("Procesando solicitud de unirse a equipo")
                 approved_join_team(application)
             elif accepted and application.action == ActionEnum.join_tournament:
-                print("Procesando solicitud de unirse a torneo")
+              
                 approved_join_tournament(application)
             elif accepted and (application.action == ActionEnum.do_payment or application.action == ActionEnum.receive_payment):
-                print("Procesando solicitud de pago")
+               
                 approved_do_payment(application)
             else:
                 return jsonify({"error": "Tipo de acción no válida"}), 400
 
             db.session.commit()
-            print("Solicitud procesada exitosamente")
+        
             return jsonify({"message": "La aplicación ha sido procesada exitosamente"}), 200
 
         except APIException as e:
-            print(f"Error API: {str(e)}")
+          
             db.session.rollback()
             return jsonify({"error": str(e)}), e.status_code
         except Exception as e:
-            print(f"Error inesperado: {str(e)}")
+        
             db.session.rollback()
             return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
     except Exception as e:
-        print(f"Error general: {str(e)}")
+    
         return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
 @api.route('/applications/team/<int:team_id>', methods=['GET'])
@@ -1017,7 +1006,6 @@ def check_payment_request(team_id):
 def create_payment_request():
     try:
         data = request.get_json()
-        print('Datos recibidos:', data)  # Log para depuración
         
         user_id = data.get('user_id')
         team_id = data.get('team_id')
@@ -1089,7 +1077,6 @@ def create_payment_request():
         }), 201
     except Exception as e:
         db.session.rollback()
-        print('Error:', str(e))  # Log para depuración
         return jsonify({"error": str(e)}), 400
 
 @api.route('/admin/payment-requests', methods=['GET'])
@@ -1313,31 +1300,19 @@ def verify_reset_otp():
     user_id = data.get('user_id')
     otp_code = data.get('otp_code')
 
-    print("\n=== INICIO DE VERIFICACIÓN OTP ===")
-    print(f"Request data: {data}")
-    print(f"User ID recibido: {user_id}")
-    print(f"OTP recibido: {otp_code}")
 
     if not user_id or not otp_code:
-        print("Error: Faltan datos")
         return jsonify({"error": "Faltan datos"}), 400
 
     user = User.query.get(user_id)
     if not user:
-        print("Error: Usuario no encontrado")
         return jsonify({"error": "Usuario no encontrado"}), 404
 
-    print(f"\nDatos del usuario:")
-    print(f"Email: {user.email}")
-    print(f"OTP almacenado: {user.otp_code}")
-    print(f"OTP expira: {user.otp_expires}")
-    print(f"Tiempo actual: {datetime.utcnow()}")
-
     if verify_otp(user, otp_code):
-        print("OTP verificado exitosamente")
+
         return jsonify({"message": "Código OTP verificado exitosamente"}), 200
     else:
-        print("OTP inválido o expirado")
+
         return jsonify({"error": "Código OTP inválido o expirado"}), 400
 
 @api.route('/reset-password', methods=['POST'])
@@ -1396,34 +1371,33 @@ def advance_tournament_round_route(tournament_id):
 @api.route('/tournaments/<tournament_id>/matches', methods=['GET'])
 def get_tournament_matches(tournament_id):
     try:
-        print(f"\n=== Obteniendo partidos del torneo {tournament_id} ===")
+       
         
         # Verificar que el torneo existe
         tournament = Tournament.query.get(tournament_id)
         if not tournament:
-            print("Torneo no encontrado")
+
             return jsonify({"error": "Torneo no encontrado"}), 404
             
         # Obtener todos los partidos del torneo ordenados por ID
         matches = Match.query.filter_by(tournament_id=tournament_id).order_by(Match.id).all()
-        print(f"Partidos encontrados: {len(matches)}")
+
         
         # Serializar los partidos
         matches_data = []
         for match in matches:
             try:
                 match_data = match.serialize()
-                print(f"Partido {match.id}: {match_data}")
+
                 matches_data.append(match_data)
             except Exception as e:
-                print(f"Error al serializar partido {match.id}: {str(e)}")
                 continue
         
-        print(f"Partidos serializados: {len(matches_data)}")
+
         return jsonify(matches_data), 200
         
     except Exception as e:
-        print(f"Error al obtener partidos: {str(e)}")
+
         return jsonify({"error": f"Error al obtener los partidos: {str(e)}"}), 400
 
 @api.route('/matches/<int:match_id>/update-score', methods=['POST'])
