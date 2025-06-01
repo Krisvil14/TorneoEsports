@@ -17,6 +17,8 @@ export default function MakePaymentsInterface() {
         phone_number: ''
     });
     const [hasRequested, setHasRequested] = useState(false);
+    const [exchangeRate, setExchangeRate] = useState(0);
+    const [selectedAmount, setSelectedAmount] = useState(null);
 
     const banks = [
         'Banco de Venezuela',
@@ -28,6 +30,8 @@ export default function MakePaymentsInterface() {
         'Banco Exterior',
         'Bancaribe'
     ];
+
+    const fixedAmounts = [5, 10, 15, 20];
 
     useEffect(() => {
         const checkPaymentRequest = async () => {
@@ -54,7 +58,29 @@ export default function MakePaymentsInterface() {
             }
         };
 
+        const fetchExchangeRate = async () => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al obtener la tasa de cambio');
+                }
+
+                const data = await response.json();
+                setExchangeRate(data.rate);
+            } catch (error) {
+                console.error('Error fetching exchange rate:', error);
+                toast.error('Error al obtener la tasa de cambio');
+            }
+        };
+
         checkPaymentRequest();
+        fetchExchangeRate();
     }, [user]);
 
     const handleChange = (e) => {
@@ -65,25 +91,29 @@ export default function MakePaymentsInterface() {
         }));
     };
 
+    const handleAmountSelect = (amount) => {
+        setSelectedAmount(amount);
+        setFormData(prev => ({
+            ...prev,
+            amount: amount.toString()
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        console.log('Estado del usuario:', user); // Log para depuración
 
         if (hasRequested) {
             toast.warning('Ya tienes una solicitud de pago pendiente');
             return;
         }
 
-        // Validar que el usuario tenga un equipo
         if (!user || !user.team_id) {
             toast.error('Debes pertenecer a un equipo para realizar esta acción');
             return;
         }
 
-        // Validaciones
-        if (!formData.amount || isNaN(formData.amount) || formData.amount <= 0) {
-            toast.error('Por favor ingrese un monto válido');
+        if (!selectedAmount) {
+            toast.error('Por favor seleccione un monto');
             return;
         }
         if (!formData.bank) {
@@ -115,7 +145,6 @@ export default function MakePaymentsInterface() {
                 payment_type: 'incoming',
                 action: 'do_payment'
             };
-            console.log('Datos enviados al backend:', requestData);
 
             const response = await fetch(process.env.BACKEND_URL + '/api/payment-requests', {
                 method: 'POST',
@@ -126,7 +155,6 @@ export default function MakePaymentsInterface() {
             });
 
             const data = await response.json();
-            console.log('Respuesta del backend:', data);
 
             if (!response.ok) {
                 throw new Error(data.error || 'Error al procesar el pago');
@@ -141,6 +169,7 @@ export default function MakePaymentsInterface() {
                 cedula: '',
                 phone_number: ''
             });
+            setSelectedAmount(null);
         } catch (error) {
             toast.error(error.message);
         }
@@ -150,35 +179,41 @@ export default function MakePaymentsInterface() {
         <div className="gaming-form-container">
             <h1 className="gaming-form-title">Solicitud de Pago</h1>
             {hasRequested ? (
-               
-               <div>
-               <div className="gaming-alert-info">
-                    Ya tienes una solicitud de pago pendiente. Por favor espera a que sea procesada.
-                </div>
-                <div className="volver-container">
-                    <button
-                        type="button"
-                        className="gaming-form-button secondary"
-                        onClick={() => navigate('/payments')}
-                    >
-                        Volver
-                    </button>
-                </div>
+                <div>
+                    <div className="gaming-alert-info">
+                        Ya tienes una solicitud de pago pendiente. Por favor espera a que sea procesada.
+                    </div>
+                    <div className="volver-container">
+                        <button
+                            type="button"
+                            className="gaming-form-button secondary"
+                            onClick={() => navigate('/payments')}
+                        >
+                            Volver
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="amount" className="gaming-form-label">Monto del Pago</label>
-                        <input
-                            type="number"
-                            className="gaming-form-input form-control"
-                            id="amount"
-                            name="amount"
-                            value={formData.amount}
-                            onChange={handleChange}
-                            placeholder="Ingrese el monto"
-                            required
-                        />
+                        <label className="gaming-form-label">Seleccione el Monto en USD</label>
+                        <div className="amount-buttons">
+                            {fixedAmounts.map((amount) => (
+                                <button
+                                    key={amount}
+                                    type="button"
+                                    className={`gaming-form-button ${selectedAmount === amount ? 'selected' : ''}`}
+                                    onClick={() => handleAmountSelect(amount)}
+                                >
+                                    ${amount}
+                                </button>
+                            ))}
+                        </div>
+                        {selectedAmount && (
+                            <div className="conversion-display">
+                                <p>Monto: Bs.{(selectedAmount * exchangeRate).toFixed(2)}</p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">

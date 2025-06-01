@@ -17,6 +17,7 @@ export default function RecievePaymentsInterface() {
     });
     const [hasRequested, setHasRequested] = useState(false);
     const [teamBalance, setTeamBalance] = useState(0);
+    const [exchangeRate, setExchangeRate] = useState(0);
 
     const banks = [
         'Banco de Venezuela',
@@ -72,7 +73,29 @@ export default function RecievePaymentsInterface() {
             }
         };
 
+        const fetchExchangeRate = async () => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al obtener la tasa de cambio');
+                }
+
+                const data = await response.json();
+                setExchangeRate(data.rate);
+            } catch (error) {
+                console.error('Error fetching exchange rate:', error);
+                toast.error('Error al obtener la tasa de cambio');
+            }
+        };
+
         checkPaymentRequest();
+        fetchExchangeRate();
     }, [user]);
 
     const handleChange = (e) => {
@@ -86,14 +109,11 @@ export default function RecievePaymentsInterface() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log('Estado del usuario:', user);
-
         if (hasRequested) {
             toast.warning('Ya tienes una solicitud de pago pendiente');
             return;
         }
 
-        // Validar que el usuario tenga un equipo
         if (!user || !user.team_id) {
             toast.error('Debes pertenecer a un equipo para realizar esta acción');
             return;
@@ -101,13 +121,13 @@ export default function RecievePaymentsInterface() {
 
         // Validaciones
         if (!formData.amount || isNaN(formData.amount) || formData.amount <= 0) {
-            toast.error('Por favor ingrese un monto válido mayor a 0');
+            toast.error('Por favor ingrese un monto válido en dólares mayor a 0');
             return;
         }
 
-        // Validar que el monto no exceda el saldo del equipo
-        if (parseInt(formData.amount) > teamBalance) {
-            toast.error(`El monto solicitado no puede exceder el saldo actual del equipo (${teamBalance})`);
+        // Validar que el monto en dólares no exceda el saldo del equipo en dólares
+        if (parseFloat(formData.amount) > teamBalance) {
+            toast.error(`El monto solicitado no puede exceder el saldo actual del equipo (${teamBalance} USD)`);
             return;
         }
 
@@ -128,14 +148,13 @@ export default function RecievePaymentsInterface() {
             const requestData = {
                 user_id: user.id,
                 team_id: user.team_id,
-                amount: parseInt(formData.amount),
+                amount: parseFloat(formData.amount), // Enviar en dólares
                 bank: formData.bank.toLowerCase().replace(/ /g, '_'),
                 cedula: formData.cedula,
                 phone_number: formData.phone_number,
                 payment_type: 'outgoing',
                 action: 'receive_payment'
             };
-            console.log('Datos enviados al backend:', requestData);
 
             const response = await fetch(process.env.BACKEND_URL + '/api/payment-requests', {
                 method: 'POST',
@@ -146,7 +165,6 @@ export default function RecievePaymentsInterface() {
             });
 
             const data = await response.json();
-            console.log('Respuesta del backend:', data);
 
             if (!response.ok) {
                 throw new Error(data.error || 'Error al procesar la solicitud de pago');
@@ -187,7 +205,7 @@ export default function RecievePaymentsInterface() {
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="amount" className="gaming-form-label">Monto a Recibir</label>
+                        <label htmlFor="amount" className="gaming-form-label">Monto a Recibir (USD)</label>
                         <input
                             type="number"
                             className="gaming-form-input form-control"
@@ -195,11 +213,15 @@ export default function RecievePaymentsInterface() {
                             name="amount"
                             value={formData.amount}
                             onChange={handleChange}
-                            placeholder="Ingrese el monto a recibir"
+                            placeholder="Ingrese el monto en dólares"
                             required
                             min="1"
-                            max={teamBalance}
                         />
+                        {formData.amount && exchangeRate > 0 && (
+                            <div className="conversion-display">
+                                <p>Monto equivalente en Bs.: Bs.{(parseFloat(formData.amount) * exchangeRate).toFixed(2)}</p>
+                            </div>
+                        )}
                     </div>
 
                     <div className="form-group">

@@ -10,9 +10,13 @@ export default function AdminPaymentsInterface() {
     const [paymentRequests, setPaymentRequests] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [showDetails, setShowDetails] = useState(false);
+    const [exchangeRate, setExchangeRate] = useState(0);
+    const [isEditingRate, setIsEditingRate] = useState(false);
+    const [newRate, setNewRate] = useState('');
 
     useEffect(() => {
         fetchPaymentRequests();
+        fetchExchangeRate();
     }, []);
 
     const fetchPaymentRequests = async () => {
@@ -33,6 +37,52 @@ export default function AdminPaymentsInterface() {
         } catch (error) {
             console.error('Error fetching payment requests:', error);
             toast.error('Error al obtener las solicitudes de pago');
+        }
+    };
+
+    const fetchExchangeRate = async () => {
+        try {
+            const response = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al obtener la tasa de cambio');
+            }
+
+            const data = await response.json();
+            setExchangeRate(data.rate);
+        } catch (error) {
+            console.error('Error fetching exchange rate:', error);
+            toast.error('Error al obtener la tasa de cambio');
+        }
+    };
+
+    const handleUpdateExchangeRate = async () => {
+        try {
+            const response = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rate: parseFloat(newRate)
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al actualizar la tasa de cambio');
+            }
+
+            toast.success('Tasa de cambio actualizada exitosamente');
+            setExchangeRate(parseFloat(newRate));
+            setIsEditingRate(false);
+            setNewRate('');
+        } catch (error) {
+            toast.error(error.message);
         }
     };
 
@@ -122,6 +172,47 @@ export default function AdminPaymentsInterface() {
         <div className="gaming-form-container">
             <h1 className="gaming-form-title">Gestión de Solicitudes de Pago</h1>
             
+            <div className="exchange-rate-section">
+                <h2>Tasa de Cambio Actual</h2>
+                {isEditingRate ? (
+                    <div className="rate-edit-form">
+                        <input
+                            type="number"
+                            step="0.01"
+                            value={newRate}
+                            onChange={(e) => setNewRate(e.target.value)}
+                            placeholder="Nueva tasa de cambio"
+                            className="gaming-form-input"
+                        />
+                        <button
+                            className="gaming-form-button"
+                            onClick={handleUpdateExchangeRate}
+                        >
+                            Guardar
+                        </button>
+                        <button
+                            className="gaming-form-button secondary"
+                            onClick={() => {
+                                setIsEditingRate(false);
+                                setNewRate('');
+                            }}
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                ) : (
+                    <div className="rate-display">
+                        <p>1 USD = {exchangeRate} Bs.</p>
+                        <button
+                            className="gaming-form-button"
+                            onClick={() => setIsEditingRate(true)}
+                        >
+                            Editar Tasa
+                        </button>
+                    </div>
+                )}
+            </div>
+
             {showDetails && selectedRequest ? (
                 <div className="payment-details">
                     <h2>Detalles de la Solicitud</h2>
@@ -134,7 +225,8 @@ export default function AdminPaymentsInterface() {
                         {selectedRequest.payment_details && (
                             <>
                                 <h3>Detalles del Pago</h3>
-                                <p><strong>Monto:</strong> Bs.{selectedRequest.payment_details.amount}</p>
+                                <p><strong>Monto en USD:</strong> ${selectedRequest.payment_details.amount}</p>
+                                <p><strong>Monto en Bs.:</strong> Bs.{(selectedRequest.payment_details.amount * exchangeRate).toFixed(2)}</p>
                                 <p><strong>Banco:</strong> {selectedRequest.payment_details.bank}</p>
                                 <p><strong>Referencia:</strong> {selectedRequest.payment_details.reference}</p>
                                 <p><strong>Cédula:</strong> {selectedRequest.payment_details.cedula}</p>

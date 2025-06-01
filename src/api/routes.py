@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats, Match
+from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats, Match, ExchangeRate
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment, advance_tournament_round
 from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user
 from flask_cors import CORS
@@ -1522,3 +1522,41 @@ def get_team_tournaments(team_id):
     tournament_ids = list(set([str(m.tournament_id) for m in matches]))
     tournaments = Tournament.query.filter(Tournament.id.in_(tournament_ids)).all()
     return jsonify([t.serialize() for t in tournaments]), 200
+
+@api.route('/admin/exchange-rate', methods=['GET'])
+def get_exchange_rate():
+    try:
+        # Obtener la tasa de cambio más reciente
+        exchange_rate = ExchangeRate.query.order_by(ExchangeRate.created_at.desc()).first()
+        
+        if not exchange_rate:
+            # Si no hay tasa de cambio, crear una por defecto
+            exchange_rate = ExchangeRate(rate=35.0)  # Tasa por defecto
+            db.session.add(exchange_rate)
+            db.session.commit()
+        
+        return jsonify(exchange_rate.serialize()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/exchange-rate', methods=['POST'])
+def update_exchange_rate():
+    try:
+        data = request.get_json()
+        if not data or 'rate' not in data:
+            return jsonify({"error": "Falta el campo 'rate' en la solicitud"}), 400
+
+        rate = float(data['rate'])
+        if rate <= 0:
+            return jsonify({"error": "La tasa de cambio debe ser mayor que 0"}), 400
+
+        # Crear una nueva entrada de tasa de cambio
+        new_rate = ExchangeRate(rate=rate)
+        db.session.add(new_rate)
+        db.session.commit()
+
+        return jsonify(new_rate.serialize()), 200
+    except ValueError:
+        return jsonify({"error": "La tasa de cambio debe ser un número válido"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

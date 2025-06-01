@@ -444,3 +444,20 @@ class Calendar(db.Model):
             "updated_at": self.updated_at.isoformat()
         }
 
+class ExchangeRate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rate = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now(), onupdate=db.func.now())
+
+    def __repr__(self):
+        return f'<ExchangeRate {self.id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "rate": self.rate,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()
+        }
+

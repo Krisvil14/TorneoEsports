@@ -1,5 +1,5 @@
 from flask import jsonify, url_for
-from api.models import User, Team, Match, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, Team_Stats, db
+from api.models import User, Team, Match, Tournament, Application, Payment, PaymentTypeEnum, StatusEnum, ActionEnum, User_Stats, Team_Stats, ExchangeRate, db
 from datetime import datetime, timedelta
 
 class APIException(Exception):
@@ -308,13 +308,20 @@ def approved_do_payment(application):
     if not payment:
         raise APIException("Detalles del pago no encontrados", status_code=404)
     
+    # Obtener la tasa de cambio actual
+    exchange_rate = ExchangeRate.query.order_by(ExchangeRate.created_at.desc()).first()
+    if not exchange_rate:
+        exchange_rate = ExchangeRate(rate=35.0)  # Tasa por defecto
+        db.session.add(exchange_rate)
+        db.session.commit()
+    
     # Actualizar el balance del equipo
     if team.balance is None:
         team.balance = 0
     
-    # Si es una solicitud de pago (do_payment), sumar 10 al balance
+    # Si es una solicitud de pago (do_payment), sumar el monto en dólares directamente
     if application.action == ActionEnum.do_payment:
-        team.balance += 10
+        team.balance += payment.amount
     # Si es una solicitud de recepción de pago (receive_payment), restar el monto solicitado del balance
     elif application.action == ActionEnum.receive_payment:
         if team.balance < payment.amount:
