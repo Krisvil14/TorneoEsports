@@ -23,7 +23,6 @@ export default function ProfileInterface() {
         fetchUserStats();
     }, [user]);
 
-    // Función para obtener las iniciales del nombre
     const getInitials = (firstName, lastName) => {
         return `${firstName ? firstName[0] : ''}${lastName ? lastName[0] : ''}`;
     };

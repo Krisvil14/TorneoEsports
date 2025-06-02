@@ -8,7 +8,7 @@ const BuscaEquipo = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Obtener los datos de los equipos desde el backend
+
     const fetchTeams = async () => {
       try {
         const response = await fetch(process.env.BACKEND_URL + '/api/teams');

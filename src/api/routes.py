@@ -820,9 +820,12 @@ def remove_player_from_team(team_id):
         if user_to_remove.team_id != team_id:
             return jsonify({"error": "El usuario no pertenece a este equipo"}), 400
 
-        # Verificar que el usuario que hace la petición sea admin
+        # Verificar que el usuario que hace la petición sea admin o líder del equipo
         requesting_user = User.query.get(requesting_user_id)
-        if not requesting_user or requesting_user.role != RoleEnum.admin:
+        if not requesting_user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+            
+        if requesting_user.role != RoleEnum.admin and not requesting_user.is_leader:
             return jsonify({"error": "No tienes permiso para eliminar jugadores de este equipo"}), 403
 
         # Si el usuario a eliminar es el líder y hay más miembros, se requiere un nuevo líder
@@ -1422,84 +1425,61 @@ def update_match_score(match_id):
         match.score2 = score2
         if registered is not None:
             match.registered = registered
+        match.team1_stats_data = team1Stats
+        match.team2_stats_data = team2Stats
 
-        # Actualizar estadísticas de los jugadores del equipo 1
-        for player_stats in team1Stats:
-            user_stats = User_Stats.query.filter_by(user_id=player_stats['id']).first()
-            if user_stats:
-                user_stats.kills += player_stats['kills']
-                user_stats.assists += player_stats['assists']
-                user_stats.deaths += player_stats['deaths']
-                user_stats.kda = user_stats.calculate_kda()
-
-        # Actualizar estadísticas de los jugadores del equipo 2
-        for player_stats in team2Stats:
-            user_stats = User_Stats.query.filter_by(user_id=player_stats['id']).first()
-            if user_stats:
-                user_stats.kills += player_stats['kills']
-                user_stats.assists += player_stats['assists']
-                user_stats.deaths += player_stats['deaths']
-                user_stats.kda = user_stats.calculate_kda()
-
-        # Actualizar estadísticas de los equipos
-        team1_stats = Team_Stats.query.filter_by(team_id=match.team1_id).first()
-        team2_stats = Team_Stats.query.filter_by(team_id=match.team2_id).first()
-
-        if team1_stats:
-            team1_stats.games_count += 1
-            if score1 > score2:
-                team1_stats.games_win += 1
-            else:
-                team1_stats.games_lose += 1
-            # Sumar kills, assists y deaths del equipo 1
-            team1_stats.total_kills += sum(p['kills'] for p in team1Stats)
-            team1_stats.total_assists += sum(p['assists'] for p in team1Stats)
-            team1_stats.total_deaths += sum(p['deaths'] for p in team1Stats)
-            team1_stats.team_kda = team1_stats.calculate_team_kda()
-
-        if team2_stats:
-            team2_stats.games_count += 1
-            if score2 > score1:
-                team2_stats.games_win += 1
-            else:
-                team2_stats.games_lose += 1
-            # Sumar kills, assists y deaths del equipo 2
-            team2_stats.total_kills += sum(p['kills'] for p in team2Stats)
-            team2_stats.total_assists += sum(p['assists'] for p in team2Stats)
-            team2_stats.total_deaths += sum(p['deaths'] for p in team2Stats)
-            team2_stats.team_kda = team2_stats.calculate_team_kda()
-
-        # Si es el partido final y tiene scores, procesar el ganador
-        if isFinal and match.is_final and score1 is not None and score2 is not None:
-            tournament = Tournament.query.get(match.tournament_id)
-            if not tournament:
-                return jsonify({"error": "Torneo no encontrado"}), 404
-
-            # Determinar el equipo ganador
-            winning_team_id = match.team1_id if score1 > score2 else match.team2_id
-            winning_team = Team.query.get(winning_team_id)
-            
-            if winning_team:
-                # Añadir el premio al balance del equipo ganador
-                if winning_team.balance is None:
-                    winning_team.balance = 0
-                winning_team.balance += tournament.prize
-                
-                # Actualizar estadísticas del equipo
-                team_stats = Team_Stats.query.filter_by(team_id=winning_team_id).first()
-                if team_stats:
-                    team_stats.tournament_win += 1
-                    team_stats.tournament_count += 1
-
+        # Si es la final y está registrada, actualizar estadísticas igual que en advance_tournament_round
+        if isFinal and match.is_final and match.registered:
+            # Actualizar stats de jugadores equipo 1
+            if match.team1_stats_data:
+                for player_stats in match.team1_stats_data:
+                    user_stats = User_Stats.query.filter_by(user_id=player_stats['id']).first()
+                    if user_stats:
+                        user_stats.kills += player_stats.get('kills', 0)
+                        user_stats.assists += player_stats.get('assists', 0)
+                        user_stats.deaths += player_stats.get('deaths', 0)
+                        user_stats.kda = user_stats.calculate_kda()
+            # Actualizar stats de jugadores equipo 2
+            if match.team2_stats_data:
+                for player_stats in match.team2_stats_data:
+                    user_stats = User_Stats.query.filter_by(user_id=player_stats['id']).first()
+                    if user_stats:
+                        user_stats.kills += player_stats.get('kills', 0)
+                        user_stats.assists += player_stats.get('assists', 0)
+                        user_stats.deaths += player_stats.get('deaths', 0)
+                        user_stats.kda = user_stats.calculate_kda()
+            # Actualizar stats de equipos
+            team1_stats = Team_Stats.query.filter_by(team_id=match.team1_id).first()
+            team2_stats = Team_Stats.query.filter_by(team_id=match.team2_id).first()
+            if team1_stats and match.team1_stats_data:
+                team1_stats.games_count += 1
+                if match.score1 > match.score2:
+                    team1_stats.games_win += 1
+                else:
+                    team1_stats.games_lose += 1
+                team1_stats.total_kills += sum(p.get('kills', 0) for p in match.team1_stats_data)
+                team1_stats.total_assists += sum(p.get('assists', 0) for p in match.team1_stats_data)
+                team1_stats.total_deaths += sum(p.get('deaths', 0) for p in match.team1_stats_data)
+                team1_stats.team_kda = team1_stats.calculate_team_kda()
+            if team2_stats and match.team2_stats_data:
+                team2_stats.games_count += 1
+                if match.score2 > match.score1:
+                    team2_stats.games_win += 1
+                else:
+                    team2_stats.games_lose += 1
+                team2_stats.total_kills += sum(p.get('kills', 0) for p in match.team2_stats_data)
+                team2_stats.total_assists += sum(p.get('assists', 0) for p in match.team2_stats_data)
+                team2_stats.total_deaths += sum(p.get('deaths', 0) for p in match.team2_stats_data)
+                team2_stats.team_kda = team2_stats.calculate_team_kda()
             # Marcar el torneo como finalizado
-            tournament.finished = True
-
-            # Limpiar el torneo (remover equipos)
-            for team in tournament.teams:
-                team.tournament_id = None
-
+            tournament = Tournament.query.get(match.tournament_id)
+            if tournament:
+                tournament.finished = True
+                # Limpiar el torneo (remover equipos)
+                for team in tournament.teams:
+                    team.tournament_id = None
         db.session.commit()
-        return jsonify({"message": "Score y estadísticas actualizados exitosamente"}), 200
+        return jsonify({"message": "Score actualizado exitosamente"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400

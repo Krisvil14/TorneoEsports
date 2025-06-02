@@ -106,7 +106,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await resp.json();
                     localStorage.setItem("user", JSON.stringify(data)); 
                     setStore({ user: data });
-                    console.log("User data loaded from backend", data);
+                    
                 } catch (error) {
                     console.log("Error loading user from backend", error);
                 }

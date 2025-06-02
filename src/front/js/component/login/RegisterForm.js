@@ -17,7 +17,7 @@ export default function RegisterForm() {
 
   const handleDniChange = (e) => {
     const value = e.target.value;
-    // Solo permite números y asegura que sea positivo
+    
     if (/^\d*$/.test(value)) {
       setDni(value);
     }
@@ -25,7 +25,7 @@ export default function RegisterForm() {
 
   const handleAgeChange = (e) => {
     const value = e.target.value;
-    // Solo permite números positivos
+    
     if (/^\d*$/.test(value)) {
       setAge(value);
     }
@@ -34,7 +34,7 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validaciones adicionales
+
     if (parseInt(dni) <= 0) {
       toast.error('La cédula debe ser un número positivo');
       return;
@@ -74,7 +74,7 @@ export default function RegisterForm() {
           autoClose: 5000,
           isLoading: false,
         });
-        // Redirigir a la página de verificación con el ID del usuario
+
         navigate('/verify-email', { state: { user_id: data.user_id } });
       } else {
         toast.update(notification, {

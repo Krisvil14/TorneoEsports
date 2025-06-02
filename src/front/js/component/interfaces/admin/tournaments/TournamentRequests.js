@@ -127,48 +127,56 @@ function MatchEditModal({ match, onClose, onSave }) {
                     <span>
                       {p.first_name} {p.last_name}
                     </span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={p.kills}
-                      onChange={(e) =>
-                        handleStatChange(
-                          1,
-                          idx,
-                          'kills',
-                          Number(e.target.value)
-                        )
-                      }
-                      placeholder="Kills"
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      value={p.assists}
-                      onChange={(e) =>
-                        handleStatChange(
-                          1,
-                          idx,
-                          'assists',
-                          Number(e.target.value)
-                        )
-                      }
-                      placeholder="Assists"
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      value={p.deaths}
-                      onChange={(e) =>
-                        handleStatChange(
-                          1,
-                          idx,
-                          'deaths',
-                          Number(e.target.value)
-                        )
-                      }
-                      placeholder="Deaths"
-                    />
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Kills
+                        <input
+                          type="number"
+                          min={0}
+                          value={p.kills}
+                          onChange={(e) =>
+                            handleStatChange(
+                              1,
+                              idx,
+                              'kills',
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Asistencias
+                        <input
+                          type="number"
+                          min={0}
+                          value={p.assists}
+                          onChange={(e) =>
+                            handleStatChange(
+                              1,
+                              idx,
+                              'assists',
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Muertes
+                        <input
+                          type="number"
+                          min={0}
+                          value={p.deaths}
+                          onChange={(e) =>
+                            handleStatChange(
+                              1,
+                              idx,
+                              'deaths',
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </label>
+                    </div>
                   </div>
                 ))}
           </div>
@@ -196,48 +204,56 @@ function MatchEditModal({ match, onClose, onSave }) {
                     <span>
                       {p.first_name} {p.last_name}
                     </span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={p.kills}
-                      onChange={(e) =>
-                        handleStatChange(
-                          2,
-                          idx,
-                          'kills',
-                          Number(e.target.value)
-                        )
-                      }
-                      placeholder="Kills"
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      value={p.assists}
-                      onChange={(e) =>
-                        handleStatChange(
-                          2,
-                          idx,
-                          'assists',
-                          Number(e.target.value)
-                        )
-                      }
-                      placeholder="Assists"
-                    />
-                    <input
-                      type="number"
-                      min={0}
-                      value={p.deaths}
-                      onChange={(e) =>
-                        handleStatChange(
-                          2,
-                          idx,
-                          'deaths',
-                          Number(e.target.value)
-                        )
-                      }
-                      placeholder="Deaths"
-                    />
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Kills
+                        <input
+                          type="number"
+                          min={0}
+                          value={p.kills}
+                          onChange={(e) =>
+                            handleStatChange(
+                              2,
+                              idx,
+                              'kills',
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Asistencias
+                        <input
+                          type="number"
+                          min={0}
+                          value={p.assists}
+                          onChange={(e) =>
+                            handleStatChange(
+                              2,
+                              idx,
+                              'assists',
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </label>
+                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Muertes
+                        <input
+                          type="number"
+                          min={0}
+                          value={p.deaths}
+                          onChange={(e) =>
+                            handleStatChange(
+                              2,
+                              idx,
+                              'deaths',
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </label>
+                    </div>
                   </div>
                 ))}
           </div>

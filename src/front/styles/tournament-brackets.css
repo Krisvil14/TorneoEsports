@@ -446,3 +446,22 @@
   color: #222;
   font-size: 1em;
 }
+
+.bracket-simple-match.past-round {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.bracket-simple-match.past-round:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: #00e6e6;
+}
+
+.bracket-simple-match.past-round .bracket-team {
+  color: #666;
+}
+
+.bracket-simple-match.past-round .bracket-button-separator__span {
+  color: #666;
+}

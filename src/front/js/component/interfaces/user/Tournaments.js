@@ -202,9 +202,15 @@ export default function TournamentsInterface() {
           <h1>Gestión de Torneos</h1>
         </section>
         <div className="tournaments-content">
-          <div className="tournaments-table">
-            <Table columns={columns} data={filteredTournaments} />
-          </div>
+          {filteredTournaments.length > 0 ? (
+            <div className="tournaments-table">
+              <Table columns={columns} data={filteredTournaments} />
+            </div>
+          ) : (
+            <p className="tournaments-message">
+              No hay torneos activos asociados a tu juego ({teamGame})
+            </p>
+          )}
         </div>
       </div>
     );

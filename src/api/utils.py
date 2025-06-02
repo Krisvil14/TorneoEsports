@@ -186,12 +186,8 @@ def final_brackets(tournament_id, team1_id, team2_id, final_depth):
         losing_team_stats = Team_Stats.query.filter_by(team_id=losing_team_id).first()
         if losing_team_stats:
             losing_team_stats.tournament_loses += 1
-        
     
-    # Limpiar el torneo (remover equipos)
-    for team in tournament.teams:
-        team.tournament_id = None
-    
+    # NO limpiar el torneo aquí, solo cuando realmente finalice
     db.session.commit()
     return final_match
 
@@ -275,21 +271,69 @@ def approved_join_tournament(application):
 
 def advance_tournament_round(tournament_id, current_depth):
     """
-    Avanza al siguiente round del torneo
+    Avanza al siguiente round del torneo y actualiza estadísticas de jugadores y equipos
     """
     tournament = Tournament.query.get(tournament_id)
     if not tournament:
         raise APIException("Torneo no encontrado", status_code=404)
-    
+
+    # Actualizar estadísticas de los partidos registrados de la ronda actual
+    matches = Match.query.filter_by(tournament_id=tournament_id, depth=current_depth).all()
+    for match in matches:
+        if not match.registered:
+            continue
+        # Actualizar stats de jugadores equipo 1
+        if match.team1_stats_data:
+            for player_stats in match.team1_stats_data:
+                user_stats = User_Stats.query.filter_by(user_id=player_stats['id']).first()
+                if user_stats:
+                    user_stats.kills += player_stats.get('kills', 0)
+                    user_stats.assists += player_stats.get('assists', 0)
+                    user_stats.deaths += player_stats.get('deaths', 0)
+                    user_stats.kda = user_stats.calculate_kda()
+        # Actualizar stats de jugadores equipo 2
+        if match.team2_stats_data:
+            for player_stats in match.team2_stats_data:
+                user_stats = User_Stats.query.filter_by(user_id=player_stats['id']).first()
+                if user_stats:
+                    user_stats.kills += player_stats.get('kills', 0)
+                    user_stats.assists += player_stats.get('assists', 0)
+                    user_stats.deaths += player_stats.get('deaths', 0)
+                    user_stats.kda = user_stats.calculate_kda()
+        # Actualizar stats de equipos
+        team1_stats = Team_Stats.query.filter_by(team_id=match.team1_id).first()
+        team2_stats = Team_Stats.query.filter_by(team_id=match.team2_id).first()
+        if team1_stats and match.team1_stats_data:
+            team1_stats.games_count += 1
+            if match.score1 > match.score2:
+                team1_stats.games_win += 1
+            else:
+                team1_stats.games_lose += 1
+            team1_stats.total_kills += sum(p.get('kills', 0) for p in match.team1_stats_data)
+            team1_stats.total_assists += sum(p.get('assists', 0) for p in match.team1_stats_data)
+            team1_stats.total_deaths += sum(p.get('deaths', 0) for p in match.team1_stats_data)
+            team1_stats.team_kda = team1_stats.calculate_team_kda()
+        if team2_stats and match.team2_stats_data:
+            team2_stats.games_count += 1
+            if match.score2 > match.score1:
+                team2_stats.games_win += 1
+            else:
+                team2_stats.games_lose += 1
+            team2_stats.total_kills += sum(p.get('kills', 0) for p in match.team2_stats_data)
+            team2_stats.total_assists += sum(p.get('assists', 0) for p in match.team2_stats_data)
+            team2_stats.total_deaths += sum(p.get('deaths', 0) for p in match.team2_stats_data)
+            team2_stats.team_kda = team2_stats.calculate_team_kda()
+    db.session.commit()
+
     # Obtener los ganadores de la ronda actual
     winners = get_round_winners(tournament_id, current_depth)
-    
+
     # Si solo quedan 2 equipos, crear la final con depth+1
     if len(winners) == 2:
         final_brackets(tournament_id, winners[0], winners[1], current_depth + 1)
         db.session.commit()
         return
-    
+
     # Si hay más de 2 equipos, crear la siguiente ronda con depth+1
     create_brackets(winners, tournament_id, current_depth + 1)
     db.session.commit()

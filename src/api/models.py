@@ -2,7 +2,7 @@ import enum
 import uuid
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import CheckConstraint
-from sqlalchemy.dialects.postgresql import ENUM, UUID
+from sqlalchemy.dialects.postgresql import ENUM, UUID, JSON
 from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
@@ -140,7 +140,8 @@ class Tournament(db.Model):
             "game": self.game.name,
             "cost": self.cost,
             "started": self.started,
-            "finished": self.finished
+            "finished": self.finished,
+            "prize": self.prize
         }
 
 class Team(db.Model):
@@ -267,6 +268,8 @@ class Match(db.Model):
     is_final = db.Column(db.Boolean, default=False, nullable=True)
     registered = db.Column(db.Boolean, default=False, nullable=True)
     prize = db.Column(db.Integer, nullable=True)
+    team1_stats_data = db.Column(JSON, nullable=True)
+    team2_stats_data = db.Column(JSON, nullable=True)
 
     # Relationships
     tournament = relationship("Tournament")

@@ -104,46 +104,54 @@ export default function TournamentBrackets({ tournamentId, onMatchClick }) {
 
   return (
     <div className="bracket-simple-wrapper">
-      {rounds.map((round, rIdx) => (
-        <div className="bracket-simple-round" key={rIdx}>
-          <div className="bracket-simple-title">
-            {rIdx === rounds.length - 1 ? 'Ronda Final' : `Ronda ${rIdx + 1}`}
+      {rounds.map((round, rIdx) => {
+        const isCurrentRound = rIdx === currentDepth;
+        const isPastRound = rIdx < currentDepth;
+        return (
+          <div className="bracket-simple-round" key={rIdx}>
+            <div className="bracket-simple-title">
+              {round[0].is_final ? 'Ronda Final' : `Ronda ${round[0].depth + 1}`}
+            </div>
+            {round.map((match, mIdx) => {
+              let matchClass = 'bracket-simple-match d-flex flex-column';
+              if (
+                rIdx < rounds.length - 1 &&
+                round.length > 2 &&
+                mIdx !== 0 &&
+                mIdx !== round.length - 1
+              ) {
+                matchClass += ' connect-vertical';
+              }
+              if (isPastRound) {
+                matchClass += ' past-round';
+              }
+              const isFinalAndRegistered = match.is_final && match.registered;
+              return (
+                <button
+                  className={matchClass}
+                  key={match.id}
+                  onClick={
+                    onMatchClick && !isPastRound && !isFinalAndRegistered
+                      ? () => onMatchClick(match, setRefresh)
+                      : undefined
+                  }
+                  disabled={isPastRound || isFinalAndRegistered}
+                >
+                  <span className="bracket-team bracket-team-left">
+                    {match.team1 ? match.team1.name : 'TBD'}
+                  </span>
+                  <div className="w-100 bracket-button-separator">
+                    <span className="bracket-button-separator__span">vs</span>
+                  </div>
+                  <span className="bracket-team bracket-team-right">
+                    {match.team2 ? match.team2.name : 'TBD'}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          {round.map((match, mIdx) => {
-            // Agregar la clase connect-vertical a los partidos intermedios (no primero ni último)
-            let matchClass = 'bracket-simple-match d-flex flex-column';
-            if (
-              rIdx < rounds.length - 1 &&
-              round.length > 2 &&
-              mIdx !== 0 &&
-              mIdx !== round.length - 1
-            ) {
-              matchClass += ' connect-vertical';
-            }
-            return (
-              <button
-                className={matchClass}
-                key={match.id}
-                onClick={
-                  onMatchClick
-                    ? () => onMatchClick(match, setRefresh)
-                    : undefined
-                }
-              >
-                <span className="bracket-team bracket-team-left">
-                  {match.team1 ? match.team1.name : 'TBD'}
-                </span>
-                <div className="w-100 bracket-button-separator">
-                  <span className="bracket-button-separator__span">vs</span>
-                </div>
-                <span className="bracket-team bracket-team-right">
-                  {match.team2 ? match.team2.name : 'TBD'}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      ))}
+        );
+      })}
       {/* Columna extra para el ganador */}
       {winner && (
         <div className="bracket-simple-round">

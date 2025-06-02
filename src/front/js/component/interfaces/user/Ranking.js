@@ -11,13 +11,11 @@ export default function RankingInterface() {
     });
     const [filters, setFilters] = useState({
         teamId: '',      // filtro por ID de equipo
-        game: ''         // filtro por juego
     });
 
     const resetFilters = () => {
         setFilters({
             teamId: '',
-            game: ''
         });
         setSortConfig({
             key: 'kda',
@@ -178,23 +176,7 @@ export default function RankingInterface() {
                             ))}
                         </select>
                     </div>
-                    <div className="filter-group">
-                        <label htmlFor="game">Filtrar por Juego:</label>
-                        <select
-                            id="game"
-                            value={filters.game}
-                            onChange={(e) => setFilters({...filters, game: e.target.value})}
-                            className="form-control"
-                        >
-                            <option value="">Todos los juegos</option>
-                            <option value="League of Legends">League of Legends</option>
-                            <option value="Valorant">Valorant</option>
-                            <option value="csgo">Counter Strike: Global Offensive</option>
-                            <option value="dota_2">Dota 2</option>
-                            <option value="overwatch">Overwatch</option>
-                            <option value="apex_legends">Apex Legends</option>
-                        </select>
-                    </div>
+                    
                 </div>
                 
                 <div className="users-table">

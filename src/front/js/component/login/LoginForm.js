@@ -41,7 +41,7 @@ export default function LoginForm() {
         navigate('/inicio');
       } else {
         if (json.error === "Por favor, verifica tu email antes de iniciar sesión.") {
-          // Obtener el ID del usuario por email
+         
           const userResponse = await fetch(process.env.BACKEND_URL + '/api/users');
           const users = await userResponse.json();
           const user = users.find(u => u.email === email);

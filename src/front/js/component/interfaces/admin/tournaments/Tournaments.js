@@ -11,14 +11,18 @@ export default function TournamentsAdminInterface() {
     });
     const [filters, setFilters] = useState({
         name: '',
-        game: ''
+        game: '',
+        started: '',
+        finished: ''
     });
     const navigate = useNavigate();
 
     const resetFilters = () => {
         setFilters({
             name: '',
-            game: ''
+            game: '',
+            started: '',
+            finished: ''
         });
         setSortConfig({
             key: 'name',
@@ -72,6 +76,22 @@ export default function TournamentsAdminInterface() {
             );
         }
 
+        // Aplicar filtro por estado de inicio
+        if (filters.started !== '') {
+            const startedValue = filters.started === 'true';
+            filteredTournaments = filteredTournaments.filter(tournament => 
+                tournament.started === startedValue
+            );
+        }
+
+        // Aplicar filtro por estado de finalización
+        if (filters.finished !== '') {
+            const finishedValue = filters.finished === 'true';
+            filteredTournaments = filteredTournaments.filter(tournament => 
+                tournament.finished === finishedValue
+            );
+        }
+
         // Aplicar ordenamiento
         if (sortConfig.key) {
             filteredTournaments.sort((a, b) => {
@@ -101,16 +121,20 @@ export default function TournamentsAdminInterface() {
             Cell: ({ row }) => `${row.num_teams}/${row.num_max_teams}`
         },
         {
+            header: 'Iniciado',
+            accessor: 'started',
+            Cell: ({ value }) => value ? '✅' : '❌'
+        },
+        {
+            header: 'Finalizado',
+            accessor: 'finished',
+            Cell: ({ value }) => value ? '✅' : '❌'
+        },
+        {
             header: 'Acciones',
             accessor: 'id',
             Cell: ({ value }) => (
                 <div className="action-buttons">
-                    <button
-                        className="action-button"
-                        onClick={() => navigate(`/admin/addteam/${value}`)}
-                    >
-                        Añadir Equipo
-                    </button>
                     <button
                         className="action-button"
                         onClick={() => navigate(`/admin/tournament-requests/${value}`)}
@@ -194,6 +218,32 @@ export default function TournamentsAdminInterface() {
                             <option value="dota_2">Dota 2</option>
                             <option value="overwatch">Overwatch</option>
                             <option value="apex_legends">Apex Legends</option>
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="startedFilter">Filtrar por Estado de Inicio:</label>
+                        <select
+                            id="startedFilter"
+                            value={filters.started}
+                            onChange={(e) => setFilters({...filters, started: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos</option>
+                            <option value="true">Iniciados</option>
+                            <option value="false">No Iniciados</option>
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="finishedFilter">Filtrar por Estado de Finalización:</label>
+                        <select
+                            id="finishedFilter"
+                            value={filters.finished}
+                            onChange={(e) => setFilters({...filters, finished: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos</option>
+                            <option value="true">Finalizados</option>
+                            <option value="false">No Finalizados</option>
                         </select>
                     </div>
                 </div>
