@@ -140,7 +140,7 @@ export const Navbar = () => {
             )}
             {/* Acciones: balance y cerrar sesión, alineados a la derecha en escritorio y al final en móvil */}
             {store.isAuthenticated && (
-              <Container className="navbar-actions ms-auto d-flex align-items-center flex-column flex-lg-row w-100">
+              <Container className="navbar-actions ms-auto d-flex align-items-center flex-column flex-lg-row w-100 w-lg-auto">
                 {store.user && store.user.team_id && teamInfo && (
                   <div className="team-balance me-3">
                     <div className="balance-content">

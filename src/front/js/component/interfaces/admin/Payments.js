@@ -181,7 +181,7 @@ export default function AdminPaymentsInterface() {
                             step="0.01"
                             value={newRate}
                             onChange={(e) => setNewRate(e.target.value)}
-                            placeholder="Nueva tasa de cambio"
+                            placeholder="Nueva tasa"
                             className="gaming-form-input"
                         />
                         <button
