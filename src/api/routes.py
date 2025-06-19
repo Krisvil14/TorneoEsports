@@ -759,109 +759,6 @@ def check_team_request(team_id):
         return jsonify({"error": str(e)}), 400
 
 @api.route('/team-requests', methods=['POST'])
-def create_team_request():
-    try:
-        data = request.get_json()
-        user_id = data.get('user_id')
-        team_id = data.get('team_id')
-
-        if not user_id or not team_id:
-            return jsonify({"error": "User ID and Team ID are required"}), 400
-
-        # Verificar si ya existe una solicitud activa y pendiente
-        existing_request = Application.query.filter_by(
-            userID=user_id,
-            teamID=team_id,
-            action=ActionEnum.join_team,
-            active=True,
-            status=StatusEnum.pending
-        ).first()
-
-        if existing_request:
-            return jsonify({"error": "Ya tienes una solicitud pendiente para este equipo"}), 400
-
-        # Crear nueva solicitud
-        new_request = Application(
-            userID=user_id,
-            teamID=team_id,
-            action=ActionEnum.join_team,
-            status=StatusEnum.pending,
-            active=True
-        )
-
-        db.session.add(new_request)
-        db.session.commit()
-
-        return jsonify({"message": "Solicitud creada exitosamente"}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-@api.route('/teams/<int:team_id>/remove_player', methods=['POST'])
-def remove_player_from_team(team_id):
-    try:
-        data = request.get_json()
-        user_id = data.get('user_id')
-        requesting_user_id = data.get('requesting_user_id')
-        new_leader_id = data.get('new_leader_id')
-
-        if not user_id or not requesting_user_id:
-            return jsonify({"error": "Se requiere el ID del usuario y del solicitante"}), 400
-
-        # Obtener el equipo y el usuario
-        team = Team.query.get(team_id)
-        if not team:
-            return jsonify({"error": "Equipo no encontrado"}), 404
-
-        user_to_remove = User.query.get(user_id)
-        if not user_to_remove:
-            return jsonify({"error": "Usuario no encontrado"}), 404
-
-        # Verificar que el usuario esté en el equipo
-        if user_to_remove.team_id != team_id:
-            return jsonify({"error": "El usuario no pertenece a este equipo"}), 400
-
-        # Verificar que el usuario que hace la petición sea admin o líder del equipo
-        requesting_user = User.query.get(requesting_user_id)
-        if not requesting_user:
-            return jsonify({"error": "Usuario no encontrado"}), 404
-            
-        if requesting_user.role != RoleEnum.admin and not requesting_user.is_leader:
-            return jsonify({"error": "No tienes permiso para eliminar jugadores de este equipo"}), 403
-
-        # Si el usuario a eliminar es el líder y hay más miembros, se requiere un nuevo líder
-        if user_to_remove.is_leader:
-            remaining_members = User.query.filter(User.team_id == team_id, User.id != user_id).all()
-            if remaining_members and not new_leader_id:
-                return jsonify({"error": "Se requiere designar un nuevo líder"}), 400
-
-            if new_leader_id:
-                new_leader = User.query.get(new_leader_id)
-                if not new_leader or new_leader.team_id != team_id:
-                    return jsonify({"error": "El nuevo líder debe ser un miembro del equipo"}), 400
-                new_leader.is_leader = True
-
-        # Si es el último miembro, desactivar el equipo
-        remaining_members = User.query.filter(User.team_id == team_id, User.id != user_id).all()
-        if not remaining_members:
-            team.is_active = False
-
-        # Eliminar al usuario del equipo
-        user_to_remove.team_id = None
-        user_to_remove.is_in_team = False
-        user_to_remove.is_leader = False
-
-        db.session.commit()
-
-        return jsonify({
-            "message": "Jugador eliminado del equipo exitosamente",
-            "team_disabled": not remaining_members
-        }), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 400
-
-@api.route('/tournament-requests', methods=['POST'])
 def create_tournament_request():
     try:
         data = request.get_json()
@@ -888,6 +785,19 @@ def create_tournament_request():
         # Verificar si el juego del equipo coincide con el del torneo
         if team.game != tournament.game:
             return jsonify({"error": "El juego del equipo no coincide con el del torneo"}), 400
+
+        # Verificar que el equipo esté activo
+        if not team.is_active:
+            return jsonify({"error": "El equipo no está activo y no puede unirse al torneo"}), 400
+
+        # Verificar que el equipo esté completo (tenga 5 jugadores)
+        team_members_count = len(team.members)
+        if team_members_count < team.max_players:
+            return jsonify({"error": f"El equipo no está completo. Tiene {team_members_count} jugadores de {team.max_players} requeridos"}), 400
+
+        # Verificar que el equipo tenga suficiente balance
+        if team.balance is None or team.balance < tournament.cost:
+            return jsonify({"error": "El equipo no tiene suficiente balance para unirse al torneo"}), 400
 
         # Verificar si ya existe una solicitud activa y pendiente
         existing_request = Application.query.filter_by(

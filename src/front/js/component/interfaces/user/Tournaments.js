@@ -13,6 +13,8 @@ export default function TournamentsInterface() {
   const [teamGame, setTeamGame] = useState(null);
   const [teamId, setTeamId] = useState(null);
   const [teamBalance, setTeamBalance] = useState(0);
+  const [teamMembersCount, setTeamMembersCount] = useState(0);
+  const [teamMaxPlayers, setTeamMaxPlayers] = useState(5);
   const { store } = useContext(Context);
   const user = store.user;
 
@@ -40,12 +42,14 @@ export default function TournamentsInterface() {
           setTeamGame(teamData.game);
           setTeamId(teamData.id);
           setTeamBalance(teamData.balance || 0);
+          setTeamMaxPlayers(teamData.max_players || 5);
 
           // Obtener información de los miembros del equipo
           const membersResponse = await fetch(
             process.env.BACKEND_URL + `/api/teams/${user.team_id}/users`
           );
           const membersData = await membersResponse.json();
+          setTeamMembersCount(membersData.length);
 
           // Verificar si el usuario es líder
           const currentUserInTeam = membersData.find(
@@ -131,13 +135,23 @@ export default function TournamentsInterface() {
       accessor: 'actions',
       Cell: ({ row }) => {
         if (isTeamLeader && !teamTournament) {
-          const canJoin = teamBalance >= row.cost;
+          const hasEnoughBalance = teamBalance >= row.cost;
+          const isTeamComplete = teamMembersCount >= teamMaxPlayers;
+          const canJoin = hasEnoughBalance && isTeamComplete;
+          
+          let tooltipMessage = '';
+          if (!hasEnoughBalance) {
+            tooltipMessage = 'Saldo insuficiente para unirse al torneo';
+          } else if (!isTeamComplete) {
+            tooltipMessage = `Tu equipo debe estar completo (${teamMembersCount}/${teamMaxPlayers} jugadores)`;
+          }
+          
           return (
             <button
               onClick={() => handleJoinTournament(row.id)}
               className={`join-tournament-button ${!canJoin ? 'disabled' : ''}`}
               disabled={!canJoin}
-              title={!canJoin ? 'Saldo insuficiente para unirse al torneo' : ''}
+              title={tooltipMessage}
             >
               Solicitar Unirse
             </button>

@@ -25,7 +25,7 @@ const LoadingSpinner = () => {
                     color: '#666',
                     fontSize: '16px',
                     margin: 0
-                }}>Verificando sesión...</p>
+                }}>Cargando...</p>
                 <style>{`
                     @keyframes spin {
                         0% { transform: rotate(0deg); }
