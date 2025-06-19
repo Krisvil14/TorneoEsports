@@ -951,6 +951,11 @@ def get_tournament_applications(tournament_id):
             if team:
                 app_data = app.serialize()
                 app_data['team_name'] = team.name
+                app_data['team_players_count'] = len(team.members)
+                app_data['team_max_players'] = team.max_players
+                app_data['team_is_complete'] = len(team.members) >= team.max_players
+                app_data['team_is_active'] = team.is_active
+                app_data['team_can_join'] = team.is_active and len(team.members) >= team.max_players
                 applications_data.append(app_data)
 
         return jsonify(applications_data), 200

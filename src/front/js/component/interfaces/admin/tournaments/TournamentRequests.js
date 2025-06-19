@@ -420,26 +420,71 @@ export default function TournamentRequests() {
 
   const applicationsColumns = [
     { header: 'Equipo Solicitante', accessor: 'team_name' },
+    { 
+      header: 'Estado', 
+      accessor: 'team_is_active',
+      Cell: ({ row }) => {
+        const isActive = row.team_is_active;
+        return (
+          <span style={{ 
+            color: isActive ? '#00e6e6' : '#ff6b6b',
+            fontWeight: isActive ? 'bold' : 'normal'
+          }}>
+            {isActive ? 'Activo ✅' : 'Inactivo ❌'}
+          </span>
+        );
+      }
+    },
+    { 
+      header: 'Jugadores', 
+      accessor: 'team_players_count',
+      Cell: ({ row }) => {
+        const current = row.team_players_count || 0;
+        const max = row.team_max_players || 5;
+        const isComplete = row.team_is_complete;
+        return (
+          <span style={{ 
+            color: isComplete ? '#00e6e6' : '#ff6b6b',
+            fontWeight: isComplete ? 'bold' : 'normal'
+          }}>
+            {current}/{max} {isComplete ? '✅' : '❌'}
+          </span>
+        );
+      }
+    },
     { header: 'Fecha de Solicitud', accessor: 'created_at' },
     {
       header: 'Acciones',
       accessor: 'id',
-      Cell: ({ row }) => (
-        <div className="action-buttons">
-          <button
-            className="action-button"
-            onClick={() => handleApplication(row.id, true)}
-          >
-            Aceptar
-          </button>
-          <button
-            className="action-button secondary"
-            onClick={() => handleApplication(row.id, false)}
-          >
-            Rechazar
-          </button>
-        </div>
-      ),
+      Cell: ({ row }) => {
+        const canJoin = row.team_can_join;
+        let tooltipMessage = '';
+        
+        if (!row.team_is_active) {
+          tooltipMessage = 'El equipo no está activo';
+        } else if (!row.team_is_complete) {
+          tooltipMessage = 'El equipo no está completo';
+        }
+        
+        return (
+          <div className="action-buttons">
+            <button
+              className="action-button"
+              onClick={() => handleApplication(row.id, true)}
+              disabled={!canJoin}
+              title={tooltipMessage}
+            >
+              Aceptar
+            </button>
+            <button
+              className="action-button secondary"
+              onClick={() => handleApplication(row.id, false)}
+            >
+              Rechazar
+            </button>
+          </div>
+        );
+      },
     },
   ];
 

@@ -200,6 +200,14 @@ def approved_join_tournament(application):
         if not team or not tournament:
             raise APIException("Equipo o torneo no encontrado", status_code=404)
 
+        # Verificar que el equipo esté activo
+        if not team.is_active:
+            raise APIException("El equipo no está activo y no puede unirse al torneo", status_code=400)
+
+        # Verificar que el equipo esté completo (tenga 5 jugadores)
+        team_members_count = len(team.members)
+        if team_members_count < team.max_players:
+            raise APIException(f"El equipo no está completo. Tiene {team_members_count} jugadores de {team.max_players} requeridos", status_code=400)
         
         # Verificar que el equipo tenga suficiente balance
         if team.balance is None or team.balance < tournament.cost:
