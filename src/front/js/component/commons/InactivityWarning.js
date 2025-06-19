@@ -147,38 +147,6 @@ const InactivityWarning = () => {
                         transition: 'width 1s linear'
                     }}></div>
                 </div>
-                <button 
-                    onClick={hideWarning}
-                    style={{
-                        marginTop: '1rem',
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#27ae60',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer',
-                        marginRight: '0.5rem'
-                    }}
-                >
-                    Mantener Sesión
-                </button>
-                <button 
-                    onClick={() => {
-                        console.log("InactivityWarning: Botón de prueba clickeado");
-                        hideWarning();
-                    }}
-                    style={{
-                        marginTop: '1rem',
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#3498db',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '5px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    Probar Extensión
-                </button>
             </div>
         </div>
     );
