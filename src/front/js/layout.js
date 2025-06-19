@@ -41,6 +41,8 @@ import LoginForm from './component/login/LoginForm';
 import RegisterForm from './component/login/RegisterForm';
 import ResetPasswordRequest from './component/login/ResetPasswordRequest';
 import ResetPasswordVerify from './component/login/ResetPasswordVerify';
+import InactivityWarning from './component/commons/InactivityWarning';
+
 
 // Crear tu primer componente
 const Layout = () => {
@@ -52,6 +54,7 @@ const Layout = () => {
   return (
     <div>
       <ToastContainer />
+      <InactivityWarning />
       <BrowserRouter basename={basename}>
         <ScrollToTop>
           <Routes>

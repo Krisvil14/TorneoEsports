@@ -153,7 +153,7 @@ export const Navbar = () => {
                   </div>
                 )}
                 <button onClick={handleLogout} className="btn-logout">
-                  <Text style={{ fontSize: '1.2rem', fontFamily: 'Impact, sans-serif', color: 'white' }}>Cerrar Sesión</Text>
+                  Cerrar Sesión
                 </button>
               </Container>
             )}
