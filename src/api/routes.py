@@ -476,6 +476,12 @@ def get_teams():
     filtered_teams = [team for team in teams if len(team.members) < 5]
     return jsonify([team.serialize() for team in filtered_teams]), 200
 
+@api.route('/admin/teams', methods=['GET'])
+def get_all_teams():
+    """Obtener todos los equipos para el panel de administración"""
+    teams = Team.query.all()
+    return jsonify([team.serialize() for team in teams]), 200
+
 @api.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()

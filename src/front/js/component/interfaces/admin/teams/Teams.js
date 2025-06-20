@@ -29,7 +29,7 @@ export default function TeamsAdminInterface() {
         const fetchData = async () => {
             try {
                 // Cargar equipos
-                const teamsResponse = await fetch(process.env.BACKEND_URL + '/api/teams');
+                const teamsResponse = await fetch(process.env.BACKEND_URL + '/api/admin/teams');
                 if (teamsResponse.ok) {
                     const teamsData = await teamsResponse.json();
                     setTeams(teamsData);
