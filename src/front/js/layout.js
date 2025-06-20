@@ -42,6 +42,7 @@ import RegisterForm from './component/login/RegisterForm';
 import ResetPasswordRequest from './component/login/ResetPasswordRequest';
 import ResetPasswordVerify from './component/login/ResetPasswordVerify';
 import InactivityWarning from './component/commons/InactivityWarning';
+import AdminCreateTeamPage from './pages/admin/createTeam';
 
 
 // Crear tu primer componente
@@ -81,7 +82,7 @@ const Layout = () => {
             <Route element={<Protected> <Navbar /><BuscaEquipo /> </Protected>}path="/busca-equipo" />
             <Route element={<Protected> <Navbar /><RankingInterface /> </Protected>}path="/ranking" />
 
-            <Route element={<Protected requiredRole="admin"> <Navbar /><RegTeamsForm /> </Protected>}path="/admin/Regteams" />
+            <Route element={<Protected requiredRole="admin"> <Navbar /><AdminCreateTeamPage /> </Protected>}path="/admin/create-team" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><CreateTournamentForm /> </Protected>}path="/admin/create_tournament" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><AddTeamToTournament /> </Protected>}path="/admin/addteam/:tournament_id" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><AddPlayerToTeam /> </Protected>}path="/admin/add_player_to_team/:user_id" />

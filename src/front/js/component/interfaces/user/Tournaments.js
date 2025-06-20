@@ -117,7 +117,20 @@ export default function TournamentsInterface() {
 
   const columns = [
     { header: 'Nombre', accessor: 'name' },
-    { header: 'Fecha de Inicio', accessor: 'date_start' },
+    { 
+        header: 'Fecha de Inicio', 
+        accessor: 'date_start',
+        Cell: ({ value }) => {
+            if (!value) return '';
+            try {
+                const datePart = value.split('T')[0];
+                const [year, month, day] = datePart.split('-');
+                return `${day}/${month}/${year}`;
+            } catch (e) {
+                return value;
+            }
+        }
+    },
     { header: 'Juego', accessor: 'game' },
     { header: 'Costo ($)', accessor: 'cost' },
     {header: 'Premio ($)', accessor: 'prize'},

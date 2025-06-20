@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
-from api.models import db, User, Team, Tournament, GameEnum, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, BankEnum, User_Stats, Team_Stats, Match, ExchangeRate
+from api.models import db, User, Team, Tournament, Game, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, Bank, User_Stats, Team_Stats, Match, ExchangeRate
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment, advance_tournament_round
 from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user
 from flask_cors import CORS
@@ -226,10 +226,15 @@ def register_team():
      if not name or not game:
          return jsonify({"error": "Faltan datos"}), 400
 
+     # Buscar el juego por nombre
+     game_obj = Game.query.filter_by(name=game).first()
+     if not game_obj:
+         return jsonify({"error": f"Juego '{game}' no encontrado"}), 400
+
      try:
          new_team = Team(
              name=name,
-             game=GameEnum[game],
+             game_id=game_obj.id,
              is_active=True,
          )
          db.session.add(new_team)
@@ -263,10 +268,15 @@ def register_team_admin():
      if not name or not game:
          return jsonify({"error": "Faltan datos"}), 400
 
+     # Buscar el juego por nombre
+     game_obj = Game.query.filter_by(name=game).first()
+     if not game_obj:
+         return jsonify({"error": f"Juego '{game}' no encontrado"}), 400
+
      try:
          new_team = Team(
              name=name,
-             game=GameEnum[game],
+             game_id=game_obj.id,
              is_active=True,
          )
          db.session.add(new_team)
@@ -324,33 +334,37 @@ def create_tournament():
 
     try:
         # Convertir el juego al enum correspondiente
-        game_enum = GameEnum[game.lower()]
-    except KeyError:
-        return jsonify({"error": f"Juego inválido. Los juegos permitidos son: {', '.join([g.name for g in GameEnum])}"}), 400
+        game_obj = Game.query.filter_by(name=game).first()
+        if not game_obj:
+            games = Game.query.all()
+            game_names = [g.name for g in games]
+            return jsonify({"error": f"Juego inválido. Los juegos permitidos son: {', '.join(game_names)}"}), 400
 
-    try:
-        # Verificar que el número de equipos sea válido antes de crear el torneo
-        if num_max_teams not in valid_team_numbers:
-            return jsonify({
-                "error": f"El número de equipos debe ser uno de los siguientes: {', '.join(map(str, valid_team_numbers))}"
-            }), 400
+        try:
+            # Verificar que el número de equipos sea válido antes de crear el torneo
+            if num_max_teams not in valid_team_numbers:
+                return jsonify({
+                    "error": f"El número de equipos debe ser uno de los siguientes: {', '.join(map(str, valid_team_numbers))}"
+                }), 400
 
-        new_tournament = Tournament(
-            name=name,
-            date_start=date_start,
-            num_max_teams=num_max_teams,
-            game=game_enum,
-            cost=cost,
-            prize=prize
-        )
-        db.session.add(new_tournament)
-        db.session.commit()
+            new_tournament = Tournament(
+                name=name,
+                date_start=date_start,
+                num_max_teams=num_max_teams,
+                game_id=game_obj.id,
+                cost=cost,
+                prize=prize
+            )
+            db.session.add(new_tournament)
+            db.session.commit()
 
-        response = jsonify({"message": "Torneo creado exitosamente"})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response, 201
+            response = jsonify({"message": "Torneo creado exitosamente"})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 400
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": str(e)}), 400
 
 @api.route('/admin/add_player_to_team/<int:user_id>', methods=['POST'])
@@ -1016,10 +1030,11 @@ def create_payment_request():
             return jsonify({"error": f"Faltan datos requeridos: {', '.join(missing_fields)}"}), 400
 
         # Convertir el nombre del banco al formato correcto
-        try:
-            bank_enum = BankEnum[bank]
-        except KeyError:
-            return jsonify({"error": f"Banco inválido: {bank}"}), 400
+        bank_obj = Bank.query.filter_by(name=bank).first()
+        if not bank_obj:
+            banks = Bank.query.all()
+            bank_names = [b.name for b in banks]
+            return jsonify({"error": f"Banco inválido. Los bancos permitidos son: {', '.join(bank_names)}"}), 400
 
         # Primero crear la solicitud
         new_request = Application(
@@ -1038,7 +1053,7 @@ def create_payment_request():
             application_id=new_request.id,
             type=PaymentTypeEnum[payment_type],
             amount=amount,
-            bank=bank_enum,
+            bank_id=bank_obj.id,
             reference=reference,
             cedula=cedula,
             phone_number=phone_number
@@ -1582,3 +1597,159 @@ def remove_player_from_team(team_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
+
+# Endpoints para gestionar juegos
+@api.route('/games', methods=['GET'])
+def get_games():
+    """Obtener todos los juegos disponibles"""
+    try:
+        games = Game.query.all()
+        return jsonify([game.serialize() for game in games]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/games', methods=['POST'])
+def create_game():
+    """Crear un nuevo juego (solo admin)"""
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        
+        if not name:
+            return jsonify({"error": "El nombre del juego es requerido"}), 400
+        
+        # Verificar si el juego ya existe
+        existing_game = Game.query.filter_by(name=name).first()
+        if existing_game:
+            return jsonify({"error": "El juego ya existe"}), 400
+        
+        new_game = Game(name=name)
+        db.session.add(new_game)
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Juego creado exitosamente",
+            "game": new_game.serialize()
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/games/<int:game_id>', methods=['PUT'])
+def update_game(game_id):
+    """Actualizar un juego (solo admin)"""
+    try:
+        game = Game.query.get(game_id)
+        if not game:
+            return jsonify({"error": "Juego no encontrado"}), 404
+        
+        data = request.get_json()
+        name = data.get('name')
+        
+        if not name:
+            return jsonify({"error": "El nombre del juego es requerido"}), 400
+        
+        # Verificar si el nuevo nombre ya existe en otro juego
+        existing_game = Game.query.filter(Game.name == name, Game.id != game_id).first()
+        if existing_game:
+            return jsonify({"error": "Ya existe un juego con ese nombre"}), 400
+        
+        game.name = name
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Juego actualizado exitosamente",
+            "game": game.serialize()
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/games/<int:game_id>', methods=['DELETE'])
+def delete_game(game_id):
+    """Eliminar un juego (solo admin)"""
+    try:
+        game = Game.query.get(game_id)
+        if not game:
+            return jsonify({"error": "Juego no encontrado"}), 404
+        
+        # Verificar si hay equipos o torneos usando este juego
+        teams_count = Team.query.filter_by(game_id=game_id).count()
+        tournaments_count = Tournament.query.filter_by(game_id=game_id).count()
+        
+        if teams_count > 0 or tournaments_count > 0:
+            return jsonify({
+                "error": f"No se puede eliminar el juego porque está siendo usado por {teams_count} equipos y {tournaments_count} torneos"
+            }), 400
+        
+        db.session.delete(game)
+        db.session.commit()
+        
+        return jsonify({"message": "Juego eliminado exitosamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
+# Endpoints para gestionar bancos
+@api.route('/banks', methods=['GET'])
+def get_banks():
+    """Obtener todos los bancos disponibles"""
+    try:
+        banks = Bank.query.all()
+        return jsonify([bank.serialize() for bank in banks]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/admin/banks', methods=['POST'])
+def create_bank():
+    """Crear un nuevo banco (solo admin)"""
+    data = request.get_json()
+    name = data.get('name')
+    
+    if not name:
+        return jsonify({"error": "El nombre del banco es requerido"}), 400
+    
+    if Bank.query.filter_by(name=name).first():
+        return jsonify({"error": "El banco ya existe"}), 400
+    
+    new_bank = Bank(name=name)
+    db.session.add(new_bank)
+    db.session.commit()
+    
+    return jsonify(new_bank.serialize()), 201
+
+@api.route('/admin/banks/<int:bank_id>', methods=['PUT'])
+def update_bank(bank_id):
+    """Actualizar un banco (solo admin)"""
+    bank = Bank.query.get(bank_id)
+    if not bank:
+        return jsonify({"error": "Banco no encontrado"}), 404
+        
+    data = request.get_json()
+    name = data.get('name')
+    
+    if not name:
+        return jsonify({"error": "El nombre del banco es requerido"}), 400
+    
+    if Bank.query.filter(Bank.name == name, Bank.id != bank_id).first():
+        return jsonify({"error": "Ya existe un banco con ese nombre"}), 400
+    
+    bank.name = name
+    db.session.commit()
+    
+    return jsonify(bank.serialize()), 200
+
+@api.route('/admin/banks/<int:bank_id>', methods=['DELETE'])
+def delete_bank(bank_id):
+    """Eliminar un banco (solo admin)"""
+    bank = Bank.query.get(bank_id)
+    if not bank:
+        return jsonify({"error": "Banco no encontrado"}), 404
+    
+    if Payment.query.filter_by(bank_id=bank_id).count() > 0:
+        return jsonify({"error": "No se puede eliminar el banco porque está siendo usado en pagos"}), 400
+    
+    db.session.delete(bank)
+    db.session.commit()
+    
+    return jsonify({"message": "Banco eliminado exitosamente"}), 200

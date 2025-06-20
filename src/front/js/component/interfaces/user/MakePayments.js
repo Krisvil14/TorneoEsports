@@ -19,17 +19,8 @@ export default function MakePaymentsInterface() {
     const [hasRequested, setHasRequested] = useState(false);
     const [exchangeRate, setExchangeRate] = useState(0);
     const [selectedAmount, setSelectedAmount] = useState(null);
-
-    const banks = [
-        'Banco de Venezuela',
-        'Mercantil',
-        'Banesco',
-        'Provincial',
-        'BNC',
-        'Banco Plaza',
-        'Banco Exterior',
-        'Bancaribe'
-    ];
+    const [banks, setBanks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const fixedAmounts = [5, 10, 15, 20];
 
@@ -58,29 +49,36 @@ export default function MakePaymentsInterface() {
             }
         };
 
-        const fetchExchangeRate = async () => {
+        const fetchInitialData = async () => {
+            setLoading(true);
             try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al obtener la tasa de cambio');
+                // Fetch exchange rate
+                const rateResponse = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate');
+                if (rateResponse.ok) {
+                    const rateData = await rateResponse.json();
+                    setExchangeRate(rateData.rate);
+                } else {
+                    toast.error('Error al obtener la tasa de cambio');
                 }
 
-                const data = await response.json();
-                setExchangeRate(data.rate);
+                // Fetch banks
+                const banksResponse = await fetch(process.env.BACKEND_URL + '/api/banks');
+                if (banksResponse.ok) {
+                    const banksData = await banksResponse.json();
+                    setBanks(banksData);
+                } else {
+                    toast.error('Error al cargar los bancos');
+                }
             } catch (error) {
-                console.error('Error fetching exchange rate:', error);
-                toast.error('Error al obtener la tasa de cambio');
+                console.error('Error fetching initial data:', error);
+                toast.error('Error al cargar los datos iniciales');
+            } finally {
+                setLoading(false);
             }
         };
-
+        
         checkPaymentRequest();
-        fetchExchangeRate();
+        fetchInitialData();
     }, [user]);
 
     const handleChange = (e) => {
@@ -138,7 +136,7 @@ export default function MakePaymentsInterface() {
                 user_id: user.id,
                 team_id: user.team_id,
                 amount: parseInt(formData.amount),
-                bank: formData.bank.toLowerCase().replace(/ /g, '_'),
+                bank: formData.bank,
                 reference: formData.reference,
                 cedula: formData.cedula,
                 phone_number: formData.phone_number,
@@ -225,10 +223,11 @@ export default function MakePaymentsInterface() {
                             value={formData.bank}
                             onChange={handleChange}
                             required
+                            disabled={loading}
                         >
-                            <option value="">Seleccione un banco</option>
-                            {banks.map((bank, index) => (
-                                <option key={index} value={bank}>{bank}</option>
+                            <option value="">{loading ? 'Cargando bancos...' : 'Seleccione un banco'}</option>
+                            {banks.map((bank) => (
+                                <option key={bank.id} value={bank.name}>{bank.name}</option>
                             ))}
                         </select>
                     </div>

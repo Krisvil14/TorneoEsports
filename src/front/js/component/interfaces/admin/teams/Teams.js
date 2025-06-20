@@ -1,94 +1,137 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Table from '../../../commons/Table';
 import "../../../../../styles/teams.css";
 
 export default function TeamsAdminInterface() {
-    const navigate = useNavigate();
     const [teams, setTeams] = useState([]);
-    const [selectedGame, setSelectedGame] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('');
-    const [sortConfig, setSortConfig] = useState({
-        key: 'name',
-        direction: 'asc'
+    const [games, setGames] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filters, setFilters] = useState({
+        name: '',
+        game: '',
+        is_active: ''
     });
-
-    const handleCreateTeam = () => {
-        navigate('/Regteams');
-    };
+    const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
+    const navigate = useNavigate();
 
     const resetFilters = () => {
-        setSelectedGame('');
-        setSelectedStatus('');
-        setSortConfig({ key: 'name', direction: 'asc' });
-    };
-
-    const fetchTeams = async () => {
-        try {
-            const response = await fetch(process.env.BACKEND_URL + '/api/teams');
-            const data = await response.json();
-            setTeams(data);
-        } catch (error) {
-            console.error('Error fetching teams:', error);
-        }
+        setFilters({
+            name: '',
+            game: '',
+            is_active: ''
+        });
+        setSortConfig({ key: '', direction: 'asc' });
     };
 
     useEffect(() => {
-        fetchTeams();
+        const fetchData = async () => {
+            try {
+                // Cargar equipos
+                const teamsResponse = await fetch(process.env.BACKEND_URL + '/api/teams');
+                if (teamsResponse.ok) {
+                    const teamsData = await teamsResponse.json();
+                    setTeams(teamsData);
+                }
+
+                // Cargar juegos
+                const gamesResponse = await fetch(process.env.BACKEND_URL + '/api/games');
+                if (gamesResponse.ok) {
+                    const gamesData = await gamesResponse.json();
+                    setGames(gamesData);
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                toast.error('Error al cargar los datos');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
+
+    const handleCreateTeam = () => {
+        navigate('/admin/create-team');
+    };
 
     const handleToggleStatus = async (teamId, currentStatus) => {
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/teams/${teamId}/toggle-status`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 }
             });
 
-            if (!response.ok) {
-                throw new Error('Error al cambiar el estado del equipo');
+            if (response.ok) {
+                const result = await response.json();
+                
+                // Actualizar el estado local del equipo
+                setTeams(prevTeams => 
+                    prevTeams.map(team => 
+                        team.id === teamId 
+                            ? { ...team, is_active: !team.is_active }
+                            : team
+                    )
+                );
+
+                toast.success(result.message);
+            } else {
+                const error = await response.json();
+                toast.error(error.error || 'Error al cambiar el estado del equipo');
             }
-
-            // Actualizar la lista de equipos después de cambiar el estado
-            await fetchTeams();
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error al cambiar el estado del equipo');
+            console.error('Error toggling team status:', error);
+            toast.error('Error al cambiar el estado del equipo');
         }
     };
 
-    // Función para ordenar los equipos
     const sortTeams = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
+        setSortConfig(prevConfig => ({
+            key,
+            direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+        }));
     };
 
-    // Filtrar y ordenar los equipos
+    // Función para obtener equipos filtrados y ordenados
     const getFilteredAndSortedTeams = () => {
         let filteredTeams = [...teams];
-        
-        // Aplicar filtro por juego
-        if (selectedGame) {
-            filteredTeams = filteredTeams.filter(team => team.game === selectedGame);
+
+        // Aplicar filtro por nombre
+        if (filters.name) {
+            const searchTerm = filters.name.toLowerCase();
+            filteredTeams = filteredTeams.filter(team => 
+                team.name.toLowerCase().includes(searchTerm)
+            );
         }
 
-        // Aplicar filtro por estado
-        if (selectedStatus !== '') {
-            const isActive = selectedStatus === 'true';
-            filteredTeams = filteredTeams.filter(team => team.is_active === isActive);
+        // Aplicar filtro por juego
+        if (filters.game) {
+            filteredTeams = filteredTeams.filter(team => 
+                team.game === filters.game
+            );
+        }
+
+        // Aplicar filtro por estado activo
+        if (filters.is_active !== '') {
+            const activeValue = filters.is_active === 'true';
+            filteredTeams = filteredTeams.filter(team => 
+                team.is_active === activeValue
+            );
         }
 
         // Aplicar ordenamiento
         if (sortConfig.key) {
             filteredTeams.sort((a, b) => {
-                if (a[sortConfig.key] < b[sortConfig.key]) {
+                const aValue = a[sortConfig.key] || '';
+                const bValue = b[sortConfig.key] || '';
+                
+                if (aValue < bValue) {
                     return sortConfig.direction === 'asc' ? -1 : 1;
                 }
-                if (a[sortConfig.key] > b[sortConfig.key]) {
+                if (aValue > bValue) {
                     return sortConfig.direction === 'asc' ? 1 : -1;
                 }
                 return 0;
@@ -99,12 +142,18 @@ export default function TeamsAdminInterface() {
     };
 
     const columns = [
-        { header: 'Nombre del Equipo', accessor: 'name' },
+        { header: 'Nombre', accessor: 'name' },
         { header: 'Juego', accessor: 'game' },
         { 
-            header: 'Estado', 
+            header: 'Jugadores', 
+            accessor: 'current_players',
+            Cell: ({ row }) => `${row.current_players}/${row.max_players}`
+        },
+        
+        {
+            header: 'Estado',
             accessor: 'is_active',
-            Cell: ({ value }) => (
+            Cell: ({ value, row }) => (
                 <span className={`status-badge ${value ? 'active' : 'inactive'}`}>
                     {value ? 'Activo' : 'Inactivo'}
                 </span>
@@ -112,18 +161,18 @@ export default function TeamsAdminInterface() {
         },
         {
             header: 'Acciones',
-            accessor: 'acciones',
-            Cell: ({ row }) => (
+            accessor: 'id',
+            Cell: ({ value, row }) => (
                 <div className="action-buttons">
                     <button
                         className="action-button"
-                        onClick={() => navigate(`/admin/teamInfo/${row.id}`)}
+                        onClick={() => navigate(`/admin/teamInfo/${value}`)}
                     >
-                        Ver Información
+                        Ver Detalles
                     </button>
                     <button
                         className={`toggle-status-button ${row.is_active ? 'deactivate' : 'activate'}`}
-                        onClick={() => handleToggleStatus(row.id, row.is_active)}
+                        onClick={() => handleToggleStatus(value, row.is_active)}
                     >
                         {row.is_active ? 'Desactivar' : 'Activar'}
                     </button>
@@ -132,12 +181,25 @@ export default function TeamsAdminInterface() {
         },
     ];
 
+    if (loading) {
+        return <div>Cargando...</div>;
+    }
+
     return (
         <div className="teams-container">
             <section className="teams-hero">
                 <h1>Gestión de Equipos</h1>
             </section>
             
+            <div className="button-container">
+                <button 
+                    className="create-team-button"
+                    onClick={handleCreateTeam}
+                >
+                    Crear Equipo
+                </button>
+            </div>
+
             <div className="teams-content">
                 <div className="teams-filters">
                     <div className="filters-header">
@@ -149,46 +211,63 @@ export default function TeamsAdminInterface() {
                             Reestablecer Filtros
                         </button>
                     </div>
-                    <div className="filters-body">
-                        <div className="sort-group">
-                            <label>Ordenar por:</label>
-                            <button
-                                onClick={() => sortTeams('name')}
-                                className={`sort-button ${sortConfig.key === 'name' ? 'active' : ''}`}
-                            >
-                                Nombre {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '(A-Z)' : '(Z-A)')}
-                            </button>
-                        </div>
-                        <div className="filter-group">
-                            <label htmlFor="gameFilter">Filtrar por Juego:</label>
-                            <select
-                                id="gameFilter"
-                                value={selectedGame}
-                                onChange={(e) => setSelectedGame(e.target.value)}
-                                className="form-control"
-                            >
-                                <option value="">Todos los juegos</option>
-                                <option value="league_of_legends">League of Legends</option>
-                                <option value="valorant">Valorant</option>
-                                <option value="csgo">Counter Strike: Global Offensive</option>
-                                <option value="dota_2">Dota 2</option>
-                                <option value="overwatch">Overwatch</option>
-                                <option value="apex_legends">Apex Legends</option>
-                            </select>
-                        </div>
-                        <div className="filter-group">
-                            <label htmlFor="statusFilter">Filtrar por Estado:</label>
-                            <select
-                                id="statusFilter"
-                                value={selectedStatus}
-                                onChange={(e) => setSelectedStatus(e.target.value)}
-                                className="form-control"
-                            >
-                                <option value="">Todos los estados</option>
-                                <option value="true">Activo</option>
-                                <option value="false">Inactivo</option>
-                            </select>
-                        </div>
+                    <div className="sort-group">
+                        <label>Ordenar por:</label>
+                        <button
+                            onClick={() => sortTeams('name')}
+                            className={`sort-button ${sortConfig.key === 'name' ? 'active' : ''}`}
+                        >
+                            Nombre {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '(A-Z)' : '(Z-A)')}
+                        </button>
+                        <button
+                            onClick={() => sortTeams('current_players')}
+                            className={`sort-button ${sortConfig.key === 'current_players' ? 'active' : ''}`}
+                        >
+                            Jugadores {sortConfig.key === 'current_players' && (sortConfig.direction === 'asc' ? '(↑)' : '(↓)')}
+                        </button>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="teamName">Filtrar por Equipo:</label>
+                        <select
+                            id="teamName"
+                            value={filters.name}
+                            onChange={(e) => setFilters({...filters, name: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos los equipos</option>
+                            {[...new Set(teams.map(t => t.name))].map((name, idx) => (
+                                <option key={idx} value={name}>{name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="gameFilter">Filtrar por Juego:</label>
+                        <select
+                            id="gameFilter"
+                            value={filters.game}
+                            onChange={(e) => setFilters({...filters, game: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos los juegos</option>
+                            {games.map((game) => (
+                                <option key={game.id} value={game.name}>
+                                    {game.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="activeFilter">Filtrar por Estado:</label>
+                        <select
+                            id="activeFilter"
+                            value={filters.is_active}
+                            onChange={(e) => setFilters({...filters, is_active: e.target.value})}
+                            className="form-control"
+                        >
+                            <option value="">Todos</option>
+                            <option value="true">Activos</option>
+                            <option value="false">Inactivos</option>
+                        </select>
                     </div>
                 </div>
                 

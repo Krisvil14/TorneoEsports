@@ -14,17 +14,6 @@ class RoleEnum(enum.Enum):
 
 role_enum = ENUM(RoleEnum, name='roleenum', create_type=True)
 
-class GameEnum(enum.Enum):
-    league_of_legends = 'League of Legends'
-    valorant = 'Valorant'
-    csgo = 'Counter-Strike: Global Offensive'
-    dota_2 = 'Dota 2'
-    overwatch = 'Overwatch'
-    apex_legends = 'Apex Legends'
-    
-
-
-game_enum = ENUM(GameEnum, name='gameenum', create_type=True)
 
 class ActionEnum(enum.Enum):
     join_team = 'join_team'
@@ -47,19 +36,41 @@ class PaymentTypeEnum(enum.Enum):
 
 payment_type_enum = ENUM(PaymentTypeEnum, name='paymenttypeenum', create_type=False)
 
-class BankEnum(enum.Enum):
-    banco_de_venezuela = 'Banco de Venezuela'
-    mercantil = 'Mercantil'
-    banesco = 'Banesco'
-    provincial = 'Provincial'
-    bnc = 'BNC'
-    banco_plaza = 'Banco Plaza'
-    banco_exterior = 'Banco Exterior'
-    bancaribe = 'Bancaribe'
-
-bank_enum = ENUM(BankEnum, name='bankenum', create_type=False)
 
 # Models
+class Game(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+
+    # Relationships
+    teams = relationship("Team", back_populates="game")
+    tournaments = relationship("Tournament", back_populates="game")
+
+    def __repr__(self):
+        return f'<Game {self.name}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
+class Bank(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    
+    # Relationships
+    payments = relationship("Payment", back_populates="bank")
+
+    def __repr__(self):
+        return f'<Bank {self.name}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
@@ -113,13 +124,14 @@ class Tournament(db.Model):
     name = db.Column(db.String(120), nullable=False)
     date_start = db.Column(db.String(50), nullable=False)
     num_max_teams = db.Column(db.Integer, nullable=False)
-    game = db.Column(game_enum, nullable=False)
+    game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     cost = db.Column(db.Integer, nullable=False, default=10)
     started = db.Column(db.Boolean, default=False, nullable=True)
     finished = db.Column(db.Boolean, default=False, nullable=True)
     prize = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships
+    game = relationship("Game", back_populates="tournaments")
     teams = relationship("Team", back_populates="tournament")
     applications = relationship('Application', back_populates="tournament")
 
@@ -137,7 +149,8 @@ class Tournament(db.Model):
             "name": self.name,
             "date_start": self.date_start,
             "num_max_teams": self.num_max_teams,
-            "game": self.game.name,
+            "game": self.game.name if self.game else None,
+            "game_id": self.game_id,
             "cost": self.cost,
             "started": self.started,
             "finished": self.finished,
@@ -149,11 +162,12 @@ class Team(db.Model):
     name = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean(), nullable=True, default=True)
     max_players = db.Column(db.Integer, nullable=False, default=5)
-    game = db.Column(game_enum, nullable=False)
+    game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     tournament_id = db.Column(UUID(as_uuid=True), db.ForeignKey('tournament.id'), nullable=True)
     balance = db.Column(db.Integer, nullable=False, default=0)
 
     # Relationships
+    game = relationship("Game", back_populates="teams")
     tournament = relationship("Tournament", back_populates="teams")
     members = relationship("User", back_populates="team")
     applications = relationship('Application', back_populates="team")
@@ -169,7 +183,8 @@ class Team(db.Model):
             "is_active": self.is_active,
             "max_players": self.max_players,
             "current_players": len(self.members),
-            "game": self.game.name,
+            "game": self.game.name if self.game else None,
+            "game_id": self.game_id,
             "tournament_id": str(self.tournament_id) if self.tournament_id else None,
             "members": [member.email for member in self.members],
             "balance": self.balance if self.balance is not None else 0
@@ -222,7 +237,7 @@ class Payment(db.Model):
     application_id = db.Column(db.Integer, db.ForeignKey('application.id'), nullable=False)
     type = db.Column(payment_type_enum, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
-    bank = db.Column(bank_enum, nullable=False)
+    bank_id = db.Column(db.Integer, db.ForeignKey('bank.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     reference = db.Column(db.String(50), nullable=True)
     cedula = db.Column(db.String(20), nullable=False)
@@ -231,6 +246,7 @@ class Payment(db.Model):
     # Relationships
     user = relationship('User', back_populates="payments")
     application = relationship('Application', back_populates="payments")
+    bank = relationship('Bank', back_populates="payments")
 
     __table_args__ = (
         CheckConstraint('amount > 0', name='check_amount_positive'),
@@ -249,7 +265,7 @@ class Payment(db.Model):
             "application_id": self.application_id,
             "type": self.type.name,
             "amount": self.amount,
-            "bank": self.bank.name,
+            "bank": self.bank.name if self.bank else None,
             "date": self.date.isoformat(),
             "reference": self.reference,
             "cedula": self.cedula,

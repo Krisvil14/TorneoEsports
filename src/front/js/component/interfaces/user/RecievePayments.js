@@ -18,84 +18,59 @@ export default function RecievePaymentsInterface() {
     const [hasRequested, setHasRequested] = useState(false);
     const [teamBalance, setTeamBalance] = useState(0);
     const [exchangeRate, setExchangeRate] = useState(0);
-
-    const banks = [
-        'Banco de Venezuela',
-        'Mercantil',
-        'Banesco',
-        'Provincial',
-        'BNC',
-        'Banco Plaza',
-        'Banco Exterior',
-        'Bancaribe'
-    ];
+    const [banks, setBanks] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkPaymentRequest = async () => {
-            if (!user || !user.team_id) return;
+        const fetchInitialData = async () => {
+            if (!user || !user.team_id) {
+                setLoading(false);
+                return;
+            }
 
+            setLoading(true);
             try {
                 // Obtener el saldo del equipo
                 const balanceResponse = await fetch(process.env.BACKEND_URL + '/api/team/balance', {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'user_id': user.id.toString()
-                    }
+                    headers: { 'user_id': user.id.toString() }
                 });
-
-                if (!balanceResponse.ok) {
-                    throw new Error('Error al obtener el saldo del equipo');
+                if (balanceResponse.ok) {
+                    const balanceData = await balanceResponse.json();
+                    setTeamBalance(balanceData.balance);
                 }
-
-                const balanceData = await balanceResponse.json();
-                setTeamBalance(balanceData.balance);
 
                 // Verificar solicitudes existentes
-                const response = await fetch(process.env.BACKEND_URL + `/api/payment-requests/check/${user.team_id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'user_id': user.id.toString(),
-                        'action': 'receive_payment'
-                    }
+                const checkResponse = await fetch(process.env.BACKEND_URL + `/api/payment-requests/check/${user.team_id}`, {
+                    headers: { 'user_id': user.id.toString(), 'action': 'receive_payment' }
                 });
-
-                if (!response.ok) {
-                    throw new Error('Error al verificar solicitudes existentes');
+                if (checkResponse.ok) {
+                    const checkData = await checkResponse.json();
+                    setHasRequested(checkData.hasRequested);
                 }
 
-                const data = await response.json();
-                setHasRequested(data.hasRequested);
+                // Obtener tasa de cambio
+                const rateResponse = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate');
+                if (rateResponse.ok) {
+                    const rateData = await rateResponse.json();
+                    setExchangeRate(rateData.rate);
+                }
+
+                // Obtener bancos
+                const banksResponse = await fetch(process.env.BACKEND_URL + '/api/banks');
+                if (banksResponse.ok) {
+                    const banksData = await banksResponse.json();
+                    setBanks(banksData);
+                }
             } catch (error) {
-                console.error('Error checking payment request:', error);
-                toast.error('Error al verificar solicitudes existentes');
+                console.error('Error fetching initial data:', error);
+                toast.error('Error al cargar los datos');
+            } finally {
+                setLoading(false);
             }
         };
 
-        const fetchExchangeRate = async () => {
-            try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/admin/exchange-rate', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error('Error al obtener la tasa de cambio');
-                }
-
-                const data = await response.json();
-                setExchangeRate(data.rate);
-            } catch (error) {
-                console.error('Error fetching exchange rate:', error);
-                toast.error('Error al obtener la tasa de cambio');
-            }
-        };
-
-        checkPaymentRequest();
-        fetchExchangeRate();
+        fetchInitialData();
     }, [user]);
 
     const handleChange = (e) => {
@@ -119,13 +94,11 @@ export default function RecievePaymentsInterface() {
             return;
         }
 
-        // Validaciones
-        if (!formData.amount || isNaN(formData.amount) || formData.amount <= 0) {
+        if (!formData.amount || isNaN(formData.amount) || parseFloat(formData.amount) <= 0) {
             toast.error('Por favor ingrese un monto válido en dólares mayor a 0');
             return;
         }
 
-        // Validar que el monto en dólares no exceda el saldo del equipo en dólares
         if (parseFloat(formData.amount) > teamBalance) {
             toast.error(`El monto solicitado no puede exceder el saldo actual del equipo (${teamBalance} USD)`);
             return;
@@ -148,8 +121,8 @@ export default function RecievePaymentsInterface() {
             const requestData = {
                 user_id: user.id,
                 team_id: user.team_id,
-                amount: parseFloat(formData.amount), // Enviar en dólares
-                bank: formData.bank.toLowerCase().replace(/ /g, '_'),
+                amount: parseFloat(formData.amount),
+                bank: formData.bank,
                 cedula: formData.cedula,
                 phone_number: formData.phone_number,
                 payment_type: 'outgoing',
@@ -233,10 +206,11 @@ export default function RecievePaymentsInterface() {
                             value={formData.bank}
                             onChange={handleChange}
                             required
+                            disabled={loading}
                         >
-                            <option value="">Seleccione un banco</option>
-                            {banks.map((bank, index) => (
-                                <option key={index} value={bank}>{bank}</option>
+                            <option value="">{loading ? 'Cargando bancos...' : 'Seleccione un banco'}</option>
+                            {banks.map((bank) => (
+                                <option key={bank.id} value={bank.name}>{bank.name}</option>
                             ))}
                         </select>
                     </div>

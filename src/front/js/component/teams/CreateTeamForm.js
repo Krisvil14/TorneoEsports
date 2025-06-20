@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -8,8 +8,32 @@ import '../../../styles/createTeamForm.css';
 export default function CreateTeamForm() {
   const [name, setName] = useState('');
   const [game, setGame] = useState('');
+  const [games, setGames] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { store, actions } = useContext(Context);
+
+  // Cargar juegos al montar el componente
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        const response = await fetch(process.env.BACKEND_URL + '/api/games');
+        if (response.ok) {
+          const gamesData = await response.json();
+          setGames(gamesData);
+        } else {
+          toast.error('Error al cargar los juegos');
+        }
+      } catch (error) {
+        console.error('Error fetching games:', error);
+        toast.error('Error al cargar los juegos');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGames();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,18 +126,20 @@ export default function CreateTeamForm() {
             value={game}
             onChange={({ target }) => setGame(target.value)}
             required
+            disabled={loading}
           >
-            <option value="">Seleccione un juego</option>
-            <option value="league_of_legends">League of Legends</option>
-            <option value="valorant">Valorant</option>
-            <option value="csgo">Counter Strike: Global Offensive</option>
-            <option value="dota_2">Dota 2</option>
-            <option value="overwatch">Overwatch</option>
-            <option value="apex_legends">Apex Legends</option>
+            <option value="">
+              {loading ? 'Cargando juegos...' : 'Seleccione un juego'}
+            </option>
+            {games.map((gameItem) => (
+              <option key={gameItem.id} value={gameItem.name}>
+                {gameItem.name}
+              </option>
+            ))}
           </select>
         </div>
         <div className="button-group">
-          <button type="submit" className="submit-button">
+          <button type="submit" className="submit-button" disabled={loading}>
             Registrar Equipo
           </button>
           <Link to="/teams" className="cancel-button">

@@ -9,7 +9,7 @@ def setup_admin(app):
     admin = Admin(app, name='Database', template_mode='bootstrap3')
 
     # Import models here to avoid circular dependencies
-    from .models import User, Team, Tournament, Application, Payment, Match, User_Stats, Team_Stats, Calendar
+    from .models import User, Team, Tournament, Application, Payment, Match, User_Stats, Team_Stats, Calendar, Game
     
     # Add your models here, for example this is how we add a the User model to the admin
     admin.add_view(ModelView(User, db.session))
@@ -21,5 +21,6 @@ def setup_admin(app):
     admin.add_view(ModelView(User_Stats, db.session))
     admin.add_view(ModelView(Team_Stats, db.session))
     admin.add_view(ModelView(Calendar, db.session))
+    admin.add_view(ModelView(Game, db.session))
     # You can duplicate that line to add mew models
     # admin.add_view(ModelView(YourModelName, db.session))

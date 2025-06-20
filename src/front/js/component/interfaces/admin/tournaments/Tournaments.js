@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Table from '../../../commons/Table';
 import { useNavigate } from 'react-router-dom';
 import "../../../../../styles/tournaments.css";
+import { toast } from 'react-toastify';
 
 export default function TournamentsAdminInterface() {
     const [tournaments, setTournaments] = useState([]);
+    const [games, setGames] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState({
         key: 'name',
         direction: 'asc'
@@ -31,17 +34,30 @@ export default function TournamentsAdminInterface() {
     };
 
     useEffect(() => {
-        const fetchTournaments = async () => {
+        const fetchData = async () => {
             try {
-                const response = await fetch(process.env.BACKEND_URL + '/api/tournaments');
-                const data = await response.json();
-                setTournaments(data);
+                // Cargar torneos
+                const tournamentsResponse = await fetch(process.env.BACKEND_URL + '/api/tournaments');
+                if (tournamentsResponse.ok) {
+                    const tournamentsData = await tournamentsResponse.json();
+                    setTournaments(tournamentsData);
+                }
+
+                // Cargar juegos
+                const gamesResponse = await fetch(process.env.BACKEND_URL + '/api/games');
+                if (gamesResponse.ok) {
+                    const gamesData = await gamesResponse.json();
+                    setGames(gamesData);
+                }
             } catch (error) {
-                console.error('Error fetching tournaments:', error);
+                console.error('Error fetching data:', error);
+                toast.error('Error al cargar los datos');
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchTournaments();
+        fetchData();
     }, []);
 
     const handleCreateTournament = () => {
@@ -50,11 +66,10 @@ export default function TournamentsAdminInterface() {
 
     // Función para ordenar torneos
     const sortTournaments = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
+        setSortConfig(prevConfig => ({
+            key,
+            direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc'
+        }));
     };
 
     // Función para obtener torneos filtrados y ordenados
@@ -113,7 +128,20 @@ export default function TournamentsAdminInterface() {
 
     const columns = [
         { header: 'Nombre', accessor: 'name' },
-        { header: 'Fecha de Inicio', accessor: 'date_start' },
+        { 
+            header: 'Fecha de Inicio', 
+            accessor: 'date_start',
+            Cell: ({ value }) => {
+                if (!value) return '';
+                try {
+                    const datePart = value.split('T')[0];
+                    const [year, month, day] = datePart.split('-');
+                    return `${day}/${month}/${year}`;
+                } catch (e) {
+                    return value;
+                }
+            }
+        },
         { header: 'Juego', accessor: 'game' },
         { 
             header: 'Cantidad de Equipos', 
@@ -145,6 +173,10 @@ export default function TournamentsAdminInterface() {
             ),
         },
     ];
+
+    if (loading) {
+        return <div>Cargando...</div>;
+    }
 
     return (
         <div className="tournaments-container">
@@ -212,12 +244,11 @@ export default function TournamentsAdminInterface() {
                             className="form-control"
                         >
                             <option value="">Todos los juegos</option>
-                            <option value="league_of_legends">League of Legends</option>
-                            <option value="valorant">Valorant</option>
-                            <option value="csgo">Counter Strike: Global Offensive</option>
-                            <option value="dota_2">Dota 2</option>
-                            <option value="overwatch">Overwatch</option>
-                            <option value="apex_legends">Apex Legends</option>
+                            {games.map((game) => (
+                                <option key={game.id} value={game.name}>
+                                    {game.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className="filter-group">
