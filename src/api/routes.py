@@ -1103,6 +1103,12 @@ def leave_team():
         if not team:
             return jsonify({"error": "Equipo no encontrado"}), 404
 
+        # Verificar que el equipo no esté en un torneo activo
+        if team.tournament_id:
+            tournament = Tournament.query.get(team.tournament_id)
+            if tournament and not tournament.finished:
+                return jsonify({"error": "No puedes salir del equipo mientras está participando en un torneo activo"}), 400
+
         # Obtener todos los miembros del equipo
         team_members = User.query.filter_by(team_id=team.id).all()
         
@@ -1454,4 +1460,63 @@ def update_exchange_rate():
     except ValueError:
         return jsonify({"error": "La tasa de cambio debe ser un número válido"}), 400
     except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api.route('/teams/<int:team_id>/remove_player', methods=['POST'])
+def remove_player_from_team(team_id):
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        requesting_user_id = data.get('requesting_user_id')
+
+        if not user_id or not requesting_user_id:
+            return jsonify({"error": "Se requieren el ID del usuario y del solicitante"}), 400
+
+        # Verificar que el equipo existe
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        # Verificar que el usuario solicitante existe y es líder o admin
+        requesting_user = User.query.get(requesting_user_id)
+        if not requesting_user:
+            return jsonify({"error": "Usuario solicitante no encontrado"}), 404
+
+        if requesting_user.role != RoleEnum.admin and not requesting_user.is_leader:
+            return jsonify({"error": "Solo los líderes o administradores pueden eliminar jugadores"}), 403
+
+        # Verificar que el usuario a eliminar existe y pertenece al equipo
+        user_to_remove = User.query.get(user_id)
+        if not user_to_remove:
+            return jsonify({"error": "Usuario a eliminar no encontrado"}), 404
+
+        if user_to_remove.team_id != team_id:
+            return jsonify({"error": "El usuario no pertenece a este equipo"}), 400
+
+        # Verificar que el equipo no esté en un torneo activo
+        if team.tournament_id:
+            tournament = Tournament.query.get(team.tournament_id)
+            if tournament and not tournament.finished:
+                return jsonify({"error": "No se pueden eliminar jugadores mientras el equipo está participando en un torneo activo"}), 400
+
+        # No permitir que el líder se elimine a sí mismo
+        if user_to_remove.is_leader:
+            return jsonify({"error": "El líder no puede eliminarse a sí mismo. Debe transferir el liderazgo o salir del equipo"}), 400
+
+        # Eliminar al usuario del equipo
+        user_to_remove.team_id = None
+        user_to_remove.is_in_team = False
+        user_to_remove.is_leader = False
+
+        # Actualizar las estadísticas del usuario
+        user_stats = User_Stats.query.filter_by(user_id=user_id).first()
+        if user_stats:
+            user_stats.team_id = None
+
+        db.session.commit()
+
+        return jsonify({"message": "Jugador eliminado del equipo exitosamente"}), 200
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify({"error": str(e)}), 400

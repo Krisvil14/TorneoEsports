@@ -87,11 +87,24 @@ export default function TeamInfo() {
     }, [showLastPlayerModal, showNewLeaderModal]);
 
     const handleRemovePlayer = async (userId) => {
-        const userToRemove = users.find(user => user.id === userId);
-        const remainingUsers = users.filter(user => user.id !== userId);
+        // Verificar si el equipo está en un torneo activo
+        if (team && team.tournament_id) {
+            toast.error('No se pueden eliminar jugadores mientras el equipo está participando en un torneo activo', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            return;
+        }
 
-        // Si es el último jugador
-        if (remainingUsers.length === 0) {
+        const userToRemove = users.find(user => user.id === userId);
+        
+        // Si es el último jugador del equipo
+        if (users.length === 1) {
             setUserToRemove(userToRemove);
             setShowLastPlayerModal(true);
             return;
@@ -176,8 +189,10 @@ export default function TeamInfo() {
         'Es Líder': user.is_leader ? 'Sí' : 'No',
         Acciones: (
             <button 
-                className="team-info-button secondary" 
+                className={`team-info-button secondary ${team && team.tournament_id ? 'disabled' : ''}`}
                 onClick={() => handleRemovePlayer(user.id)}
+                disabled={team && team.tournament_id}
+                title={team && team.tournament_id ? 'No se pueden eliminar jugadores mientras el equipo está en un torneo activo' : ''}
             >
                 Eliminar
             </button>
@@ -273,6 +288,19 @@ export default function TeamInfo() {
                         <Table data={teamData} columns={teamColumns} />
                     </div>
                 </div>
+
+                {/* Mostrar información si el equipo está en un torneo activo */}
+                {team && team.tournament_id && (
+                    <div className="team-info-section tournament-warning">
+                        <div className="tournament-warning-content">
+                            <div className="tournament-warning-icon">🏆</div>
+                            <div className="tournament-warning-text">
+                                <h4>Equipo en Torneo Activo</h4>
+                                <p>Este equipo está actualmente participando en un torneo. No se pueden realizar cambios en la composición del equipo hasta que el torneo finalice.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Sección de Estadísticas del Equipo */}
                 <div className="team-info-section">

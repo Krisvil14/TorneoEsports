@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { Context } from '../store/appContext';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../../styles/teamInfo.css'
+import '../../styles/teamInfoo.css'
 
 export default function TeamInfo() {
     const { teamId } = useParams();
@@ -174,6 +174,20 @@ export default function TeamInfo() {
 
     const handleRemovePlayer = async (userId) => {
         try {
+            // Verificar si el equipo está en un torneo activo
+            if (team && team.tournament_id) {
+                toast.error('No se pueden eliminar jugadores mientras el equipo está participando en un torneo activo', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                return;
+            }
+
             const response = await fetch(process.env.BACKEND_URL + `/api/teams/${teamId}/remove_player`, {
                 method: 'POST',
                 headers: {
@@ -219,6 +233,20 @@ export default function TeamInfo() {
 
     const handleLeaveTeam = async () => {
         try {
+            // Verificar si el equipo está en un torneo activo
+            if (team && team.tournament_id) {
+                toast.error('No puedes salir del equipo mientras está participando en un torneo activo', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+                return;
+            }
+
             const teamMembers = users.filter(user => user.id !== store.user.id);
             
             if (teamMembers.length > 0) {
@@ -285,8 +313,10 @@ export default function TeamInfo() {
             // Si es el usuario logueado y es líder, mostrar botón de salir
             (user.id === store.user?.id && user.is_leader) ? (
                 <button 
-                    className="team-info-button danger" 
+                    className={`team-info-button danger ${team && team.tournament_id ? 'disabled' : ''}`}
                     onClick={handleLeaveTeam}
+                    disabled={team && team.tournament_id}
+                    title={team && team.tournament_id ? 'No puedes salir del equipo mientras está en un torneo activo' : ''}
                 >
                     Salir del Equipo
                 </button>
@@ -294,8 +324,10 @@ export default function TeamInfo() {
             // Si el usuario logueado es líder o admin y la fila es otro miembro, mostrar eliminar
             ((isLeader || store.user.role === 'admin') && user.id !== store.user?.id) ? (
                 <button 
-                    className="team-info-button secondary" 
+                    className={`team-info-button secondary ${team && team.tournament_id ? 'disabled' : ''}`}
                     onClick={() => handleRemovePlayer(user.id)}
+                    disabled={team && team.tournament_id}
+                    title={team && team.tournament_id ? 'No se pueden eliminar jugadores mientras el equipo está en un torneo activo' : ''}
                 >
                     Eliminar
                 </button>
@@ -397,6 +429,19 @@ export default function TeamInfo() {
                         <Table data={teamData} columns={teamColumns} />
                     </div>
                 </div>
+
+                {/* Mostrar información si el equipo está en un torneo activo */}
+                {team && team.tournament_id && (
+                    <div className="team-info-section tournament-warning">
+                        <div className="tournament-warning-content">
+                            <div className="tournament-warning-icon">🏆</div>
+                            <div className="tournament-warning-text">
+                                <h4>Equipo en Torneo Activo</h4>
+                                <p>Este equipo está actualmente participando en un torneo. No se pueden realizar cambios en la composición del equipo hasta que el torneo finalice.</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="team-info-section">
                     <h3>Estadísticas del Equipo</h3>

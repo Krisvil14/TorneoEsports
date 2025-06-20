@@ -46,14 +46,16 @@
     border-spacing: 0;
 }
 
-.team-info-table th {
+.team-info-table .table-dark th {
     background: linear-gradient(90deg, #6a0572 0%, #00ffff 100%);
-    color: white;
+    color: #000000 !important;
     font-family: 'Orbitron', Impact, sans-serif;
     padding: 1rem;
     text-align: center;
     position: relative;
     z-index: 1;
+    text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff;
+    letter-spacing: 1px;
 }
 
 .team-info-table td {
@@ -108,10 +110,26 @@
 .team-info-button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+    background: linear-gradient(45deg, #555 0%, #777 100%) !important;
+    color: #ccc !important;
+    transform: none !important;
+}
+
+.team-info-button:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .team-info-button.secondary {
     background: linear-gradient(45deg, #333 0%, #666 100%);
+}
+
+.team-info-button.secondary:disabled {
+    background: linear-gradient(45deg, #444 0%, #666 100%) !important;
+}
+
+.team-info-button.danger:disabled {
+    background: linear-gradient(45deg, #555 0%, #777 100%) !important;
 }
 
 .team-info-section {
@@ -231,5 +249,46 @@
     .team-info-button {
         width: 100%;
     }
+}
+
+/* Estilos para la advertencia de torneo activo */
+.tournament-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.tournament-warning-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tournament-warning-icon {
+    font-size: 2rem;
+    background: #ffc107;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #333;
+    flex-shrink: 0;
+}
+
+.tournament-warning-text h4 {
+    color: #ffc107;
+    margin: 0 0 0.5rem 0;
+    font-family: 'Orbitron', Impact, sans-serif;
+    text-shadow: 0 0 8px #ffc10780;
+}
+
+.tournament-warning-text p {
+    color: #fff;
+    margin: 0;
+    line-height: 1.5;
 } 
 
