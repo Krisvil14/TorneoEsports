@@ -74,7 +74,6 @@ const Layout = () => {
             <Route element={<Protected> <Navbar /><TournamentsPage /> </Protected>}path="/tournaments" />
             <Route element={<Protected> <Navbar /><TeamInfoUser /> </Protected>}path="/busca-equipo/:teamId" />
             <Route element={<Protected> <Navbar /><TeamInfo /> </Protected>}path="/teamInfo/:teamId" />
-            <Route element={<Protected> <Navbar /><TeamInfoAdmin /> </Protected>}path="/admin/teamInfo/:teamId" />
             <Route element={<Protected> <Navbar /><PaymentsPage /> </Protected>}path="/payments" />
             <Route element={<Protected> <Navbar /><MakePaymentsPage /> </Protected>}path="/make-payments" />
             <Route element={<Protected> <Navbar /><RecievePaymentsPage /> </Protected>}path="/receive-payments" />
@@ -82,6 +81,7 @@ const Layout = () => {
             <Route element={<Protected> <Navbar /><BuscaEquipo /> </Protected>}path="/busca-equipo" />
             <Route element={<Protected> <Navbar /><RankingInterface /> </Protected>}path="/ranking" />
 
+            <Route element={<Protected> <Navbar /><TeamInfoAdmin /> </Protected>}path="/admin/teamInfo/:teamId" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><AdminCreateTeamPage /> </Protected>}path="/admin/create-team" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><CreateTournamentForm /> </Protected>}path="/admin/create_tournament" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><AddTeamToTournament /> </Protected>}path="/admin/addteam/:tournament_id" />
