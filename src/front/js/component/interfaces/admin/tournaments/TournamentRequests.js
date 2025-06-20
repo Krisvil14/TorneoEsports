@@ -4,7 +4,7 @@ import Table from '../../../commons/Table';
 import TournamentBrackets from '../../../commons/TournamentBrackets';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../../../../../styles/tournaments.css';
+import '../../../../../styles/tournament-requests.css';
 
 function MatchEditModal({ match, onClose, onSave }) {
   const [score1, setScore1] = useState(match.score1 ?? 0);
@@ -104,158 +104,160 @@ function MatchEditModal({ match, onClose, onSave }) {
           ×
         </button>
         <h2 style={{ color: '#00e6e6', marginTop: 0 }}>Editar Partido</h2>
-        <div className="modal-section">
-          <div className="modal-team-name">
-            {match.team1 ? match.team1.name : 'TBD'}
-          </div>
-          <div className="modal-score-input">
-            <label>Score:</label>
-            <input
-              type="number"
-              value={score1}
-              min={0}
-              onChange={(e) => handleScoreChange(1, e.target.value)}
-            />
-          </div>
-          <div className="modal-players-list">
-            {loading
-              ? 'Cargando jugadores...'
-              : error
-              ? error
-              : team1Stats.map((p, idx) => (
-                  <div key={p.id} className="modal-player-row">
-                    <span>
-                      {p.first_name} {p.last_name}
-                    </span>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        Kills
-                        <input
-                          type="number"
-                          min={0}
-                          value={p.kills}
-                          onChange={(e) =>
-                            handleStatChange(
-                              1,
-                              idx,
-                              'kills',
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        Asistencias
-                        <input
-                          type="number"
-                          min={0}
-                          value={p.assists}
-                          onChange={(e) =>
-                            handleStatChange(
-                              1,
-                              idx,
-                              'assists',
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        Muertes
-                        <input
-                          type="number"
-                          min={0}
-                          value={p.deaths}
-                          onChange={(e) =>
-                            handleStatChange(
-                              1,
-                              idx,
-                              'deaths',
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </label>
+        <div className="modal-scrollable-area">
+          <div className="modal-section">
+            <div className="modal-team-name">
+              {match.team1 ? match.team1.name : 'TBD'}
+            </div>
+            <div className="modal-score-input">
+              <label>Score:</label>
+              <input
+                type="number"
+                value={score1}
+                min={0}
+                onChange={(e) => handleScoreChange(1, e.target.value)}
+              />
+            </div>
+            <div className="modal-players-list">
+              {loading
+                ? 'Cargando jugadores...'
+                : error
+                ? error
+                : team1Stats.map((p, idx) => (
+                    <div key={p.id} className="modal-player-row">
+                      <span>
+                        {p.first_name} {p.last_name}
+                      </span>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          Kills
+                          <input
+                            type="number"
+                            min={0}
+                            value={p.kills}
+                            onChange={(e) =>
+                              handleStatChange(
+                                1,
+                                idx,
+                                'kills',
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </label>
+                        <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          Asistencias
+                          <input
+                            type="number"
+                            min={0}
+                            value={p.assists}
+                            onChange={(e) =>
+                              handleStatChange(
+                                1,
+                                idx,
+                                'assists',
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </label>
+                        <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          Muertes
+                          <input
+                            type="number"
+                            min={0}
+                            value={p.deaths}
+                            onChange={(e) =>
+                              handleStatChange(
+                                1,
+                                idx,
+                                'deaths',
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+            </div>
           </div>
-        </div>
-        <div className="modal-section">
-          <div className="modal-team-name">
-            {match.team2 ? match.team2.name : 'TBD'}
-          </div>
-          <div className="modal-score-input">
-            <label>Score:</label>
-            <input
-              type="number"
-              value={score2}
-              min={0}
-              onChange={(e) => handleScoreChange(2, e.target.value)}
-            />
-          </div>
-          <div className="modal-players-list">
-            {loading
-              ? 'Cargando jugadores...'
-              : error
-              ? error
-              : team2Stats.map((p, idx) => (
-                  <div key={p.id} className="modal-player-row">
-                    <span>
-                      {p.first_name} {p.last_name}
-                    </span>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        Kills
-                        <input
-                          type="number"
-                          min={0}
-                          value={p.kills}
-                          onChange={(e) =>
-                            handleStatChange(
-                              2,
-                              idx,
-                              'kills',
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        Asistencias
-                        <input
-                          type="number"
-                          min={0}
-                          value={p.assists}
-                          onChange={(e) =>
-                            handleStatChange(
-                              2,
-                              idx,
-                              'assists',
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        Muertes
-                        <input
-                          type="number"
-                          min={0}
-                          value={p.deaths}
-                          onChange={(e) =>
-                            handleStatChange(
-                              2,
-                              idx,
-                              'deaths',
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </label>
+          <div className="modal-section">
+            <div className="modal-team-name">
+              {match.team2 ? match.team2.name : 'TBD'}
+            </div>
+            <div className="modal-score-input">
+              <label>Score:</label>
+              <input
+                type="number"
+                value={score2}
+                min={0}
+                onChange={(e) => handleScoreChange(2, e.target.value)}
+              />
+            </div>
+            <div className="modal-players-list">
+              {loading
+                ? 'Cargando jugadores...'
+                : error
+                ? error
+                : team2Stats.map((p, idx) => (
+                    <div key={p.id} className="modal-player-row">
+                      <span>
+                        {p.first_name} {p.last_name}
+                      </span>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          Kills
+                          <input
+                            type="number"
+                            min={0}
+                            value={p.kills}
+                            onChange={(e) =>
+                              handleStatChange(
+                                2,
+                                idx,
+                                'kills',
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </label>
+                        <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          Asistencias
+                          <input
+                            type="number"
+                            min={0}
+                            value={p.assists}
+                            onChange={(e) =>
+                              handleStatChange(
+                                2,
+                                idx,
+                                'assists',
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </label>
+                        <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          Muertes
+                          <input
+                            type="number"
+                            min={0}
+                            value={p.deaths}
+                            onChange={(e) =>
+                              handleStatChange(
+                                2,
+                                idx,
+                                'deaths',
+                                Number(e.target.value)
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+            </div>
           </div>
         </div>
         {scoreError && (
@@ -263,15 +265,10 @@ function MatchEditModal({ match, onClose, onSave }) {
             {scoreError}
           </div>
         )}
-        <div
-          className="custom-modal-buttons"
-          style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}
-        >
-          <button onClick={onClose} style={{ marginRight: 10 }}>
-            Cancelar
-          </button>
-          <button 
-            className="primary" 
+        <div className="custom-modal-buttons">
+          <button onClick={onClose}>Cancelar</button>
+          <button
+            className="primary"
             onClick={handleSave}
             disabled={scoreError !== null}
           >
