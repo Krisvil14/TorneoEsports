@@ -90,7 +90,7 @@ export default function TournamentsInterface() {
   const handleJoinTournament = async (tournamentId) => {
     try {
       const response = await fetch(
-        process.env.BACKEND_URL + '/api/tournament-requests',
+        process.env.BACKEND_URL + '/api/team-requests',
         {
           method: 'POST',
           headers: {

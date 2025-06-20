@@ -189,7 +189,8 @@
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   min-height: 600px;
   position: relative;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .bracket-simple-wrapper::before {

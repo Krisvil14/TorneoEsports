@@ -80,7 +80,7 @@ export default function TeamInfoUser() {
         }
 
         try {
-            const response = await fetch(process.env.BACKEND_URL + `/api/team-requests`, {
+            const response = await fetch(process.env.BACKEND_URL + `/api/team-join-requests`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

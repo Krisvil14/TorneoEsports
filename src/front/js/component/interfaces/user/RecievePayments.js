@@ -219,7 +219,7 @@ export default function RecievePaymentsInterface() {
                         />
                         {formData.amount && exchangeRate > 0 && (
                             <div className="conversion-display">
-                                <p>Monto equivalente en Bs.: Bs.{(parseFloat(formData.amount) * exchangeRate).toFixed(2)}</p>
+                                <p>Monto equivalente en Bs.: {(parseFloat(formData.amount) * exchangeRate).toFixed(2)}</p>
                             </div>
                         )}
                     </div>

@@ -827,6 +827,68 @@ def create_tournament_request():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@api.route('/team-join-requests', methods=['POST'])
+def create_team_join_request():
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        team_id = data.get('team_id')
+
+        if not user_id or not team_id:
+            return jsonify({"error": "User ID and Team ID are required"}), 400
+
+        # Verificar si el usuario existe
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+
+        # Verificar si el equipo existe
+        team = Team.query.get(team_id)
+        if not team:
+            return jsonify({"error": "Equipo no encontrado"}), 404
+
+        # Verificar que el usuario no esté ya en un equipo
+        if user.is_in_team:
+            return jsonify({"error": "Ya perteneces a un equipo"}), 400
+
+        # Verificar que el equipo esté activo
+        if not team.is_active:
+            return jsonify({"error": "El equipo no está activo"}), 400
+
+        # Verificar que el equipo no esté lleno
+        team_members_count = len(team.members)
+        if team_members_count >= team.max_players:
+            return jsonify({"error": "El equipo está lleno"}), 400
+
+        # Verificar si ya existe una solicitud activa y pendiente
+        existing_request = Application.query.filter_by(
+            userID=user_id,
+            teamID=team_id,
+            action=ActionEnum.join_team,
+            active=True,
+            status=StatusEnum.pending
+        ).first()
+
+        if existing_request:
+            return jsonify({"error": "Ya tienes una solicitud pendiente para este equipo"}), 400
+
+        # Crear nueva solicitud
+        new_request = Application(
+            userID=user_id,
+            teamID=team_id,
+            action=ActionEnum.join_team,
+            status=StatusEnum.pending,
+            active=True
+        )
+
+        db.session.add(new_request)
+        db.session.commit()
+
+        return jsonify({"message": "Solicitud creada exitosamente"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 400
+
 @api.route('/tournaments/<tournament_id>/teams', methods=['GET'])
 def get_tournament_teams(tournament_id):
     try:

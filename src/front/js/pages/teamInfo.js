@@ -412,7 +412,7 @@ export default function TeamInfo() {
 
                 {showLeaveModal && (
                     <div className="custom-modal-overlay">
-                        <div className="custom-modal-content">
+                        <div className="custom-modal-leave">
                             <h3>Confirmar Salida</h3>
                             <p>¿Estás seguro de que deseas salir del equipo? Al ser el último miembro, el equipo será desactivado.</p>
                             <div className="custom-modal-buttons">
@@ -548,25 +548,15 @@ export default function TeamInfo() {
 
                 {showBracketModal && (
                     <div className="custom-modal-overlay">
-                        <div className="custom-modal-content" style={{ minWidth: 400, maxWidth: 900, position: 'relative' }}>
+                        <div className="custom-modal-content">
                             <button
                                 className="modal-close"
                                 onClick={() => setShowBracketModal(false)}
-                                style={{
-                                    position: 'absolute',
-                                    color: 'black',
-                                    top: 10,
-                                    right: 20,
-                                    fontSize: 28,
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
                                 aria-label="Cerrar"
                             >
-                                ×
+                                &times;
                             </button>
-                            <h2 style={{ color: '#00e6e6', marginTop: 0 }}>Bracket del Torneo</h2>
+                            <h2 style={{ color: '#00e6e6', marginTop: 0, textAlign: 'center' }}>Bracket del Torneo</h2>
                             <TournamentBrackets tournamentId={selectedTournamentId} />
                         </div>
                     </div>
