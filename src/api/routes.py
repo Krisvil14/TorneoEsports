@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, render_template
 from api.models import db, User, Team, Tournament, Game, Application, ActionEnum, RoleEnum, StatusEnum, Payment, PaymentTypeEnum, Bank, User_Stats, Team_Stats, Match, ExchangeRate
 from api.utils import generate_sitemap, APIException, approved_join_team, approved_join_tournament, approved_do_payment, advance_tournament_round
-from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user
+from api.email_utils import init_mail, send_verification_email, verify_otp, set_otp_for_user, send_team_application_notification, send_tournament_application_notification, send_payment_application_notification
 from flask_cors import CORS
 import re
 from datetime import datetime
@@ -724,11 +724,69 @@ def handle_application():
         if application_id is None or accepted is None:
             return jsonify({"error": "Faltan datos requeridos"}), 400
 
-
         application = Application.query.filter_by(id=application_id).first()
         if not application:
             return jsonify({"error": "Solicitud no encontrada"}), 404
 
+        # Enviar notificación por email según el tipo de solicitud
+        try:
+            if application.action == ActionEnum.join_team:
+                # Notificación para solicitud de unirse a equipo
+                user = User.query.get(application.userID)
+                team = Team.query.get(application.teamID)
+                
+                if user and team:
+                    # Buscar el líder del equipo
+                    team_leader = User.query.filter_by(team_id=team.id, is_leader=True).first()
+                    leader_name = f"{team_leader.first_name} {team_leader.last_name}" if team_leader else None
+                    
+                    send_team_application_notification(
+                        user_email=user.email,
+                        user_name=f"{user.first_name} {user.last_name}",
+                        team_name=team.name,
+                        is_accepted=accepted,
+                        leader_name=leader_name
+                    )
+                    
+            elif application.action == ActionEnum.join_tournament:
+                # Notificación para solicitud de unirse a torneo
+                team = Team.query.get(application.teamID)
+                tournament = Tournament.query.get(application.tournamentID)
+                
+                if team and tournament:
+                    # Buscar el líder del equipo
+                    team_leader = User.query.filter_by(team_id=team.id, is_leader=True).first()
+                    
+                    if team_leader:
+                        send_tournament_application_notification(
+                            leader_email=team_leader.email,
+                            leader_name=f"{team_leader.first_name} {team_leader.last_name}",
+                            team_name=team.name,
+                            tournament_name=tournament.name,
+                            is_accepted=accepted
+                        )
+                        
+            elif application.action in [ActionEnum.do_payment, ActionEnum.receive_payment]:
+                # Notificación para solicitud de pago
+                team = Team.query.get(application.teamID)
+                payment = Payment.query.filter_by(application_id=application.id).first()
+                
+                if team and payment:
+                    # Buscar el líder del equipo
+                    team_leader = User.query.filter_by(team_id=team.id, is_leader=True).first()
+                    
+                    if team_leader:
+                        send_payment_application_notification(
+                            leader_email=team_leader.email,
+                            leader_name=f"{team_leader.first_name} {team_leader.last_name}",
+                            team_name=team.name,
+                            payment_type=application.action.name,
+                            amount=payment.amount,
+                            is_accepted=accepted
+                        )
+        except Exception as e:
+            print(f"Error enviando notificación por email: {str(e)}")
+            # No fallar la operación principal si falla el envío de email
 
         if not accepted:
             application.status = StatusEnum.rejected
@@ -740,10 +798,8 @@ def handle_application():
             if accepted and application.action == ActionEnum.join_team:
                 approved_join_team(application)
             elif accepted and application.action == ActionEnum.join_tournament:
-              
                 approved_join_tournament(application)
             elif accepted and (application.action == ActionEnum.do_payment or application.action == ActionEnum.receive_payment):
-               
                 approved_do_payment(application)
             else:
                 return jsonify({"error": "Tipo de acción no válida"}), 400
@@ -753,16 +809,13 @@ def handle_application():
             return jsonify({"message": "La aplicación ha sido procesada exitosamente"}), 200
 
         except APIException as e:
-          
             db.session.rollback()
             return jsonify({"error": str(e)}), e.status_code
         except Exception as e:
-        
             db.session.rollback()
             return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
     except Exception as e:
-    
         return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
 @api.route('/applications/team/<int:team_id>', methods=['GET'])
