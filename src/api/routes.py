@@ -310,6 +310,9 @@ def create_tournament():
     game = data.get('game')
     cost = data.get('cost', 10)  
     prize = data.get('prize')
+    match_format = data.get('match_format', 'best_of_3')
+    final_format = data.get('final_format', 'best_of_5')
+    custom_rules = data.get('custom_rules', '')
 
     if not name or not date_start or not num_max_teams or not game or not prize:
         return jsonify({"error": "Faltan datos"}), 400
@@ -332,6 +335,16 @@ def create_tournament():
     if prize <= 0:
         return jsonify({"error": "El premio debe ser un valor positivo"}), 400
 
+    # Validar formatos de partida
+    valid_match_formats = ['best_of_1', 'best_of_3', 'best_of_5']
+    valid_final_formats = ['best_of_3', 'best_of_5', 'best_of_7']
+    
+    if match_format not in valid_match_formats:
+        return jsonify({"error": f"Formato de partida inválido. Formatos válidos: {', '.join(valid_match_formats)}"}), 400
+    
+    if final_format not in valid_final_formats:
+        return jsonify({"error": f"Formato de final inválido. Formatos válidos: {', '.join(valid_final_formats)}"}), 400
+
     try:
         # Convertir el juego al enum correspondiente
         game_obj = Game.query.filter_by(name=game).first()
@@ -353,7 +366,10 @@ def create_tournament():
                 num_max_teams=num_max_teams,
                 game_id=game_obj.id,
                 cost=cost,
-                prize=prize
+                prize=prize,
+                match_format=match_format,
+                final_format=final_format,
+                custom_rules=custom_rules
             )
             db.session.add(new_tournament)
             db.session.commit()
@@ -1759,3 +1775,76 @@ def delete_bank(bank_id):
     db.session.commit()
     
     return jsonify({"message": "Banco eliminado exitosamente"}), 200
+
+@api.route('/tournament-rules', methods=['GET'])
+def get_tournament_rules():
+    """Obtener las reglas estándar de torneos"""
+    standard_rules = {
+        "general_rules": [
+            "No se permite el uso de trampas.",
+            "En caso de desconexión o falla técnica por parte de un usuario, el equipo contrario tomará la decisión de rehacer la partida o no.",
+            "Se debe tener conducta deportiva y no se permitirá el acoso, abuso, acciones de odio ni conductas indebidas.",
+            "Cualquier programa que altere el juego está prohibido.",
+            "Se permite el uso de cualquier software de comunicación para el equipo."
+        ],
+        "penalties": [
+            "Partida perdida",
+            "Descalificación", 
+            "Baneo del equipo"
+        ],
+        "warning": "Se advierte a todo participante que se tomará alguna de las siguientes sanciones en caso de violar estas reglas:"
+    }
+    
+    return jsonify(standard_rules), 200
+
+@api.route('/tournament-rules/<tournament_id>', methods=['GET'])
+def get_tournament_rules_by_id(tournament_id):
+    """Obtener las reglas de un torneo específico"""
+    try:
+        tournament = Tournament.query.get(tournament_id)
+        if not tournament:
+            return jsonify({"error": "Torneo no encontrado"}), 404
+
+        # Reglas estándar
+        standard_rules = {
+            "general_rules": [
+                "No se permite el uso de trampas.",
+                "En caso de desconexión o falla técnica por parte de un usuario, el equipo contrario tomará la decisión de rehacer la partida o no.",
+                "Se debe tener conducta deportiva y no se permitirá el acoso, abuso, acciones de odio ni conductas indebidas.",
+                "Cualquier programa que altere el juego está prohibido.",
+                "Se permite el uso de cualquier software de comunicación para el equipo."
+            ],
+            "penalties": [
+                "Partida perdida",
+                "Descalificación", 
+                "Baneo del equipo"
+            ],
+            "warning": "Se advierte a todo participante que se tomará alguna de las siguientes sanciones en caso de violar estas reglas:"
+        }
+
+        # Formatear formatos de partida
+        format_map = {
+            'best_of_1': 'Mejor de 1',
+            'best_of_3': 'Mejor de 3',
+            'best_of_5': 'Mejor de 5',
+            'best_of_7': 'Mejor de 7'
+        }
+
+        tournament_rules = {
+            "tournament": {
+                "id": str(tournament.id),
+                "name": tournament.name,
+                "date_start": tournament.date_start,
+                "game": tournament.game.name if tournament.game else None,
+                "cost": tournament.cost,
+                "prize": tournament.prize,
+                "match_format": format_map.get(tournament.match_format, tournament.match_format),
+                "final_format": format_map.get(tournament.final_format, tournament.final_format),
+                "custom_rules": tournament.custom_rules
+            },
+            "standard_rules": standard_rules
+        }
+        
+        return jsonify(tournament_rules), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

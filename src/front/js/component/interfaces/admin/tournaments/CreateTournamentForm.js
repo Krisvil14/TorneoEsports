@@ -11,6 +11,9 @@ export default function CreateTournamentForm() {
     const [game, setGame] = useState('');
     const [cost, setCost] = useState(10);
     const [prize, setPrize] = useState('');
+    const [match_format, setMatchFormat] = useState('best_of_3');
+    const [final_format, setFinalFormat] = useState('best_of_5');
+    const [custom_rules, setCustomRules] = useState('');
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -47,6 +50,9 @@ export default function CreateTournamentForm() {
         formData.append('game', game);
         formData.append('cost', cost);
         formData.append('prize', prize);
+        formData.append('match_format', match_format);
+        formData.append('final_format', final_format);
+        formData.append('custom_rules', custom_rules);
 
         const notification = toast.loading('Creando torneo...');
 
@@ -179,6 +185,51 @@ export default function CreateTournamentForm() {
                         value={prize}
                         onChange={({ target }) => setPrize(target.value)}
                         required
+                        className="gaming-form-input form-control"
+                    />
+                </div>
+
+                <div className="gaming-form-group">
+                    <label className="gaming-form-label" htmlFor="match_format">Formato de Partida:</label>
+                    <select
+                        id="match_format"
+                        name="match_format"
+                        value={match_format}
+                        onChange={({ target }) => setMatchFormat(target.value)}
+                        required
+                        className="gaming-form-input form-control"
+                    >
+                        <option value="best_of_1">Mejor de 1</option>
+                        <option value="best_of_3">Mejor de 3</option>
+                        <option value="best_of_5">Mejor de 5</option>
+                    </select>
+                </div>
+
+                <div className="gaming-form-group">
+                    <label className="gaming-form-label" htmlFor="final_format">Formato de Final:</label>
+                    <select
+                        id="final_format"
+                        name="final_format"
+                        value={final_format}
+                        onChange={({ target }) => setFinalFormat(target.value)}
+                        required
+                        className="gaming-form-input form-control"
+                    >
+                        <option value="best_of_3">Mejor de 3</option>
+                        <option value="best_of_5">Mejor de 5</option>
+                        <option value="best_of_7">Mejor de 7</option>
+                    </select>
+                </div>
+
+                <div className="gaming-form-group">
+                    <label className="gaming-form-label" htmlFor="custom_rules">Reglas Adicionales (Opcional):</label>
+                    <textarea
+                        id="custom_rules"
+                        name="custom_rules"
+                        value={custom_rules}
+                        onChange={({ target }) => setCustomRules(target.value)}
+                        rows="4"
+                        placeholder="Agregue reglas adicionales específicas para este torneo..."
                         className="gaming-form-input form-control"
                     />
                 </div>

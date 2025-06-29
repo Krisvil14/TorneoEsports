@@ -441,4 +441,65 @@ body {
     font-weight: bold;
     margin: 0;
     text-shadow: 0 0 8px rgba(0, 255, 247, 0.5);
+}
+
+/* Estilos para textarea */
+.gaming-form-input[type="textarea"],
+.gaming-form-input textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Estilos específicos para el textarea de reglas */
+.gaming-form-input[name="custom_rules"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    color: #e0e0e0;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.gaming-form-input[name="custom_rules"]:focus {
+    border-color: #4a90e2;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.3);
+    outline: none;
+}
+
+.gaming-form-input[name="custom_rules"]::placeholder {
+    color: rgba(224, 224, 224, 0.6);
+    font-style: italic;
+}
+
+/* Estilos para los nuevos campos de formato */
+.gaming-form-group:has(select[name="match_format"]),
+.gaming-form-group:has(select[name="final_format"]) {
+    margin-bottom: 20px;
+}
+
+.gaming-form-group:has(select[name="match_format"]) label,
+.gaming-form-group:has(select[name="final_format"]) label {
+    color: #4a90e2;
+    font-weight: bold;
+}
+
+.gaming-form-group:has(textarea[name="custom_rules"]) {
+    margin-bottom: 25px;
+}
+
+.gaming-form-group:has(textarea[name="custom_rules"]) label {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+/* Indicador visual para campos opcionales */
+.gaming-form-label[for="custom_rules"]::after {
+    content: " (Opcional)";
+    color: rgba(255, 193, 7, 0.7);
+    font-size: 0.9em;
+    font-weight: normal;
 } 

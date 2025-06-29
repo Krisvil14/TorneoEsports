@@ -149,6 +149,28 @@ export default function TournamentsAdminInterface() {
             Cell: ({ row }) => `${row.num_teams}/${row.num_max_teams}`
         },
         {
+            header: 'Formato',
+            accessor: 'match_format',
+            Cell: ({ row }) => {
+                const formatMap = {
+                    'best_of_1': 'Mejor de 1',
+                    'best_of_3': 'Mejor de 3',
+                    'best_of_5': 'Mejor de 5'
+                };
+                const finalFormatMap = {
+                    'best_of_3': 'Mejor de 3',
+                    'best_of_5': 'Mejor de 5',
+                    'best_of_7': 'Mejor de 7'
+                };
+                return (
+                    <div>
+                        <div><strong>Partida:</strong> {formatMap[row.match_format] || row.match_format}</div>
+                        <div><strong>Final:</strong> {finalFormatMap[row.final_format] || row.final_format}</div>
+                    </div>
+                );
+            }
+        },
+        {
             header: 'Iniciado',
             accessor: 'started',
             Cell: ({ value }) => value ? '✅' : '❌'

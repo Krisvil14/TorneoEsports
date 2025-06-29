@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Table from '../../commons/Table';
 import TournamentBrackets from '../../commons/TournamentBrackets';
 import { Context } from '../../../store/appContext';
+import { useNavigate } from 'react-router-dom';
 import '../../../../styles/tournaments.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,8 +16,10 @@ export default function TournamentsInterface() {
   const [teamBalance, setTeamBalance] = useState(0);
   const [teamMembersCount, setTeamMembersCount] = useState(0);
   const [teamMaxPlayers, setTeamMaxPlayers] = useState(5);
+  const [tournamentRules, setTournamentRules] = useState(null);
   const { store } = useContext(Context);
   const user = store.user;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTournaments = async () => {
@@ -67,6 +70,15 @@ export default function TournamentsInterface() {
               if (tournamentResponse.ok) {
                 const tournamentData = await tournamentResponse.json();
                 setTeamTournament(tournamentData);
+                
+                // Cargar las reglas del torneo
+                const rulesResponse = await fetch(
+                  process.env.BACKEND_URL + `/api/tournament-rules/${teamData.tournament_id}`
+                );
+                if (rulesResponse.ok) {
+                  const rulesData = await rulesResponse.json();
+                  setTournamentRules(rulesData);
+                }
               } else {
                 console.error(
                   'Error fetching tournament:',
@@ -87,31 +99,18 @@ export default function TournamentsInterface() {
     fetchTeamInfo();
   }, [user]);
 
-  const handleJoinTournament = async (tournamentId) => {
-    try {
-      const response = await fetch(
-        process.env.BACKEND_URL + '/api/team-requests',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            team_id: teamId,
-            tournament_id: tournamentId,
-          }),
-        }
-      );
+  const handleViewRules = (tournamentId) => {
+    navigate(`/tournament-rules/${tournamentId}`);
+  };
 
-      if (response.ok) {
-        toast.success('Solicitud enviada exitosamente');
-      } else {
-        const data = await response.json();
-        toast.error(data.error || 'Error al enviar la solicitud');
-      }
-    } catch (error) {
-      console.error('Error sending tournament request:', error);
-      toast.error('Error al enviar la solicitud');
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const datePart = dateString.split('T')[0];
+      const [year, month, day] = datePart.split('-');
+      return `${day}/${month}/${year}`;
+    } catch (e) {
+      return dateString;
     }
   };
 
@@ -161,12 +160,12 @@ export default function TournamentsInterface() {
           
           return (
             <button
-              onClick={() => handleJoinTournament(row.id)}
+              onClick={() => handleViewRules(row.id)}
               className={`join-tournament-button ${!canJoin ? 'disabled' : ''}`}
               disabled={!canJoin}
               title={tooltipMessage}
             >
-              Solicitar Unirse
+              Ver Reglas y Unirse
             </button>
           );
         }
@@ -179,6 +178,49 @@ export default function TournamentsInterface() {
   const filteredTournaments = tournaments.filter(
     (tournament) => tournament.game === teamGame && tournament.finished !== true
   );
+
+  // Componente para mostrar las reglas del torneo actual
+  const TournamentRulesDisplay = ({ tournament, rules }) => {
+    if (!tournament || !rules) return null;
+
+    const { standard_rules } = rules;
+
+    return (
+      <div className="tournament-rules-display">
+        <h3>Reglas del Torneo</h3>
+        
+        <div className="tournament-info">
+          <h4>Información del Torneo</h4>
+          <p><strong>Formato de Partida:</strong> {tournament.match_format}</p>
+          <p><strong>Formato de Final:</strong> {tournament.final_format}</p>
+          {tournament.custom_rules && (
+            <div className="custom-rules">
+              <h5>Reglas Adicionales:</h5>
+              <p>{tournament.custom_rules}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="standard-rules">
+          <h4>Reglas Estándar</h4>
+          <ul>
+            {standard_rules.general_rules.map((rule, index) => (
+              <li key={index}>{rule}</li>
+            ))}
+          </ul>
+          
+          <div className="penalties-section">
+            <p><strong>{standard_rules.warning}</strong></p>
+            <ul>
+              {standard_rules.penalties.map((penalty, index) => (
+                <li key={index}>• {penalty}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (!user) {
     return <div className="tournaments-container">Loading...</div>;
@@ -210,6 +252,10 @@ export default function TournamentsInterface() {
           <div className="tournaments-table">
             <Table columns={columns} data={[teamTournament]} />
           </div>
+          
+          {/* Mostrar las reglas del torneo */}
+          <TournamentRulesDisplay tournament={tournamentRules?.tournament} rules={tournamentRules} />
+          
           {teamTournament.started && (
             <div className="tournament-brackets-container">
               <h2 className="text-center">Brackets del Torneo</h2>

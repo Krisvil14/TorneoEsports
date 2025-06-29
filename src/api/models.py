@@ -129,6 +129,9 @@ class Tournament(db.Model):
     started = db.Column(db.Boolean, default=False, nullable=True)
     finished = db.Column(db.Boolean, default=False, nullable=True)
     prize = db.Column(db.Integer, nullable=False, default=0)
+    match_format = db.Column(db.String(50), nullable=False, default='best_of_3')
+    final_format = db.Column(db.String(50), nullable=False, default='best_of_5')
+    custom_rules = db.Column(db.Text, nullable=True)
 
     # Relationships
     game = relationship("Game", back_populates="tournaments")
@@ -154,7 +157,10 @@ class Tournament(db.Model):
             "cost": self.cost,
             "started": self.started,
             "finished": self.finished,
-            "prize": self.prize
+            "prize": self.prize,
+            "match_format": self.match_format,
+            "final_format": self.final_format,
+            "custom_rules": self.custom_rules
         }
 
 class Team(db.Model):

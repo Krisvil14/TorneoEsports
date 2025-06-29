@@ -17,6 +17,7 @@ import Protected from './component/commons/Protected';
 import RegTeamsForm from './component/teams/RegTeamsForm';
 import ProfilePage from './pages/profile';
 import TournamentsPage from './pages/tournaments';
+import TournamentRulesPage from './pages/tournamentRules';
 import CreateTournamentForm from './component/interfaces/admin/tournaments/CreateTournamentForm';
 import AddTeamToTournament from './component/interfaces/admin/tournaments/AddTeamToTournament';
 import AddPlayerToTeam from './component/interfaces/admin/users/AddPlayerToTeam';
@@ -72,6 +73,7 @@ const Layout = () => {
             <Route element={<Protected> <Navbar /><ProfilePage /> </Protected>}path="/profile" />
             <Route element={<Protected> <Navbar /><EditProfilePage /> </Protected>}path="/editProfile" />
             <Route element={<Protected> <Navbar /><TournamentsPage /> </Protected>}path="/tournaments" />
+            <Route element={<Protected> <Navbar /><TournamentRulesPage /> </Protected>}path="/tournament-rules/:tournamentId" />
             <Route element={<Protected> <Navbar /><TeamInfoUser /> </Protected>}path="/busca-equipo/:teamId" />
             <Route element={<Protected> <Navbar /><TeamInfo /> </Protected>}path="/teamInfo/:teamId" />
             <Route element={<Protected> <Navbar /><PaymentsPage /> </Protected>}path="/payments" />
@@ -81,7 +83,7 @@ const Layout = () => {
             <Route element={<Protected> <Navbar /><BuscaEquipo /> </Protected>}path="/busca-equipo" />
             <Route element={<Protected> <Navbar /><RankingInterface /> </Protected>}path="/ranking" />
 
-            <Route element={<Protected> <Navbar /><TeamInfoAdmin /> </Protected>}path="/admin/teamInfo/:teamId" />
+            <Route element={<Protected requiredRole="admin"> <Navbar /><TeamInfoAdmin /> </Protected>}path="/admin/teamInfo/:teamId" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><AdminCreateTeamPage /> </Protected>}path="/admin/create-team" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><CreateTournamentForm /> </Protected>}path="/admin/create_tournament" />
             <Route element={<Protected requiredRole="admin"> <Navbar /><AddTeamToTournament /> </Protected>}path="/admin/addteam/:tournament_id" />
