@@ -163,9 +163,9 @@ export default function TournamentsAdminInterface() {
                     'best_of_7': 'Mejor de 7'
                 };
                 return (
-                    <div>
-                        <div><strong>Partida:</strong> {formatMap[row.match_format] || row.match_format}</div>
-                        <div><strong>Final:</strong> {finalFormatMap[row.final_format] || row.final_format}</div>
+                    <div className="format-column">
+                        <div className="format-item"><strong>Partida:</strong> {formatMap[row.match_format] || row.match_format}</div>
+                        <div className="format-item"><strong>Final:</strong> {finalFormatMap[row.final_format] || row.final_format}</div>
                     </div>
                 );
             }

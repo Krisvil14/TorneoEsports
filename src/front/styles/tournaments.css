@@ -96,8 +96,6 @@
     border-bottom: 2px solid #00ffff;
 }
 
-
-
 /* Table Body */
 .tournaments-table tbody td {
     background-color: #333 !important;
@@ -1120,4 +1118,23 @@ body.modal-open {
         width: 100%;
         max-width: 300px;
     }
+}
+
+/* Estilos para la columna de formato en la tabla de administradores */
+.format-column {
+    color: white;
+}
+
+.format-item {
+    color: white;
+    margin-bottom: 5px;
+}
+
+.format-item:last-child {
+    margin-bottom: 0;
+}
+
+.format-item strong {
+    color: #4a90e2;
+    font-weight: bold;
 } 
