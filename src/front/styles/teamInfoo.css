@@ -249,7 +249,7 @@
 }
 
 .custom-modal-content {
-    background: #1e1e1e;
+    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff) !important;
     border-radius: 12px;
     padding: 2rem;
     position: relative;
@@ -339,6 +339,7 @@
 
 .custom-modal-buttons {
     display: flex;
+    background: transparent !important;
     justify-content: center;
     gap: 1.5rem;
     margin-top: 1.5rem;

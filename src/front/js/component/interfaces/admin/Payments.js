@@ -87,6 +87,8 @@ export default function AdminPaymentsInterface() {
     };
 
     const handleApprove = async (applicationId) => {
+        const notification = toast.loading('Procesando solicitud de pago...');
+        
         try {
             const response = await fetch(process.env.BACKEND_URL + '/api/handle_application', {
                 method: 'POST',
@@ -103,15 +105,27 @@ export default function AdminPaymentsInterface() {
                 throw new Error('Error al aprobar la solicitud');
             }
 
-            toast.success('Solicitud aprobada exitosamente');
+            toast.update(notification, {
+                render: 'Solicitud aprobada exitosamente',
+                type: 'success',
+                autoClose: 5000,
+                isLoading: false,
+            });
             fetchPaymentRequests();
             setShowDetails(false);
         } catch (error) {
-            toast.error(error.message);
+            toast.update(notification, {
+                render: error.message,
+                type: 'error',
+                autoClose: 5000,
+                isLoading: false,
+            });
         }
     };
 
     const handleReject = async (applicationId) => {
+        const notification = toast.loading('Procesando solicitud de pago...');
+        
         try {
             const response = await fetch(process.env.BACKEND_URL + '/api/handle_application', {
                 method: 'POST',
@@ -128,11 +142,21 @@ export default function AdminPaymentsInterface() {
                 throw new Error('Error al rechazar la solicitud');
             }
 
-            toast.success('Solicitud rechazada exitosamente');
+            toast.update(notification, {
+                render: 'Solicitud rechazada exitosamente',
+                type: 'success',
+                autoClose: 5000,
+                isLoading: false,
+            });
             fetchPaymentRequests();
             setShowDetails(false);
         } catch (error) {
-            toast.error(error.message);
+            toast.update(notification, {
+                render: error.message,
+                type: 'error',
+                autoClose: 5000,
+                isLoading: false,
+            });
         }
     };
 

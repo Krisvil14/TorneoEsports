@@ -176,7 +176,7 @@ export default function TournamentsInterface() {
 
   // Filtrar torneos por el juego del equipo y que no estén finalizados
   const filteredTournaments = tournaments.filter(
-    (tournament) => tournament.game === teamGame && tournament.finished !== true
+    (tournament) => tournament.game === teamGame && tournament.finished !== true && tournament.started !== true
   );
 
   // Componente para mostrar las reglas del torneo actual

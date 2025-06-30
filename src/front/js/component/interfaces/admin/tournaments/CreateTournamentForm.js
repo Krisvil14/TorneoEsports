@@ -222,7 +222,7 @@ export default function CreateTournamentForm() {
                 </div>
 
                 <div className="gaming-form-group">
-                    <label className="gaming-form-label" htmlFor="custom_rules">Reglas Adicionales (Opcional):</label>
+                    <label className="gaming-form-label" htmlFor="custom_rules">Reglas Adicionales:</label>
                     <textarea
                         id="custom_rules"
                         name="custom_rules"

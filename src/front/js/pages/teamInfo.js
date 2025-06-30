@@ -128,6 +128,16 @@ export default function TeamInfo() {
                 return;
             }
 
+            const notification = toast.loading('Procesando solicitud de equipo...', {
+                position: "top-right",
+                autoClose: false,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
             const response = await fetch(process.env.BACKEND_URL + '/api/handle_application', {
                 method: 'POST',
                 headers: {
@@ -146,9 +156,12 @@ export default function TeamInfo() {
             }
 
             // Mostrar toast de éxito
-            toast.success(accepted ? 'Solicitud aceptada exitosamente' : 'Solicitud rechazada exitosamente', {
-                position: "top-right",
+            toast.update(notification, {
+                render: accepted ? 'Solicitud aceptada exitosamente' : 'Solicitud rechazada exitosamente',
+                type: 'success',
                 autoClose: 5000,
+                isLoading: false,
+                position: "top-right",
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -188,6 +201,16 @@ export default function TeamInfo() {
                 return;
             }
 
+            const notification = toast.loading('Eliminando jugador del equipo...', {
+                position: "top-right",
+                autoClose: false,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+
             const response = await fetch(process.env.BACKEND_URL + `/api/teams/${teamId}/remove_player`, {
                 method: 'POST',
                 headers: {
@@ -205,9 +228,12 @@ export default function TeamInfo() {
                 throw new Error(errorData.error || 'Error al eliminar al jugador');
             }
 
-            toast.success('Jugador eliminado del equipo exitosamente', {
-                position: "top-right",
+            toast.update(notification, {
+                render: 'Jugador eliminado del equipo exitosamente',
+                type: 'success',
                 autoClose: 5000,
+                isLoading: false,
+                position: "top-right",
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,

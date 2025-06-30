@@ -12,6 +12,7 @@ export default function TeamInfoUser() {
     const [team, setTeam] = useState(null);
     const [users, setUsers] = useState([]);
     const [hasRequested, setHasRequested] = useState(false);
+    const [teamStats, setTeamStats] = useState(null);
     const { store } = React.useContext(Context);
 
     useEffect(() => {
@@ -32,6 +33,16 @@ export default function TeamInfoUser() {
                 setUsers(data);
             } catch (error) {
                 console.error('Error fetching users:', error);
+            }
+        };
+
+        const fetchTeamStats = async () => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + `/api/teams/${teamId}/stats`);
+                const data = await response.json();
+                setTeamStats(data);
+            } catch (error) {
+                console.error('Error fetching team stats:', error);
             }
         };
 
@@ -65,6 +76,7 @@ export default function TeamInfoUser() {
 
         fetchTeam();
         fetchUsers();
+        fetchTeamStats();
         checkRequestStatus();
     }, [teamId, store.user]);
 
@@ -119,18 +131,12 @@ export default function TeamInfoUser() {
 
     const usersData = users.map(user => ({
         Nombre: user.first_name,
-        Apellido: user.last_name,
-        Cedula: user.cedula,
-        Correo: user.email,
-        Edad: user.age
+        Apellido: user.last_name
     }));
 
     const usersColumns = [
         { header: "Nombre", accessor: "Nombre" },
-        { header: "Apellido", accessor: "Apellido" },
-        { header: "Cedula", accessor: "Cedula" },
-        { header: "Correo", accessor: "Correo" },
-        { header: "Edad", accessor: "Edad" }
+        { header: "Apellido", accessor: "Apellido" }
     ];
 
     return (
@@ -157,6 +163,82 @@ export default function TeamInfoUser() {
                     <h3>Detalles del Equipo</h3>
                     <div className="team-info-table">
                         <Table data={teamData} columns={teamColumns} />
+                    </div>
+                </div>
+
+                <div className="team-info-section">
+                    <h3>Estadísticas del Equipo</h3>
+                    <div className="team-stats-grid">
+                        <div className="team-stat-card games">
+                            <div className="team-stat-icon">🎮</div>
+                            <div className="team-stat-info">
+                                <h4>Partidos Jugados</h4>
+                                <p>{teamStats?.games_count || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card wins">
+                            <div className="team-stat-icon">🏆</div>
+                            <div className="team-stat-info">
+                                <h4>Victorias</h4>
+                                <p>{teamStats?.games_win || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card losses">
+                            <div className="team-stat-icon">💔</div>
+                            <div className="team-stat-info">
+                                <h4>Derrotas</h4>
+                                <p>{teamStats?.games_lose || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card tournaments-played">
+                            <div className="team-stat-icon">🏅</div>
+                            <div className="team-stat-info">
+                                <h4>Torneos Jugados</h4>
+                                <p>{teamStats?.tournament_count || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card tournaments-won">
+                            <div className="team-stat-icon">🥇</div>
+                            <div className="team-stat-info">
+                                <h4>Torneos Ganados</h4>
+                                <p>{teamStats?.tournament_win || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card tournaments-lost">
+                            <div className="team-stat-icon">🥈</div>
+                            <div className="team-stat-info">
+                                <h4>Torneos Perdidos</h4>
+                                <p>{teamStats?.tournament_loses || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card kills">
+                            <div className="team-stat-icon">🎯</div>
+                            <div className="team-stat-info">
+                                <h4>Kills Totales</h4>
+                                <p>{teamStats?.total_kills || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card assists">
+                            <div className="team-stat-icon">🤝</div>
+                            <div className="team-stat-info">
+                                <h4>Asistencias Totales</h4>
+                                <p>{teamStats?.total_assists || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card deaths">
+                            <div className="team-stat-icon">💀</div>
+                            <div className="team-stat-info">
+                                <h4>Muertes Totales</h4>
+                                <p>{teamStats?.total_deaths || 0}</p>
+                            </div>
+                        </div>
+                        <div className="team-stat-card kda">
+                            <div className="team-stat-icon">📊</div>
+                            <div className="team-stat-info">
+                                <h4>KDA del Equipo</h4>
+                                <p>{teamStats?.team_kda ? teamStats.team_kda.toFixed(2) : '0.00'}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

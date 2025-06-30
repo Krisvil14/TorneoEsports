@@ -323,6 +323,8 @@ export default function TournamentRequests() {
   }, [tournamentId]);
 
   const handleApplication = async (applicationId, accepted) => {
+    const notification = toast.loading('Procesando solicitud de torneo...');
+    
     try {
       const response = await fetch(
         process.env.BACKEND_URL + '/api/handle_application',
@@ -343,15 +345,23 @@ export default function TournamentRequests() {
         throw new Error(errorData.error || 'Error al procesar la solicitud');
       }
 
-      toast.success(
-        accepted
+      toast.update(notification, {
+        render: accepted
           ? 'Solicitud aceptada exitosamente'
-          : 'Solicitud rechazada exitosamente'
-      );
+          : 'Solicitud rechazada exitosamente',
+        type: 'success',
+        autoClose: 5000,
+        isLoading: false,
+      });
       window.location.reload();
     } catch (error) {
       console.error('Error handling application:', error);
-      toast.error(error.message || 'Error al procesar la solicitud');
+      toast.update(notification, {
+        render: error.message || 'Error al procesar la solicitud',
+        type: 'error',
+        autoClose: 5000,
+        isLoading: false,
+      });
     }
   };
 
